@@ -35,7 +35,7 @@ c7 = Connection(v_in, 'out1', kd, 'in2', label='7')
 c8 = Connection(kd, 'out2', v_aus, 'in1', label='8')
 nw.add_conns(c1, c2, c3, c4, c0, c5, c6, c7, c8)
 
-kd.set_attr(pr1=1, pr2=2, Q=750)
+kd.set_attr(pr1=1, pr2=1, Q=750)
 c2.set_attr(fluid={'R245FA': 1})
 vd.set_attr(pr1=1, pr2=1)
 kp.set_attr(eta_s=1)
