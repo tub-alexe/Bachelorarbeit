@@ -38,7 +38,7 @@ kd.set_attr(pr1=1, pr2=2)
 c1.set_attr(T=30,fluid={'R134A': 1})
 c4.set_attr(T=125,p=4,47, fluid={'R134A': 1})
 c7.set_attr(T=113, fluid={'air': 1})
-kp.set_attr(eta_s=1)
+kp.set_attr(eta_s=0.85)
 
 nw.solve(mode='design')
 nw.print_results()
