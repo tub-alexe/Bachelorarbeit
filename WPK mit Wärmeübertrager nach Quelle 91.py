@@ -1,4 +1,4 @@
-#Wärmepumpenkreislauf mit innerem Wärmeübertrager
+#Wärmepumpenkreislauf mit innerem Wärmeübertrager nach Quelle 91 von Fukuda in adamson
 
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, HeatExchangerSimple, Sink, Source, CycleCloser, Compressor,Valve)
