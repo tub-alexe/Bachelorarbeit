@@ -29,16 +29,19 @@ c4 = Connection(kd, 'out1', exp, 'in1')
 c5 = Connection(exp, 'out1', schluss, 'in1')
 c6 = Connection(k_in, 'out1', kd, 'in2')
 c7 = Connection(kd, 'out2', k_aus, 'in1')
-nw.add_conns(c1, c2, c3, c4, c0, c5, c6, c7)
+nw.add_conns(c1, c2, c3, c4, c5, c6, c7)
 
 #Parametrisierung
 
 vd.set_attr(pr=1)
 kd.set_attr(pr1=1, pr2=2)
-c1.set_attr(T=30,fluid={'R134A': 1})
-c4.set_attr(T=125,p=4,47, fluid={'R134A': 1})
+c1.set_attr(T=30, fluid={'R134A': 1})
+c3.set_attr(T=125, p=4.47, fluid={'R134A': 1})
 c7.set_attr(T=113, fluid={'air': 1})
+c6.set_attr(fluid={'air': 1})
 kp.set_attr(eta_s=0.85)
+
+#Lösen
 
 nw.solve(mode='design')
 nw.print_results()
