@@ -73,3 +73,5 @@ nw.print_results()
 print(f'COP1 = {abs(iwt.Q.val) / kp1.P.val}')
 print(f'COP2 = {abs(kd.Q.val) / kp2.P.val}')
 print(f'COP = {abs(kd.Q.val) / (kp1.P.val+kp2.P.val)}')
+
+#warum haben beide Expansionsventiel laut Programm das gleiche Label
