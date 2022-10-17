@@ -6,6 +6,7 @@ from tespy.connections import Connection
 
 nw = Network(fluids=['R1234ZE(Z)', 'H2O'], T_unit='C', p_unit='bar',
              h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
+
 #Quellen und Senken
 
 k_in = Source('Kondensator rein')
@@ -51,4 +52,4 @@ kp.set_attr(eta_s=0.74)
 nw.solve(mode='design')
 nw.print_results()
 
-print(f'COP = {abs(co.Q.val) / cp.P.val}')
+print(f'COP = {abs(ko.Q.val) / kp.P.val}')

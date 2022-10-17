@@ -46,4 +46,4 @@ kp.set_attr(eta_s=0.85)
 nw.solve(mode='design')
 nw.print_results()
 
-print(f'COP = {abs(co.Q.val) / cp.P.val}')
+print(f'COP = {abs(ko.Q.val) / kp.P.val}')

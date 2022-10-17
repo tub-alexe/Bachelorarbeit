@@ -54,4 +54,4 @@ c11.set_attr(T=70, fluid={'air': 1})
 nw.solve(mode='design')
 nw.print_results()
 
-print(f'COP = {abs(co.Q.val) / cp.P.val}')
+print(f'COP = {abs(kd.Q.val) / kp.P.val}')
