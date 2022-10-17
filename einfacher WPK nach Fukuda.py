@@ -53,3 +53,5 @@ nw.solve(mode='design')
 nw.print_results()
 
 print(f'COP = {abs(ko.Q.val) / kp.P.val}')
+
+#Tabelle 3 in der Quelle sind Werte, wie bin man die Heat Transfer Rate ein, wie Degree of Subcool, Wärmeverluste

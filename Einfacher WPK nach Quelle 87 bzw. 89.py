@@ -47,3 +47,5 @@ nw.solve(mode='design')
 nw.print_results()
 
 print(f'COP = {abs(ko.Q.val) / kp.P.val}')
+
+#wie beziehe ich den Heat Recovery Ratio ein, sonst höchsten TA als weitere Daten

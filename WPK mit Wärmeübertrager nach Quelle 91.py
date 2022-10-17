@@ -55,3 +55,6 @@ nw.solve(mode='design')
 nw.print_results()
 
 print(f'COP = {abs(kd.Q.val) / kp.P.val}')
+
+#keinen Startwert nach dem CycleCloser,Temperaturdifferenzen gegeben, unklar was Pd/Ps heißt,
+#Frage ob generelle Einstellung von Verlusten beispielsweise fehlt

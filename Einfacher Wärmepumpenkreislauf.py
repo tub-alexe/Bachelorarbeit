@@ -1,6 +1,6 @@
 #Import
 from tespy.networks import Network
-from tespy.components import (HeatExchanger, Sink, Source, CycleCloser, Compressor,Valve)
+from tespy.components import (HeatExchanger, Sink, Source, CycleCloser, Compressor, Valve)
 from tespy.connections import Connection
 
 
