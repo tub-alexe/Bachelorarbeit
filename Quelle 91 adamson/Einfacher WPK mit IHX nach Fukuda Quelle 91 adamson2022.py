@@ -4,7 +4,7 @@ from tespy.networks import Network
 from tespy.components import (HeatExchanger, HeatExchangerSimple, Sink, Source, CycleCloser, Compressor,Valve)
 from tespy.connections import Connection
 
-nw = Network(fluids=['R1234ZE', 'N2', 'O2', 'Ar', 'CO2', 'air', 'H2O'], T_unit='C', p_unit='bar',
+nw = Network(fluids=['R1234ZE(Z)', 'N2', 'O2', 'Ar', 'CO2', 'air', 'H2O'], T_unit='C', p_unit='bar',
              h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW', )
 air = {'N2': 0.7551, 'O2': 0.2314, 'Ar': 0.129, 'CO2': 0.0006}
 
