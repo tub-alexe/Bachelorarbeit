@@ -27,9 +27,9 @@ nw.add_conns(c1, c2, c3, c4)
 
 vd.set_attr(pr1=1, pr2=1, ttd_l=2, ttd_u=5)
 c1.set_attr(T=80, fluid={'H2O': 1})
-c2.set_attr(T=70, fluid={'H2O': 1})
+c2.set_attr(T=70)
 c3.set_attr(fluid={'R1234ZE(Z)': 1})
-c4.set_attr(fluid={'R1234ZE(Z)': 1})
+
 
 # Lösen
 
