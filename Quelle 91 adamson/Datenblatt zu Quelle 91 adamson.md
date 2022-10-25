@@ -8,6 +8,6 @@ Kondensator: R1234ZE(Z), erst Enthitzung, bei x=1 Temperaturdifferenz 2K heiße 
 mit Unterkühlung, 5 Kelvin Temperaturdifferenz kalte Seite, Wasser wird von 70 auf 160 Grad Celsius erhitzt, 
 Massenstrom 0.2 kg/s
 
-Kompressor: ηise=0.85, ηmech=0.9, ηmotor=0.9
+Kompressor: η_s=0.85, η_mech=0.9, η_motor=0.9
 
 Annahme kein Druckverlust in den Wärmeübertragern
