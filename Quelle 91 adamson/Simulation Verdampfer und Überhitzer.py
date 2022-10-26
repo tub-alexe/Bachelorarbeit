@@ -2,7 +2,11 @@ from tespy.networks import Network
 from tespy.components import (HeatExchanger, Source, Sink)
 from tespy.connections import Connection
 
-nw = Network(fluids=['R1234ZE(Z)', 'H2O'], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
+
+km = 'R1234ZE(Z)'
+fld_wa = {km: 0, 'air': 1}
+fld_km = {km: 1, 'air': 0}
+nw = Network(fluids=[km, 'air'], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 vd_in = Source('Verdampfer rein')
 ue_aus = Sink ('Überhitzer raus')
@@ -28,9 +32,9 @@ nw.add_conns(c1, c2, c3, c4, c5, c6)
 
 vd.set_attr(pr1=1, pr2=1, ttd_l=2)
 ue.set_attr(pr1=1, pr2=1, ttd_u=5)
-c1.set_attr(T=80, fluid={'H2O': 1})
+c1.set_attr(T=80, p=1.2, m=1,  fluid=fld_wa)
 c3.set_attr(T=70)
-c4.set_attr(fluid={'R1234ZE(Z)': 1})
+c4.set_attr(x=0, fluid=fld_km)
 c5.set_attr(x=1)
 
 #Lösen
