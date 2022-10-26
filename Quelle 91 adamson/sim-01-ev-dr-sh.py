@@ -5,11 +5,12 @@ from CoolProp.CoolProp import PropsSI as CPSI
 
 # fluid names
 wf = 'R1234ZE(Z)'
-fld_wh = {wf: 0, 'H2O': 1}
-fld_wf = {wf: 1, 'H2O': 0}
+wh = 'air'
+fld_wh = {wf: 0, wh: 1}
+fld_wf = {wf: 1, wh: 0}
 
 # network
-nw = Network(fluids=[wf, 'H2O'], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s')
+nw = Network(fluids=[wf, wh], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s')
 
 # components
 
@@ -60,7 +61,7 @@ h_sh = CPSI("H", "P", p_evap, "T", 273.15 + 75, wf) / 1e3
 c15.set_attr(h=h_sh, fluid=fld_wf)
 
 # waste heat water
-c21.set_attr(m=1, p=1.2, T=80, fluid=fld_wh)
+c21.set_attr(m=1, p=1, T=80, fluid=fld_wh)
 c23.set_attr(T=70)
 
 # solve
