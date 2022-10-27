@@ -1,0 +1,58 @@
+from tespy.networks import Network
+from tespy.components import (HeatExchanger, Source, Sink)
+from tespy.connections import Connection
+
+km = 'R1234ZE(Z)'
+se = 'H2O'
+fld_km = {km: 1, se: 0}
+fld_se = {km: 0, se: 1}
+
+nw = Network(fluids=[km, se], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
+
+# Komponenten
+
+gk = HeatExchanger('Gaskühler')
+se_ein = Source('Senke ein')
+se_aus = Sink('Senke aus')
+kr_ein = Source('Kreislauf ein')
+kr_aus = Sink('Kreislauf aus')
+
+#Verbindungen heiße Seite
+
+c1 = Connection(kr_ein, 'out1', gk, 'in1')
+c2 = Connection(gk, 'out1', kr_aus, 'in1')
+
+#Verbindungen kalte Seite
+
+c3 = Connection(se_ein, 'out1', gk, 'in2')
+c4 = Connection(gk, 'out2', se_aus, 'in1')
+
+nw.add_conns(c1, c2, c3, c4)
+
+# Vor dem Gaskühler
+h_gk_vor = CPSI("H", "P", 36*1e5, "T", 273.15+204, km) * 1e-3
+c4.set_attr(h=h_verd)
+
+
+
+# Nach dem Gaskühler, Druck bleibt konstant im Gaskühler
+h_uebe = CPSI("H", "P", p_zw, "T", 273.15+75, km) * 1e-3
+c6.set_attr(h=h_uebe, fluid=fld_km)
+
+
+nw.solve(mode='design')
+nw.print_results()
+
+#Parametrisierung Komponenten
+
+#gk.set_attr(pr1=1, pr2=1)
+
+#Paramtrisierung Verbindungen heiße Seite
+
+#c1.set_attr(T=204, p=36)
+#c2.set_attr(T=105, fluid=fld_km)
+
+#Parametrisierung kalte Seite
+
+#c3.set_attr(T=100, m=1)
+#c4.set_attr(T=200, fluid=fld_se)

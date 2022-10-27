@@ -42,7 +42,3 @@ c5.set_attr(x=1)
 nw.solve(mode='design')
 nw.print_results()
 
-# leider immer noch nicht genug Parameter. Anstatt der Temperaturdifferenzen könnten die Temperaturen
-# aufgeschrieben werden.
-# So könnte man noch für c5 die gleiche Temperatur wie für c4 notieren und hätte einen Parameter mehr.
-# Selbst bei einer Vorgabe der Wärmemenge fehlen leider immer noch drei Parameter

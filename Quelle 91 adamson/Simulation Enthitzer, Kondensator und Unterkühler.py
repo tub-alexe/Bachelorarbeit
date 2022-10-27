@@ -34,10 +34,12 @@ c7 = Connection(ko, 'out2', unt, 'in2')
 c8 = Connection(unt, 'out2', unt_aus, 'in1')
 nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8)
 
+
+
 # Parametrisierung
 
 ent.set_attr(pr1=1, pr2=1, ttd_l=2)
-ko.set_attr(pr1=1, pr2=1, ttd_u=2)
+ko.set_attr(pr1=1, pr2=1)
 unt.set_attr(pr1=1, pr2=1, ttd_l=5)
 c1.set_attr(fluid=fld_km)
 c2.set_attr(x=1)
