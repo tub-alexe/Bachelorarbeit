@@ -4,7 +4,7 @@ from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
 
 # fluid names
-wf = 'R365MFC'
+wf = 'R601'
 wh = 'air'
 fld_wh = {wf: 0, wh: 1}
 fld_wf = {wf: 1, wh: 0}
@@ -47,13 +47,13 @@ cmp_sh.set_attr(pr1=1, pr2=1)
 # connections
 
 # working fluid saturation state
-h_sat = CPSI("H", "Q", 0, "T", 273.15 + 67, wf) / 1e3
+h_sat = CPSI("H", "Q", 0, "T", 273.15 + 70, wf) / 1e3
 c11.set_attr(h=h_sat)
 
 # evaporation pressure drum
-p_evap = CPSI("P", "Q", 1, "T", 273.15 + 67, wf) / 1e5
+p_evap = CPSI("P", "Q", 1, "T", 273.15 + 70, wf) / 1e5
 # enthalpy drum
-h_drum = CPSI("H", "Q", 0.5, "T", 273.15 + 67, wf) / 1e3
+h_drum = CPSI("H", "Q", 0.5, "T", 273.15 + 70, wf) / 1e3
 c13.set_attr(h=h_drum, p=p_evap)
 
 # working fluid superheated
@@ -68,5 +68,15 @@ c23.set_attr(T=70)
 
 nw.solve(mode='design')
 nw.print_results()
+
+#cmp_ev.set_attr(ttd_l=2)
+#cmp_sh.set_attr(ttd_u=5)
+#c11.set_attr(h=None, x=0)
+#c13.set_attr(h=None, p=None, x=1)
+#c15.set_attr(h=None)
+
+#nw.solve(mode='design')
+#nw.print_results()
+
 
 # funktioniert bei R365 MFC bei verändern der Temperatur um einen Kelvin, die anderen leider nicht

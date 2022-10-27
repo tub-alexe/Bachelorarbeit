@@ -20,7 +20,7 @@ nw.add_conns(c1, c2)
 # Parameter
 
 vd.set_attr(pr=1, Q=2)
-c1.set_attr(T=70,p=4, fluid={'H2O': 1})
+c1.set_attr(T=70, p=4, fluid={'H2O': 1})
 c2.set_attr(T=80)
 
 # Lösen
