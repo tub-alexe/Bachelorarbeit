@@ -11,8 +11,8 @@ nw = Network(fluids=[km, se], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit
 
 # Komponenten
 
-ent_ein = Source('Enthitzer rein')
-unt_aus = Sink('Unterkühler raus')
+unt_ein = Source('Enthitzer rein')
+ent_aus = Sink('Unterkühler raus')
 ent = HeatExchanger('Enthitzer')
 ko = HeatExchanger('Kondensator')
 unt = HeatExchanger('Unterkühler')
@@ -28,10 +28,10 @@ c4 = Connection(unt, 'out1', k_aus, 'in1')
 
 #Verbindungen kalte Seite
 
-c5 = Connection(ent_ein, 'out1', ent, 'in2')
-c6 = Connection(ent, 'out2', ko, 'in2')
-c7 = Connection(ko, 'out2', unt, 'in2')
-c8 = Connection(unt, 'out2', unt_aus, 'in1')
+c5 = Connection(unt_ein, 'out1', unt, 'in2')
+c6 = Connection(unt, 'out2', ko, 'in2')
+c7 = Connection(ko, 'out2', ent, 'in2')
+c8 = Connection(ent, 'out2', ent_aus, 'in1')
 nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8)
 
 

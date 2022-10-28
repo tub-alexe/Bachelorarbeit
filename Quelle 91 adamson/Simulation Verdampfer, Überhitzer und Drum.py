@@ -57,7 +57,7 @@ h_drum = CPSI("H", "Q", 0.5, "T", 273.15 + 70, wf) / 1e3
 c13.set_attr(h=h_drum, p=p_evap)
 
 # working fluid superheated
-h_sh = CPSI("H", "P", p_evap, "T", 273.15 + 75, wf) / 1e3
+h_sh = CPSI("H", "P", p_evap, "T", 273.15 + 75, wf) / 1e3 #muss der Druck 10^-5 muklipliziert werden?
 c15.set_attr(h=h_sh, fluid=fld_wf)
 
 # waste heat water
