@@ -1,6 +1,7 @@
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, Source, Sink)
 from tespy.connections import Connection
+from CoolProp.CoolProp import PropsSI as CPSI
 
 km = 'R1234ZE(Z)'
 se = 'H2O'
@@ -29,23 +30,21 @@ c4 = Connection(gk, 'out2', se_aus, 'in1')
 
 nw.add_conns(c1, c2, c3, c4)
 
-# Vor dem Gaskühler
-h_gk_vor = CPSI("H", "P", 36*1e5, "T", 273.15+204, km) * 1e-3
-c4.set_attr(h=h_verd)
-
-
-
-# Nach dem Gaskühler, Druck bleibt konstant im Gaskühler
-h_uebe = CPSI("H", "P", p_zw, "T", 273.15+75, km) * 1e-3
-c6.set_attr(h=h_uebe, fluid=fld_km)
-
-
-nw.solve(mode='design')
-nw.print_results()
-
 #Parametrisierung Komponenten
 
-#gk.set_attr(pr1=1, pr2=1)
+gk.set_attr(pr1=1, pr2=1, ttd_l=5)
+
+# Parametrisierung heiße Seite, vor dem Gaskühler
+h_gk_vor = CPSI("H", "P", 36*1e5, "T", 273.15+204, km) * 1e-3
+c1.set_attr(h=h_gk_vor)
+
+
+#h_gk_i = h_gk_nach -(i/n)*(h_gk_vor-h_gk_nach), Gaskühler in n=50 Elemente eingeteilt, i muss ich wohl oder übel annehmen, hinzufügen eines zweiten Gaskühlers
+
+# Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
+
+h_gk_nach = CPSI("H", "P", 36*1e5, "T", 273.15+105, km) * 1e-3
+c2.set_attr(h=h_gk_nach, fluid=fld_km)
 
 #Paramtrisierung Verbindungen heiße Seite
 
@@ -54,5 +53,13 @@ nw.print_results()
 
 #Parametrisierung kalte Seite
 
-#c3.set_attr(T=100, m=1)
-#c4.set_attr(T=200, fluid=fld_se)
+c3.set_attr(T=100, m=1, p=2, fluid=fld_se)
+c4.set_attr(T=200)
+
+#Lösen
+
+nw.solve(mode='design')
+nw.print_results()
+
+
+
