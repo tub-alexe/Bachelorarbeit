@@ -1,6 +1,7 @@
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, Source, Sink)
 from tespy.connections import Connection
+from CoolProp.CoolProp import PropsSI as CPSI
 
 km = 'R1234ZE(Z)'
 se = 'H2O'
@@ -36,14 +37,34 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8)
 
 
 
-# Parametrisierung
+# Parameter Komponenten ent: ttd_l=2, unt: ttd_l=5
 
-ent.set_attr(pr1=1, pr2=1, ttd_l=2)
+ent.set_attr(pr1=1, pr2=1)
 ko.set_attr(pr1=1, pr2=1)
-unt.set_attr(pr1=1, pr2=1, ttd_l=5)
-c1.set_attr(fluid=fld_km)
-c2.set_attr(x=1)
-c3.set_attr(x=0)
+unt.set_attr(pr1=1, pr2=1)
+
+# Parameter vor Enthitzer
+
+p_kond = CPSI("P", "Q", 1, "T", 273.15 +, km) / 1e5
+h_ent = CPSI("H", "P", p_kond, "T", 273.15 +, km) / 1e3
+c1.set_attr(h=h_ent, p=p_kond)
+
+# Parameter zwischen Kondensator und Enthitzer
+h_kond = CPSI("H", "Q", 1, "T", 273.15 +, km) / 1e3
+c2.set_attr(h=h_kond)
+
+# Parameter zwischen Kondensator und Unterkühler
+h_unt = CPSI("H", "Q", 0, "T", 273.15 +, km) / 1e3
+c3.set_attr(h=h_unt)
+
+#Parameter nach Unterkühler
+h_end= CPSI ("H", "P", p_kond, "T", 273.15 + 75, km) / 1e3
+c4.set_attr(h=h_end, fluid=fld_km)
+
+
+#c1.set_attr(fluid=fld_km)
+#c2.set_attr(x=1)
+#c3.set_attr(x=0)
 c5.set_attr(T=70, m=0.2, p=1, fluid=fld_se)
 c8.set_attr(T=160)
 
@@ -52,4 +73,5 @@ c8.set_attr(T=160)
 nw.solve(mode='design')
 nw.print_results()
 
-# ebenfalls wieder zu wenig Parameter
+# nur eine Temperatur auf der heißen Seite indirekt gegeben, Temperaturen die auf der heißen Seite herrschen müssten
+# sind für R1234ZE(Z) zu hoch
