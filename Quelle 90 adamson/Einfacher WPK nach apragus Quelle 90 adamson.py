@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 
 #R601
 km = 'R601'
-wa = 'air'
+wa = 'H2O'
 fld_wa = {km: 0, wa: 1}
 fld_km = {km: 1, wa: 0}
 nw = Network(fluids=[km, wa], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
@@ -37,7 +37,7 @@ nw.add_conns(c1, c2, c3, c4, c5, c6)
 vd.set_attr(pr1=1, pr2=1) #ttd_l=5
 ue.set_attr(pr1=1, pr2=1) #ttd_u=5
 
-# Vor dem Verdampfer
+#Parametrisierung vor dem Verdampfer, Druck im Verdampfer ist auch bekannt sowie wie stark das Fluid überhitzt wird
 
 #bekannter Druck im Verdampfer
 
@@ -45,12 +45,11 @@ h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
 c4.set_attr(h=h_verd)
 
 # Zwischen Verdampfer und Überhitzer
-p_zw = CPSI("P", "Q", 1, "T", 273.15+70, km) * 1e-5
 h_zw = CPSI("H", "Q", 1, "T", 273.15+70, km) * 1e-3
-c5.set_attr(h=h_zw, p=p_zw)
+c5.set_attr(h=h_zw, p=2.8)
 
 # Nach dem Überhitzer
-h_uebe = CPSI("H", "P", p_zw, "T", 273.15+75, km) * 1e-3
+h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
 c6.set_attr(h=h_uebe, fluid=fld_km)
 
 
@@ -67,13 +66,15 @@ c3.set_attr(T=75)
 
 
 
+
+
+nw.solve(mode='design')
+nw.print_results()
+
 #Parametrisierung
 
 #c4.set_attr(p=2.8, x=0, fluid=fld_km)
 #c5.set_attr(x=1)
-
-nw.solve(mode='design')
-nw.print_results()
 
 #vd.set_attr(ttd_l=5)
 #ue.set_attr(ttd_u=5)
