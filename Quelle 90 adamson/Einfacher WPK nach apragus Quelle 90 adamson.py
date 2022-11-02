@@ -52,8 +52,7 @@ c5.set_attr(h=h_zw, p=2.8)
 h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
 c6.set_attr(h=h_uebe, fluid=fld_km)
 
-
-
+#Parameter heiße Seite
 c1.set_attr(T=80, m=1, p=1, fluid=fld_wa)
 c3.set_attr(T=75)
 
