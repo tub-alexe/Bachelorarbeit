@@ -3,7 +3,7 @@ from tespy.components import (HeatExchanger, Source, Sink)
 from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
 
-km = 'R601'
+km = 'R600'
 se = 'H2O'
 fld_km = {km: 1, se: 0}
 fld_se = {km: 0, se: 1}
