@@ -72,16 +72,14 @@ nw.print_results()
 
 #Parametrisierung
 
-#c4.set_attr(p=2.8, x=0, fluid=fld_km)
-#c5.set_attr(x=1)
 
-#vd.set_attr(ttd_l=5)
-#ue.set_attr(ttd_u=5)
-#c4.set_attr(h=None, x=0)
-#c5.set_attr(h=None, p=None, x=1)
-#c6.set_attr(h=None)
+vd.set_attr(ttd_l=5)
+ue.set_attr(ttd_u=5)
+c4.set_attr(h=None, x=0)
+c5.set_attr(h=None, p=None, x=1)
+c6.set_attr(h=None)
 
-#nw.solve(mode='design')
-#nw.print_results()
+nw.solve(mode='design')
+nw.print_results()
 
 

@@ -3,7 +3,7 @@ from tespy.components import (HeatExchanger, Source, Sink)
 from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
 
-km = 'R600'
+km = 'R601'
 se = 'H2O'
 fld_km = {km: 1, se: 0}
 fld_se = {km: 0, se: 1}
@@ -35,7 +35,7 @@ nw.add_conns(c1, c2, c3, c4)
 gk.set_attr(pr1=1, pr2=1) #ttd_l = 5 irgendwo im Gaskühler
 
 # Parametrisierung heiße Seite, vor dem Gaskühler
-h_gk_vor = CPSI("H", "P", 93 * 1e5, "T", 273.15+204, km) * 1e-3
+h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+204, km) * 1e-3
 c1.set_attr(h=h_gk_vor)
 
 
@@ -43,17 +43,16 @@ c1.set_attr(h=h_gk_vor)
 
 # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
-h_gk_nach = CPSI("H", "P", 93 * 1e5, "T", 273.15+105, km) * 1e-3
-c2.set_attr(h=h_gk_nach, p=93, fluid=fld_km)
+h_gk_nach = CPSI("H", "P", 36 * 1e5, "T", 273.15+105, km) * 1e-3
+c2.set_attr(h=h_gk_nach, p=36, fluid=fld_km)
 
 #Paramtrisierung Verbindungen heiße Seite
 
-#c1.set_attr(T=204, p=36)
-#c2.set_attr(T=105, fluid=fld_km)
+
 
 #Parametrisierung kalte Seite
 
-c3.set_attr(T=100, m=1, p=10, fluid=fld_se)
+c3.set_attr(T=100, m=1, p=5, fluid=fld_se)
 c4.set_attr(T=200)
 
 #Lösen
@@ -61,5 +60,9 @@ c4.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
+c1.set_attr(h=None, T=204)
+c2.set_attr(h=None, T=105)
 
+nw.solve(mode='design')
+nw.print_results()
 
