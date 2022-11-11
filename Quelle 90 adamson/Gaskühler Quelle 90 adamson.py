@@ -35,7 +35,7 @@ nw.add_conns(c1, c2, c3, c4)
 gk.set_attr(pr1=1, pr2=1) #ttd_l = 5 irgendwo im Gaskühler
 
 # Parametrisierung heiße Seite, vor dem Gaskühler
-h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+204, km) * 1e-3
+h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 204, km) * 1e-3
 c1.set_attr(h=h_gk_vor)
 
 
@@ -43,7 +43,7 @@ c1.set_attr(h=h_gk_vor)
 
 # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
-h_gk_nach = CPSI("H", "P", 36 * 1e5, "T", 273.15+105, km) * 1e-3
+h_gk_nach = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 105, km) * 1e-3
 c2.set_attr(h=h_gk_nach, p=36, fluid=fld_km)
 
 #Paramtrisierung Verbindungen heiße Seite
@@ -60,9 +60,9 @@ c4.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
-c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, T=105)
+# c1.set_attr(h=None, T=204)
+# c2.set_attr(h=None, T=105)
 
-nw.solve(mode='design')
-nw.print_results()
+# nw.solve(mode='design')
+# nw.print_results()
 
