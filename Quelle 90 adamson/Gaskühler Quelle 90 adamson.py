@@ -52,7 +52,7 @@ c2.set_attr(h=h_gk_nach, p=36, fluid=fld_km)
 
 #Parametrisierung kalte Seite
 
-c3.set_attr(T=100, m=1, p=5, fluid=fld_se)
+c3.set_attr(T=100, m=1, p=20, fluid=fld_se)
 c4.set_attr(T=200)
 
 #Lösen

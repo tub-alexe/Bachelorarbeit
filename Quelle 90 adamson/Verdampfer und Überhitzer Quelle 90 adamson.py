@@ -10,8 +10,8 @@ fld_wa = {km: 0, wa: 1}
 fld_km = {km: 1, wa: 0}
 nw = Network(fluids=[km, wa], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
-vd_in = Source('Verdampfer rein')
-ue_aus = Sink ('Überhitzer raus')
+ue_in = Source('Verdampfer rein')
+vd_aus = Sink('Überhitzer raus')
 vd = HeatExchanger('Verdampfer')
 ue = HeatExchanger('Überhitzer')
 anfang = Source('Umgebung Eintritt')
@@ -19,9 +19,9 @@ ende = Sink('Umgebung Austritt')
 
 #Verbindungen heiße Seite
 
-c1 = Connection(vd_in, 'out1', vd, 'in1')
-c2 = Connection(vd, 'out1', ue, 'in1')
-c3 = Connection(ue, 'out1', ue_aus, 'in1')
+c1 = Connection(ue_in, 'out1', ue, 'in1')
+c2 = Connection(ue, 'out1', vd, 'in1')
+c3 = Connection(vd, 'out1', vd_aus, 'in1')
 
 #Verbindungen kalte Seite
 
@@ -53,7 +53,7 @@ h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
 c6.set_attr(h=h_uebe, fluid=fld_km)
 
 #Parameter heiße Seite
-c1.set_attr(T=80, m=1, p=1, fluid=fld_wa)
+c1.set_attr(T=80, m=1, p=5, fluid=fld_wa)
 c3.set_attr(T=75)
 
 
@@ -70,16 +70,14 @@ c3.set_attr(T=75)
 nw.solve(mode='design')
 nw.print_results()
 
-#Parametrisierung
-
-
-vd.set_attr(ttd_l=5)
-ue.set_attr(ttd_u=5)
-c4.set_attr(h=None, x=0)
+c4.set_attr(h=None, T=70, x=0)
 c5.set_attr(h=None, p=None, x=1)
-c6.set_attr(h=None)
+c6.set_attr(h=None, T=75)
 
 nw.solve(mode='design')
 nw.print_results()
+
+
+
 
 
