@@ -1,5 +1,5 @@
 from tespy.networks import Network
-from tespy.components import (HeatExchanger, Valve, Source, Sink)
+from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink)
 from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
 
@@ -22,34 +22,36 @@ vd = HeatExchanger('Verdampfer')
 ue = HeatExchanger('Überhitzer')
 
 exp = Valve('Expansionsventil')
-anfang = Source('Umgebung Eintritt')
-ende = Sink('Umgebung Austritt')
+kp = Compressor('Kompressor')
+cc = CycleCloser('Kreilaufzusammenschluss')
 
 #Verbindungen Kreislauf
 
-c1 = Connection(anfang, 'out1', gk, 'in1')
+c1 = Connection(cc, 'out1', gk, 'in1')
 c2 = Connection(gk, 'out1', exp, 'in1')
 c3 = Connection(exp, 'out1', vd, 'in2')
 c4 = Connection(vd, 'out2', ue, 'in2')
-c5 = Connection(ue, 'out2', ende, 'in1')
+c5 = Connection(ue, 'out2', kp, 'in1')
+c6 = Connection(kp, 'out1', cc, 'in1')
 
 #Verbindungen kalte Seite Gaskühler
 
-c6 = Connection(se_ein, 'out1', gk, 'in2')
-c7 = Connection(gk, 'out2', se_aus, 'in1')
+c7 = Connection(se_ein, 'out1', gk, 'in2')
+c8 = Connection(gk, 'out2', se_aus, 'in1')
 
 
 #Verbindungen heiße Seite Verdampfer und Überhitzer
-c8 = Connection(ue_in, 'out1', ue, 'in1')
-c9 = Connection(ue, 'out1', vd, 'in1')
-c10 = Connection(vd, 'out1', vd_aus, 'in1')
-nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10)
+c9 = Connection(ue_in, 'out1', ue, 'in1')
+c10 = Connection(ue, 'out1', vd, 'in1')
+c11 = Connection(vd, 'out1', vd_aus, 'in1')
+nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
 
 #Parametrisierung Komponenten
 
 gk.set_attr(pr1=1, pr2=1)
 vd.set_attr(pr1=1, pr2=1)
 ue.set_attr(pr1=1, pr2=1)
+
 
 # Parametrisierung heiße Seite, vor dem Gaskühler
 
@@ -77,12 +79,12 @@ c5.set_attr(h=h_uebe, fluid=fld_km)
 
 #Parametrisierung kalte Seite Gaskühler
 
-c6.set_attr(T=100, p=20, fluid=fld_se)
-c7.set_attr(T=200)
+c7.set_attr(T=100, p=20, fluid=fld_se)
+c8.set_attr(T=200)
 
 #Parameter heiße Seite Verdampfer
-c8.set_attr(T=80, m=5, p=5, fluid=fld_se)
-c10.set_attr(T=75)
+c9.set_attr(T=80, m=5, p=5, fluid=fld_se)
+c11.set_attr(T=75)
 
 #Lösen
 
@@ -90,9 +92,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, p=None, T=105)
-c3.set_attr(p=None, x=0)
-c4.set_attr(h=None, T=70, x=1)
+c2.set_attr(h=None, T=105)
+c4.set_attr(h=None, T=70)
 c5.set_attr(h=None, T=75)
 
 
