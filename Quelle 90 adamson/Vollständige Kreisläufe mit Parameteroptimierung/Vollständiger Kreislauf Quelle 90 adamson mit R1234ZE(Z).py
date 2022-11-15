@@ -96,3 +96,4 @@ c5.set_attr(h=None, T=75)
 nw.solve(mode='design')
 nw.print_results()
 # Temperaturen in Gaskühler werden automatisch nach oben korrigiert
+# erste Enthalpie kann nicht ohne Fehler ersetzt werden

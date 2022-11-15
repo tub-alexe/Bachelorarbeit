@@ -112,7 +112,7 @@ plt.rc('font', **{'size': 18})
 data = {
     'p_verd': np.linspace(1.1, 2.8, 19),
     'p_kond': np.linspace(36, 55, 20),
-    'eta_s': np.linspace(0.75, 0.82, 5) * 100
+    'eta_s': np.linspace(0.7, 0.82, 5) * 100
 }
 COP = {
     'p_verd': [],
