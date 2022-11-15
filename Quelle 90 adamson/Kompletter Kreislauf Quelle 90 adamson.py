@@ -51,12 +51,11 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
 gk.set_attr(pr1=1, pr2=1)
 vd.set_attr(pr1=1, pr2=1)
 ue.set_attr(pr1=1, pr2=1)
-
-
+kp.set_attr(eta_s=0.7)
 # Parametrisierung heiße Seite, vor dem Gaskühler
 
 h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+204, km) * 1e-3
-c1.set_attr(h=h_gk_vor)
+#c1.set_attr(h=h_gk_vor)
 
 # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
@@ -90,8 +89,9 @@ c11.set_attr(T=75)
 
 nw.solve(mode='design')
 nw.print_results()
+print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
-c1.set_attr(h=None, T=204)
+#c1.set_attr(h=None, T=204)
 c2.set_attr(h=None, T=105)
 c4.set_attr(h=None, T=70)
 c5.set_attr(h=None, T=75)
@@ -99,6 +99,9 @@ c5.set_attr(h=None, T=75)
 
 nw.solve(mode='design')
 nw.print_results()
-
+print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 # h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
 # sinnvolles setzen der Massenströme wichtig
+#bei setzen des oderen Druckes auf 38,625 bar statt 36 wird der erwünschte Wirkungsgrad sowie der erwünschte COP erzielt ohne ihn vorzugeben
+#wenn eta_s auf 0.7 gesetzt dann Tempertur vor Gaskühler 207 statt 204
+
