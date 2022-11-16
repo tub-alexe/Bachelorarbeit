@@ -97,3 +97,4 @@ nw.solve(mode='design')
 nw.print_results()
 #funktioniert noch nicht ganz mit dem Ersetzen der Enthalpien
 #70 °C Problem, muss um mindestens 0,05 °C größer sein
+#Maximaltemperatur bei 166 °C

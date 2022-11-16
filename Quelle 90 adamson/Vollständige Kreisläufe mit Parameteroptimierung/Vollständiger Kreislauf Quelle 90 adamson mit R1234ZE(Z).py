@@ -97,3 +97,4 @@ nw.solve(mode='design')
 nw.print_results()
 # Temperaturen in Gaskühler werden automatisch nach oben korrigiert
 # erste Enthalpie kann nicht ohne Fehler ersetzt werden
+#Maximaltemperatur bei 166 °C
