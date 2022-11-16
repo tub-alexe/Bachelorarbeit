@@ -67,7 +67,7 @@ c2.set_attr(h=h_gk_nach, p=89)
 c3.set_attr(p=6.1)
 
 # Zwischen Verdampfer und Überhitzer
-h_zw = CPSI("H", "Q", 1, "T", 273.15+70, km) * 1e-3
+h_zw = CPSI("H", "Q", 1, "T", 273.15+70.05, km) * 1e-3
 c4.set_attr(h=h_zw)
 
 # Nach dem Überhitzer
@@ -88,11 +88,12 @@ c11.set_attr(T=75)
 nw.solve(mode='design')
 nw.print_results()
 
-#c1.set_attr(h=None, T=205)
+c1.set_attr(h=None, T=205)
 c2.set_attr(h=None, T=105)
-#c4.set_attr(h=None, T=70)
+c4.set_attr(h=None, T=70.05)
 c5.set_attr(h=None, T=75)
 
 nw.solve(mode='design')
 nw.print_results()
 #funktioniert noch nicht ganz mit dem Ersetzen der Enthalpien
+#70 °C Problem, muss um mindestens 0,05 °C größer sein
