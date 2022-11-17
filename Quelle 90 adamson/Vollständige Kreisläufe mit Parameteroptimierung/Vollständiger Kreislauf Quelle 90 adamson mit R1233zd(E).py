@@ -99,6 +99,8 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
+#zweites Szenario funktioniert leider nicht
+
 import matplotlib.pyplot as plt
 import numpy as np
 

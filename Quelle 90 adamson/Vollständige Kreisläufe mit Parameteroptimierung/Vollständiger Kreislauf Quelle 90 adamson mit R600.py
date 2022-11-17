@@ -100,6 +100,7 @@ nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 #funktioniert noch nicht ganz mit dem Ersetzen der Enthalpien
 #70 °C Problem, muss um mindestens 0,05 °C größer sein
+#zweites Szenario funktioniert leider nicht
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -129,7 +130,7 @@ for p in data['p_verd']:
     nw.solve('design')
     COP['p_verd'] += [abs(gk.Q.val) / kp.P.val]
 
-# reset to base temperature
+# reset to base pressure
 c3.set_attr(p=8.1)
 
 for p in data['p_kond']:
