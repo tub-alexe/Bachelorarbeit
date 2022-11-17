@@ -1,7 +1,8 @@
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink)
-from tespy.connections import Connection
+from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
+from tespy.tools import ExergyAnalysis
 
 km = 'R601'
 se = 'H2O'
@@ -16,7 +17,7 @@ gk = HeatExchanger('Gaskühler')
 se_ein = Source('Senke ein')
 se_aus = Sink('Senke aus')
 
-ue_in = Source('Verdampfer rein')
+ue_ein = Source('Verdampfer rein')
 vd_aus = Sink('Überhitzer raus')
 vd = HeatExchanger('Verdampfer')
 ue = HeatExchanger('Überhitzer')
@@ -41,7 +42,7 @@ c8 = Connection(gk, 'out2', se_aus, 'in1')
 
 
 #Verbindungen heiße Seite Verdampfer und Überhitzer
-c9 = Connection(ue_in, 'out1', ue, 'in1')
+c9 = Connection(ue_ein, 'out1', ue, 'in1')
 c10 = Connection(ue, 'out1', vd, 'in1')
 c11 = Connection(vd, 'out1', vd_aus, 'in1')
 nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
@@ -101,6 +102,33 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
+# Implementierung Exergie Analyse
+
+pamb = 1
+Tamb = 25
+
+# busses
+power = Bus('power input')
+power.add_comps(
+    {'comp': kp, 'char': 1, 'base': 'bus'})
+
+heat_product_bus = Bus('heating')
+heat_product_bus.add_comps(
+    {'comp': se_ein, 'base': 'bus'},
+    {'comp': se_aus})
+
+heat_loss_bus = Bus('heat source')
+heat_loss_bus.add_comps(
+    {'comp': ue_ein, 'base': 'bus'},
+    {'comp': vd_aus})
+
+nw.add_busses(power, heat_product_bus, heat_loss_bus)
+
+ean = ExergyAnalysis(nw, E_P=[heat_product_bus], E_F=[power], E_L=[heat_loss_bus])
+ean.analyse(pamb=pamb, Tamb=Tamb)
+ean.print_results()
+
+#Parameteroptimierung
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -165,4 +193,5 @@ fig.savefig('Optimierung R601.svg')
 # sinnvolles setzen der Massenströme wichtig
 #bei setzen des oderen Druckes auf 38,625 bar statt 36 wird der erwünschte Wirkungsgrad sowie der erwünschte COP erzielt ohne ihn vorzugeben
 #wenn eta_s auf 0.7 gesetzt dann Tempertur vor Gaskühler 207 statt 204
+
 
