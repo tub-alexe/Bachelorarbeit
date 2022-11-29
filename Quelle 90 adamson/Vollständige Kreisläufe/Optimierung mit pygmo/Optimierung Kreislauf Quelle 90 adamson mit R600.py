@@ -20,7 +20,7 @@ class HeatPumpCycle:
     """Class template for TESPy model usage in optimization module."""
     def __init__(self):
 
-        km = 'R1233ZD(E)'
+        km = 'R600'
         se = 'H2O'
         fld_km = {km: 1, se: 0}
         fld_se = {km: 0, se: 1}
@@ -77,26 +77,26 @@ class HeatPumpCycle:
         kp.set_attr(eta_s=0.7)
         # Parametrisierung heiße Seite, vor dem Gaskühler
 
-        h_gk_vor = CPSI("H", "P", 56 * 1e5, "T", 273.15 + 205, km) * 1e-3
+        h_gk_vor = CPSI("H", "P", 93 * 1e5, "T", 273.15 + 205, km) * 1e-3
         # c1.set_attr(h=h_gk_vor)
 
         # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
-        h_gk_nach = CPSI("H", "P", 56 * 1e5, "T", 273.15 + 105, km) * 1e-3
-        c2.set_attr(h=h_gk_nach, p=56)
+        h_gk_nach = CPSI("H", "P", 93 * 1e5, "T", 273.15 + 105, km) * 1e-3
+        c2.set_attr(h=h_gk_nach, p=93)
 
         # Parameter kalte Seite
         # Vor dem Verdampfer
 
         # h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
-        c3.set_attr(p=5.1)
+        c3.set_attr(p=8.1)
 
         # Zwischen Verdampfer und Überhitzer
-        h_zw = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 70, km) * 1e-3
+        h_zw = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 70, km) * 1e-3
         c4.set_attr(h=h_zw)
 
         # Nach dem Überhitzer
-        h_uebe = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 75, km) * 1e-3
+        h_uebe = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 75, km) * 1e-3
         c5.set_attr(h=h_uebe, fluid=fld_km)
 
         # Parametrisierung kalte Seite Gaskühler
@@ -243,8 +243,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 92, "max": 112}},
-        "3": {"p": {"min": 1, "max": 18}}
+        "2": {"p": {"min": 92, "max": 100}},
+        "3": {"p": {"min": 1.1, "max": 14}}
     }
 }
 constraints = {

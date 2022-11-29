@@ -77,7 +77,7 @@ class HeatPumpCycle:
         kp.set_attr(eta_s=0.7)
         # Parametrisierung heiße Seite, vor dem Gaskühler
 
-        h_gk_vor = CPSI("H", "P", 56 * 1e5, "T", 273.15 + 205, km) * 1e-3
+        h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 205, km) * 1e-3
         # c1.set_attr(h=h_gk_vor)
 
         # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
@@ -267,7 +267,7 @@ num_gen = 100
 # documentation! The number of generations indicated in the algorithm is
 # the number of evolutions we undertake within each generation defined in
 # num_gen
-algo = pg.algorithm(pg.ihs(gen=3, seed=57))
+algo = pg.algorithm(pg.ihs(gen=3, seed=42))
 # create starting population
 pop = pg.population(pg.problem(optimize), size=num_ind, seed=42)
 
