@@ -92,7 +92,7 @@ class HeatPumpCycle:
         c3.set_attr(p=8.1)
 
         # Zwischen Verdampfer und Überhitzer
-        h_zw = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 70, km) * 1e-3
+        h_zw = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 70.05, km) * 1e-3
         c4.set_attr(h=h_zw)
 
         # Nach dem Überhitzer
@@ -116,7 +116,7 @@ class HeatPumpCycle:
 
         # c1.set_attr(h=None, T=204)
         c2.set_attr(h=None, T=105)
-        c4.set_attr(h=None, T=70)
+        c4.set_attr(h=None, T=70.05)
         c5.set_attr(h=None, T=75)
 
         self.nw.solve(mode='design')
@@ -244,7 +244,7 @@ HeatPump.get_objective("COP")
 variables = {
     "Connections": {
         "2": {"p": {"min": 92, "max": 100}},
-        "3": {"p": {"min": 1.1, "max": 14}}
+        "3": {"p": {"min": 1.2, "max": 14}}
     }
 }
 constraints = {
@@ -267,9 +267,9 @@ num_gen = 100
 # documentation! The number of generations indicated in the algorithm is
 # the number of evolutions we undertake within each generation defined in
 # num_gen
-algo = pg.algorithm(pg.ihs(gen=3, seed=57))
+algo = pg.algorithm(pg.ihs(gen=3, seed=53))
 # create starting population
-pop = pg.population(pg.problem(optimize), size=num_ind, seed=42)
+pop = pg.population(pg.problem(optimize), size=num_ind, seed=53)
 
 optimize.run(algo, pop, num_ind, num_gen)
 # %%[sec_5]
