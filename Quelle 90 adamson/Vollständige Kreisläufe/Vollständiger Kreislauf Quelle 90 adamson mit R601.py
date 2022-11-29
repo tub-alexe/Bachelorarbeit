@@ -97,36 +97,35 @@ c2.set_attr(h=None, T=105)
 c4.set_attr(h=None, T=70)
 c5.set_attr(h=None, T=75)
 
+# busses
+power = Bus('power input')
+power.add_comps(
+    {'comp': kp, 'char': 1, 'base': 'bus'},
+    {'comp': ue_ein, 'base': 'bus'},
+    {'comp': vd_aus})
+
+
+heat_product = Bus('heating')
+heat_product.add_comps(
+    {'comp': se_ein, 'base': 'bus'},
+    {'comp': se_aus})
+
+nw.add_busses(power, heat_product)
 
 nw.solve(mode='design')
 nw.print_results()
-print(f'COP = {abs(gk.Q.val) / kp.P.val}')
+print('COP', heat_product.P.val / power.P.val)
 
 # Implementierung Exergie Analyse
 
 pamb = 1
 Tamb = 25
 
-# busses
-power = Bus('power input')
-power.add_comps(
-    {'comp': kp, 'char': 1, 'base': 'bus'})
-
-heat_product_bus = Bus('heating')
-heat_product_bus.add_comps(
-    {'comp': se_ein, 'base': 'bus'},
-    {'comp': se_aus})
-
-heat_loss_bus = Bus('heat source')
-heat_loss_bus.add_comps(
-    {'comp': ue_ein, 'base': 'bus'},
-    {'comp': vd_aus})
-
-nw.add_busses(power, heat_product_bus, heat_loss_bus)
-
-ean = ExergyAnalysis(nw, E_P=[heat_product_bus], E_F=[power], E_L=[heat_loss_bus])
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
+# zwei verschiedene Exergiebetrachtungen, epsilon 72 % oder 31 % je nach Betrachtung, Frage der Definition von E_F
+
 
 #Parameteroptimierung
 
