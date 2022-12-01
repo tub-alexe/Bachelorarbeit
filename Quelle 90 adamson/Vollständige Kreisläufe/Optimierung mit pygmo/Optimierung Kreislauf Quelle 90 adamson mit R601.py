@@ -31,7 +31,6 @@ class HeatPumpCycle:
         # components
         # main cycle
         gk = HeatExchanger('Gaskühler')
-        self.gk = gk
         se_ein = Source('Senke ein')
         se_aus = Sink('Senke aus')
 
@@ -42,7 +41,6 @@ class HeatPumpCycle:
 
         exp = Valve('Expansionsventil')
         kp = Compressor('Kompressor')
-        self.kp = kp
         cc = CycleCloser('Kreilaufzusammenschluss')
 
         # Verbindungen Kreislauf
@@ -108,33 +106,11 @@ class HeatPumpCycle:
         c9.set_attr(T=80, m=5, p=5, fluid=fld_se)
         c11.set_attr(T=75)
 
-        # Lösen
-
-        self.nw.solve(mode='design')
-        self.nw.print_results()
-        print(f'COP = {abs(gk.Q.val) / kp.P.val}')
-
-        # c1.set_attr(h=None, T=204)
-        c2.set_attr(h=None, T=105)
-        c4.set_attr(h=None, T=70)
-        c5.set_attr(h=None, T=75)
-
-        self.nw.solve(mode='design')
-        self.nw.print_results()
-        print(f'COP = {abs(gk.Q.val) / kp.P.val}')
-
-        self.stable = "_stable"
-        self.nw.save(self.stable)
-        self.solved = True
-
-        pamb = 1
-        Tamb = 25
-
         # busses
 
         self.power = Bus('power')
         self.power.add_comps(
-            {'comp': kp, 'char': 1, 'base': 'bus'}
+            {'comp': kp, 'char': -1, 'base': 'bus'}
         )
 
         self.input = Bus('input')
@@ -145,15 +121,36 @@ class HeatPumpCycle:
 
         self.heat_product = Bus('heat_product')
         self.heat_product.add_comps(
-            {'comp': se_ein, 'base': 'bus'},
-            {'comp': se_aus})
+            {"comp": gk, "char": 1})
 
         self.nw.add_busses(self.input, self.heat_product, self.power)
+
+        # Lösen
+
+        self.nw.solve(mode='design')
+        self.nw.print_results()
+        print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
+
+        # c1.set_attr(h=None, T=204)
+        c2.set_attr(h=None, T=105)
+        c4.set_attr(h=None, T=70)
+        c5.set_attr(h=None, T=75)
+
+        self.nw.solve(mode='design')
+        self.nw.print_results()
+
+        self.stable = "_stable"
+        self.nw.save(self.stable)
+        self.solved = True
+
+        pamb = 1
+        Tamb = 25
 
         ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.input])
         ean.analyse(pamb=pamb, Tamb=Tamb)
         ean.print_results()
-
+        print(f'COP = {abs(gk.Q.val) / kp.P.val}')
+        print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
  # %%[sec_2]
 
     def get_param(self, obj, label, parameter):
@@ -231,7 +228,7 @@ class HeatPumpCycle:
         if self.solved:
             if objective == "COP":
                 return 1 / (
-                        abs(self.gk.Q.val) / self.kp.P.val
+                        abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)
                 )
             else:
                 msg = f"Objective {objective} not implemented."
@@ -243,8 +240,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 36, "max": 55}},
-        "3": {"p": {"min": 1.1, "max": 10}}
+        "2": {"p": {"min": 34.5, "max": 52.8}},
+        "3": {"p": {"min": 1.2, "max": 2.9}}
     }
 }
 constraints = {
@@ -261,7 +258,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 100
+num_gen = 75
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is

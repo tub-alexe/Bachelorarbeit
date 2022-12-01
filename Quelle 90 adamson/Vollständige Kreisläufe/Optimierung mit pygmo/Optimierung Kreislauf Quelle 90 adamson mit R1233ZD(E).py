@@ -108,6 +108,25 @@ class HeatPumpCycle:
         c9.set_attr(T=80, m=5, p=5, fluid=fld_se)
         c11.set_attr(T=75)
 
+        # busses
+
+        self.power = Bus('power')
+        self.power.add_comps(
+            {'comp': kp, 'char': 1, 'base': 'bus'}
+        )
+
+        self.input = Bus('input')
+        self.input.add_comps(
+            {'comp': kp, 'char': 1, 'base': 'bus'},
+            {'comp': ue_ein, 'base': 'bus'},
+            {'comp': vd_aus})
+
+        self.heat_product = Bus('heat_product')
+        self.heat_product.add_comps(
+            {"comp": gk, "char": 1})
+
+        self.nw.add_busses(self.input, self.heat_product, self.power)
+
         # Lösen
 
         self.nw.solve(mode='design')
@@ -129,26 +148,6 @@ class HeatPumpCycle:
 
         pamb = 1
         Tamb = 25
-
-        # busses
-
-        self.power = Bus('power')
-        self.power.add_comps(
-            {'comp': kp, 'char': 1, 'base': 'bus'}
-        )
-
-        self.input = Bus('input')
-        self.input.add_comps(
-            {'comp': kp, 'char': 1, 'base': 'bus'},
-            {'comp': ue_ein, 'base': 'bus'},
-            {'comp': vd_aus})
-
-        self.heat_product = Bus('heat_product')
-        self.heat_product.add_comps(
-            {'comp': se_ein, 'base': 'bus'},
-            {'comp': se_aus})
-
-        self.nw.add_busses(self.input, self.heat_product, self.power)
 
         ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.input])
         ean.analyse(pamb=pamb, Tamb=Tamb)
@@ -231,7 +230,7 @@ class HeatPumpCycle:
         if self.solved:
             if objective == "COP":
                 return 1 / (
-                        abs(self.gk.Q.val) / self.kp.P.val
+                        abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)
                 )
             else:
                 msg = f"Objective {objective} not implemented."
@@ -243,8 +242,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 56, "max": 75}},
-        "3": {"p": {"min": 1.1, "max": 10}}
+        "2": {"p": {"min": 54.5, "max": 75}},
+        "3": {"p": {"min": 1.1, "max": 5.5}}
     }
 }
 constraints = {
