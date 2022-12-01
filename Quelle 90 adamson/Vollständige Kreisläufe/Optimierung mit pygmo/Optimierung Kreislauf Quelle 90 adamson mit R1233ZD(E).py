@@ -110,22 +110,27 @@ class HeatPumpCycle:
 
         # busses
 
-        self.power = Bus('power')
+        self.power = Bus('power input')
         self.power.add_comps(
-            {'comp': kp, 'char': 1, 'base': 'bus'}
-        )
-
-        self.input = Bus('input')
-        self.input.add_comps(
             {'comp': kp, 'char': 1, 'base': 'bus'},
             {'comp': ue_ein, 'base': 'bus'},
             {'comp': vd_aus})
 
-        self.heat_product = Bus('heat_product')
+        self.heat_product = Bus('heating')
         self.heat_product.add_comps(
+            {'comp': se_ein, 'base': 'bus'},
+            {'comp': se_aus})
+
+        self.power_COP = Bus('power')
+        self.power_COP.add_comps(
+            {'comp': kp, 'char': -1, 'base': 'bus'}
+        )
+
+        self.heat_product_COP = Bus('heat_product')
+        self.heat_product_COP.add_comps(
             {"comp": gk, "char": 1})
 
-        self.nw.add_busses(self.input, self.heat_product, self.power)
+        self.nw.add_busses(self.power_COP, self.heat_product, self.power, self.heat_product_COP)
 
         # Lösen
 
@@ -149,7 +154,7 @@ class HeatPumpCycle:
         pamb = 1
         Tamb = 25
 
-        ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.input])
+        ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
         ean.analyse(pamb=pamb, Tamb=Tamb)
         ean.print_results()
 

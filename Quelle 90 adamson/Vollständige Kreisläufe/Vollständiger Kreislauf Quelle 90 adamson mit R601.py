@@ -110,11 +110,20 @@ heat_product.add_comps(
     {'comp': se_ein, 'base': 'bus'},
     {'comp': se_aus})
 
-nw.add_busses(power, heat_product)
+power_COP = Bus('power')
+power_COP.add_comps(
+        {'comp': kp, 'char': -1, 'base': 'bus'}
+)
+
+heat_product_COP = Bus('heat_product')
+heat_product_COP.add_comps(
+            {"comp": gk, "char": 1})
+
+nw.add_busses(power, heat_product, power_COP, heat_product_COP)
 
 nw.solve(mode='design')
 nw.print_results()
-print('COP', heat_product.P.val / power.P.val)
+print('COP', heat_product_COP.P.val / power_COP.P.val)
 
 # Implementierung Exergie Analyse
 
