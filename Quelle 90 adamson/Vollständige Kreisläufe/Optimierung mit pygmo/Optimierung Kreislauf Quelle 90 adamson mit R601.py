@@ -245,7 +245,7 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 34.5, "max": 52.8}},
+        "2": {"p": {"min": 35.1, "max": 52.8}},
         "3": {"p": {"min": 1.2, "max": 2.9}}
     }
 }
@@ -263,7 +263,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 75
+num_gen = 100
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is

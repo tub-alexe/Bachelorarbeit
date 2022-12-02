@@ -247,7 +247,7 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 54.5, "max": 75}},
+        "2": {"p": {"min": 52.7, "max": 60}},
         "3": {"p": {"min": 1.1, "max": 5.5}}
     }
 }
