@@ -75,7 +75,7 @@ class HeatPumpCycle:
         kp.set_attr(eta_s=0.7)
         # Parametrisierung heiße Seite, vor dem Gaskühler
 
-        h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 205, km) * 1e-3
+        h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 204, km) * 1e-3
         # c1.set_attr(h=h_gk_vor)
 
         # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
@@ -245,8 +245,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 35.1, "max": 52.8}},
-        "3": {"p": {"min": 1.2, "max": 2.9}}
+        "2": {"p": {"min": 35.6, "max": 52.8}},
+        "3": {"p": {"min": 1.2, "max": 2.82}}
     }
 }
 constraints = {
