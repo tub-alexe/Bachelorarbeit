@@ -60,21 +60,21 @@ kp.set_attr(eta_s=0.7)
 
 # Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
-h_gk_nach = CPSI("H", "P", 35.6 * 1e5, "T", 273.15+105, km) * 1e-3
-c2.set_attr(h=h_gk_nach, p=35.6)
+h_gk_nach = CPSI("H", "P", 36 * 1e5, "T", 273.15+100, km) * 1e-3
+c2.set_attr(h=h_gk_nach, p=36)
 
 # Parameter kalte Seite
 # Vor dem Verdampfer
 
 #h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
-c3.set_attr(p=2.8169)
+c3.set_attr(p=2.8)
 
 # Zwischen Verdampfer und Überhitzer
-h_zw = CPSI("H", "P", 2.8169 * 1e5, "T", 273.15+70, km) * 1e-3
+h_zw = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+70, km) * 1e-3
 c4.set_attr(h=h_zw)
 
 # Nach dem Überhitzer
-h_uebe = CPSI("H", "P", 2.8195 * 1e5, "T", 273.15+75, km) * 1e-3
+h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+71.2, km) * 1e-3
 c5.set_attr(h=h_uebe, fluid=fld_km)
 
 #Parametrisierung kalte Seite Gaskühler
@@ -93,9 +93,12 @@ nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
 #c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, T=105)
-c4.set_attr(h=None, T=70)
-c5.set_attr(h=None, T=75)
+c2.set_attr(h=None, p=34.1442, T=105)
+c3.set_attr(p=3.2083)
+c4.set_attr(h=None, x=1)
+c5.set_attr(h=None, Td_bp=5)
+c8.set_attr(T=None)
+gk.set_attr(ttd_u=4)
 
 # busses
 power = Bus('power input')

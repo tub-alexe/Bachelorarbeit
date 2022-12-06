@@ -138,8 +138,10 @@ class HeatPumpCycle:
 
         # c1.set_attr(h=None, T=204)
         c2.set_attr(h=None, T=105)
-        c4.set_attr(h=None, T=70)
-        c5.set_attr(h=None, T=75)
+        c4.set_attr(h=None, x=1)
+        c5.set_attr(h=None, Td_bp=5)
+        c8.set_attr(T=None)
+        gk.set_attr(ttd_u=4)
 
         self.nw.solve(mode='design')
         self.nw.print_results()
