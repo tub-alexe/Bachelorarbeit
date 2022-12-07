@@ -235,7 +235,7 @@ class HeatPumpCycle:
         if self.solved:
             if objective == "COP":
                 return 1 / (
-                        abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)
+                        self.nw.busses["heat_product"].P.val / self.nw.busses["power"].P.val
                 )
             else:
                 msg = f"Objective {objective} not implemented."
@@ -248,7 +248,7 @@ HeatPump.get_objective("COP")
 variables = {
     "Connections": {
         "2": {"p": {"min": 35.6, "max": 52.8}},
-        "3": {"p": {"min": 1.2, "max": 2.82}}
+        "3": {"p": {"min": 1.2, "max": 3.1}}
     }
 }
 constraints = {
