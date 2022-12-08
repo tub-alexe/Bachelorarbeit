@@ -194,6 +194,29 @@ class HeatPumpCycle:
             for c, params in kwargs["Components"].items():
                 self.nw.get_comp(c).set_attr(**params)
 
+    def reset_boundary_conditions(self):
+
+        c2, c3, c4, c5 = self.nw.get_conn(
+            ["2", "3", "4", "5"]
+        )
+
+        # Connection parameters
+        c2.set_attr(h=None, T=105, p=36)
+        c3.set_attr(p=2.8)
+        c4.set_attr(h=None, x=1)
+        c5.set_attr(h=None, Td_bp=5)
+
+        gk, kp, ue, vd = self.nw.get_comp(
+            [
+                "Gaskühler", "Verdampfer", "Überhitzer", "Kompressor"
+            ]
+        )
+        # Component parameters
+        gk.set_attr(pr1=1, pr2=1, ttd_u=4)
+        vd.set_attr(pr1=1, pr2=1)
+        ue.set_attr(pr1=1, pr2=1)
+        kp.set_attr(eta_s=.7)
+
     def solve_model(self, **kwargs):
         """
         Solve the TESPy model given the the input parameters
@@ -209,12 +232,17 @@ class HeatPumpCycle:
                 # might need more checks here!
                 if (
                         any(self.nw.results["HeatExchanger"]["Q"] > 0)
+                        or any(self.nw.results["HeatExchanger"]["ttd_l"] < 0)
+                        or any(self.nw.results["HeatExchanger"]["ttd_u"] < 0)
+                        or any(self.nw.results["Compressor"]["eta_s"] > 1)
                         or any(self.nw.results["Compressor"]["P"] < 0)
                     ):
-                    self.solved = False
+                    self.reset_boundary_conditions()
+                    self.nw.solve("design", init_only=True, init_path=self.stable)
                 else:
                     self.solved = True
         except ValueError as e:
+            print(e)
             self.nw.lin_dep = True
             self.nw.solve("design", init_only=True, init_path=self.stable)
 
@@ -247,8 +275,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("COP")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 35.6, "max": 52.8}},
-        "3": {"p": {"min": 1.2, "max": 3.1}}
+        "2": {"p": {"min": 34, "max": 52.8}},
+        "3": {"p": {"min": 1.2, "max": 3.6}}
     }
 }
 constraints = {
