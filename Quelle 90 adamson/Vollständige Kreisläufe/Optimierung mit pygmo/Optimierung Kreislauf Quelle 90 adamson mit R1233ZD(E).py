@@ -31,7 +31,6 @@ class HeatPumpCycle:
         # components
         # main cycle
         gk = HeatExchanger('Gaskühler')
-        self.gk = gk
         se_ein = Source('Senke ein')
         se_aus = Sink('Senke aus')
 
@@ -42,7 +41,6 @@ class HeatPumpCycle:
 
         exp = Valve('Expansionsventil')
         kp = Compressor('Kompressor')
-        self.kp = kp
         cc = CycleCloser('Kreilaufzusammenschluss')
 
         # Verbindungen Kreislauf
@@ -136,12 +134,14 @@ class HeatPumpCycle:
 
         self.nw.solve(mode='design')
         self.nw.print_results()
-        print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
-        # c1.set_attr(h=None, T=204)
+        # c1.set_attr(h=None, T=205)
         c2.set_attr(h=None, T=105)
-        c4.set_attr(h=None, T=70)
-        c5.set_attr(h=None, T=75)
+        # c3.set_attr(p=3.237)
+        c4.set_attr(h=None, x=1)
+        c5.set_attr(h=None, Td_bp=5)
+        c8.set_attr(T=None)
+        gk.set_attr(ttd_u=5)
 
         self.nw.solve(mode='design')
         self.nw.print_results()
@@ -151,12 +151,12 @@ class HeatPumpCycle:
         self.nw.save(self.stable)
         self.solved = True
 
-        pamb = 1
-        Tamb = 25
+        self.pamb = 1
+        self.Tamb = 25
 
-        ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
-        ean.analyse(pamb=pamb, Tamb=Tamb)
-        ean.print_results()
+        self.ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
+        self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
+        self.ean.print_results()
 
  # %%[sec_2]
 
@@ -194,6 +194,30 @@ class HeatPumpCycle:
             for c, params in kwargs["Components"].items():
                 self.nw.get_comp(c).set_attr(**params)
 
+    def reset_boundary_conditions(self):
+
+        c2, c3, c4, c5 = self.nw.get_conn(
+            ["2", "3", "4", "5"]
+        )
+
+        # Connection parameters
+        c2.set_attr(h=None, T=105, p=56)
+        c3.set_attr(p=5.1)
+        c4.set_attr(h=None, x=1)
+        c5.set_attr(h=None, Td_bp=5)
+
+        gk, vd, ue, kp = self.nw.get_comp(
+            [
+                "Gaskühler", "Verdampfer", "Überhitzer", "Kompressor"
+            ]
+        )
+        # Component parameters
+        gk.set_attr(pr1=1, pr2=1, ttd_u=5)
+        vd.set_attr(pr1=1, pr2=1)
+        ue.set_attr(pr1=1, pr2=1)
+        kp.set_attr(eta_s=0.7)
+
+
     def solve_model(self, **kwargs):
         """
         Solve the TESPy model given the the input parameters
@@ -204,13 +228,18 @@ class HeatPumpCycle:
         try:
             self.nw.solve("design")
             if self.nw.res[-1] >= 1e-3 or self.nw.lin_dep:
+                self.reset_boundary_conditions()
                 self.nw.solve("design", init_only=True, init_path=self.stable)
             else:
                 # might need more checks here!
                 if (
                         any(self.nw.results["HeatExchanger"]["Q"] > 0)
+                        or any(self.nw.results["HeatExchanger"]["ttd_l"] < 0)
+                        or any(self.nw.results["HeatExchanger"]["ttd_u"] < 0)
+                        or any(self.nw.results["Compressor"]["eta_s"] > 1)
                         or any(self.nw.results["Compressor"]["P"] < 0)
                     ):
+                    self.reset_boundary_conditions()
                     self.solved = False
                 else:
                     self.solved = True
@@ -233,9 +262,10 @@ class HeatPumpCycle:
             Evaluation of the objective function.
         """
         if self.solved:
-            if objective == "COP":
+            if objective == "eta":
+                self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
                 return 1 / (
-                        abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)
+                        self.ean.network_data.loc['epsilon']
                 )
             else:
                 msg = f"Objective {objective} not implemented."
@@ -244,11 +274,12 @@ class HeatPumpCycle:
             return np.nan
 
 HeatPump = HeatPumpCycle()
-HeatPump.get_objective("COP")
+HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 52.7, "max": 60}},
-        "3": {"p": {"min": 1.1, "max": 5.5}}
+        "2": {"p": {"min": 45, "max": 70}, "T": {"min": 100, "max": 110}},
+        "3": {"p": {"min": 2, "max": 6.5}},
+        "5": {"Td_bp": {"min": 0.1, "max": 6}},
     }
 }
 constraints = {
@@ -261,7 +292,7 @@ constraints = {
 }
 
 optimize = OptimizationProblem(
-    HeatPump, variables, constraints, objective="COP"
+    HeatPump, variables, constraints, objective="eta"
 )
 # %%[sec_4]
 num_ind = 10
@@ -291,17 +322,17 @@ plt.rc("font", **{"size": 18})
 fig, ax = plt.subplots(1, figsize=(16, 8))
 
 filter_valid_constraint = optimize.individuals["valid"].values
-filter_valid_result = ~np.isnan(optimize.individuals["COP"].values)
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
 sc = ax.scatter(
     data["Connections-2-p"],
     data["Connections-3-p"],
-    c=1 / data["COP"],
+    c=1 / data["eta"],
     s=100
 )
 cbar = plt.colorbar(sc)
-cbar.set_label("COP")
+cbar.set_label("eta")
 
 ax.set_axisbelow(True)
 ax.set_xlabel("Druck Gaskühler in bar")
@@ -309,5 +340,28 @@ ax.set_ylabel("Druck Verdampfer in bar")
 plt.tight_layout()
 
 fig.savefig("pygmo_optimization_R1233ZD(E).svg")
-print(data.loc[data["COP"].values == data["COP"].min()])
+print(data.loc[data["eta"].values == data["eta"].min()])
 # %%[sec_6]
+
+fig, ax = plt.subplots(1, figsize=(16, 8))
+
+filter_valid_constraint = optimize.individuals["valid"].values
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
+data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
+
+sc = ax.scatter(
+    data["Connections-2-T"],
+    data["Connections-5-Td_bp"],
+    c=1 / data["eta"],
+    s=100
+)
+cbar = plt.colorbar(sc)
+cbar.set_label("eta")
+
+ax.set_axisbelow(True)
+ax.set_xlabel("Temperatur nach dem Gaskühler in Kelvin")
+ax.set_ylabel("Überhitzung in Kelvin ")
+plt.tight_layout()
+
+fig.savefig("pygmo_optimization_Temperatures_R1233ZD(E).svg")
+print(data.loc[data["eta"].values == data["eta"].min()])

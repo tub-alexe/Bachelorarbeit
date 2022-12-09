@@ -91,12 +91,12 @@ nw.solve(mode='design')
 nw.print_results()
 
 #c1.set_attr(h=None, T=205)
-c2.set_attr(h=None, p=45.8912, T=105)
-c3.set_attr(p=3.237)
+c2.set_attr(h=None, T=105)
+#c3.set_attr(p=3.237)
 c4.set_attr(h=None, x=1)
 c5.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
-gk.set_attr(ttd_u=4)
+gk.set_attr(ttd_u=5)
 
 nw.solve(mode='design')
 nw.print_results()
@@ -112,7 +112,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(3, 5.1, 15),
+    'p_verd': np.linspace(3, 5, 15),
     'p_kond': np.linspace(53, 65, 12),
     'eta_s': np.linspace(0.7, 0.83, 14) * 100
 }

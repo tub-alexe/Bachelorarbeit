@@ -89,11 +89,12 @@ c11.set_attr(T=75)
 nw.solve(mode='design')
 nw.print_results()
 
-
-#c1.set_attr(h=None, T=205)
+#c1.set_attr(h=None, T=204)
 c2.set_attr(h=None, T=105)
-c4.set_attr(h=None, T=70.05)
-c5.set_attr(h=None, T=75)
+c4.set_attr(h=None, x=1)
+c5.set_attr(h=None, Td_bp=5)
+c8.set_attr(T=None)
+gk.set_attr(ttd_u=5)
 
 nw.solve(mode='design')
 nw.print_results()
