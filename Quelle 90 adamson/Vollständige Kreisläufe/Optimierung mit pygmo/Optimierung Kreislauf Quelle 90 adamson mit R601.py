@@ -150,12 +150,12 @@ class HeatPumpCycle:
         self.nw.save(self.stable)
         self.solved = True
 
-        pamb = 1
-        Tamb = 25
+        self.pamb = 1
+        self.Tamb = 25
 
-        ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
-        ean.analyse(pamb=pamb, Tamb=Tamb)
-        ean.print_results()
+        self.ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
+        self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
+        self.ean.print_results()
         print(f'COP = {abs(gk.Q.val) / kp.P.val}')
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
  # %%[sec_2]
@@ -206,7 +206,7 @@ class HeatPumpCycle:
         c4.set_attr(h=None, x=1)
         c5.set_attr(h=None, Td_bp=5)
 
-        gk, kp, ue, vd = self.nw.get_comp(
+        gk, vd, ue, kp = self.nw.get_comp(
             [
                 "Gaskühler", "Verdampfer", "Überhitzer", "Kompressor"
             ]
@@ -215,7 +215,7 @@ class HeatPumpCycle:
         gk.set_attr(pr1=1, pr2=1, ttd_u=4)
         vd.set_attr(pr1=1, pr2=1)
         ue.set_attr(pr1=1, pr2=1)
-        kp.set_attr(eta_s=.7)
+        kp.set_attr(eta_s=0.7)
 
     def solve_model(self, **kwargs):
         """
@@ -227,6 +227,7 @@ class HeatPumpCycle:
         try:
             self.nw.solve("design")
             if self.nw.res[-1] >= 1e-3 or self.nw.lin_dep:
+                self.reset_boundary_conditions()
                 self.nw.solve("design", init_only=True, init_path=self.stable)
             else:
                 # might need more checks here!
@@ -238,7 +239,7 @@ class HeatPumpCycle:
                         or any(self.nw.results["Compressor"]["P"] < 0)
                     ):
                     self.reset_boundary_conditions()
-                    self.nw.solve("design", init_only=True, init_path=self.stable)
+                    self.solved = False
                 else:
                     self.solved = True
         except ValueError as e:
@@ -261,9 +262,10 @@ class HeatPumpCycle:
             Evaluation of the objective function.
         """
         if self.solved:
-            if objective == "COP":
+            if objective == "eta":
+                self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
                 return 1 / (
-                        self.nw.busses["heat_product"].P.val / self.nw.busses["power"].P.val
+                    self.ean.network_data.loc['epsilon']
                 )
             else:
                 msg = f"Objective {objective} not implemented."
@@ -272,11 +274,12 @@ class HeatPumpCycle:
             return np.nan
 
 HeatPump = HeatPumpCycle()
-HeatPump.get_objective("COP")
+HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "2": {"p": {"min": 34, "max": 52.8}},
-        "3": {"p": {"min": 1.2, "max": 3.6}}
+        "2": {"p": {"min": 33.8, "max": 52.8}, "T": {"min": 100, "max": 110}},
+        "3": {"p": {"min": 1.2, "max": 3.6}},
+        "5": {"Td_bp": {"min": 0.1, "max": 6}},
     }
 }
 constraints = {
@@ -289,7 +292,7 @@ constraints = {
 }
 
 optimize = OptimizationProblem(
-    HeatPump, variables, constraints, objective="COP"
+    HeatPump, variables, constraints, objective="eta"
 )
 # %%[sec_4]
 num_ind = 10
@@ -319,17 +322,17 @@ plt.rc("font", **{"size": 18})
 fig, ax = plt.subplots(1, figsize=(16, 8))
 
 filter_valid_constraint = optimize.individuals["valid"].values
-filter_valid_result = ~np.isnan(optimize.individuals["COP"].values)
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
 sc = ax.scatter(
     data["Connections-2-p"],
     data["Connections-3-p"],
-    c=1 / data["COP"],
+    c=1 / data["eta"],
     s=100
 )
 cbar = plt.colorbar(sc)
-cbar.set_label("COP")
+cbar.set_label("eta")
 
 ax.set_axisbelow(True)
 ax.set_xlabel("Druck Gaskühler in bar")
@@ -337,5 +340,30 @@ ax.set_ylabel("Druck Verdampfer in bar")
 plt.tight_layout()
 
 fig.savefig("pygmo_optimization_R601.svg")
-print(data.loc[data["COP"].values == data["COP"].min()])
-# %%[sec_6]
+print(data.loc[data["eta"].values == data["eta"].min()])
+
+# make text reasonably sized
+plt.rc("font", **{"size": 18})
+
+fig, ax = plt.subplots(1, figsize=(16, 8))
+
+filter_valid_constraint = optimize.individuals["valid"].values
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
+data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
+
+sc = ax.scatter(
+    data["Connections-2-T"],
+    data["Connections-5-Td_bp"],
+    c=1 / data["eta"],
+    s=100
+)
+cbar = plt.colorbar(sc)
+cbar.set_label("eta")
+
+ax.set_axisbelow(True)
+ax.set_xlabel("Temperatur nach dem Gaskühler in Kelvin")
+ax.set_ylabel("Überhitzung in Kelvin ")
+plt.tight_layout()
+
+fig.savefig("pygmo_optimization_Temperatures_R601.svg")
+print(data.loc[data["eta"].values == data["eta"].min()])

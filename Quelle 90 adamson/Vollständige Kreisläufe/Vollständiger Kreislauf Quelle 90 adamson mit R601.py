@@ -17,8 +17,8 @@ gk = HeatExchanger('Gaskühler')
 se_ein = Source('Senke ein')
 se_aus = Sink('Senke aus')
 
-ue_ein = Source('Verdampfer rein')
-vd_aus = Sink('Überhitzer raus')
+ue_ein = Source('Überhitzer rein')
+vd_aus = Sink('Verdampfer raus')
 vd = HeatExchanger('Verdampfer')
 ue = HeatExchanger('Überhitzer')
 
@@ -93,10 +93,10 @@ nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
 #c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, p=34.1442, T=105)
-c3.set_attr(p=3.2083)
+c2.set_attr(h=None, p=44.8401, T=100.0061)
+c3.set_attr(p=3.2341)
 c4.set_attr(h=None, x=1)
-c5.set_attr(h=None, Td_bp=5)
+c5.set_attr(h=None, Td_bp=5.0347)
 c8.set_attr(T=None)
 gk.set_attr(ttd_u=4)
 
@@ -127,6 +127,7 @@ nw.add_busses(power, heat_product, power_COP, heat_product_COP)
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
+print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Implementierung Exergie Analyse
 
@@ -136,6 +137,7 @@ Tamb = 25
 ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
+print(ean.network_data.loc['epsilon'])
 # zwei verschiedene Exergiebetrachtungen, epsilon 72 % oder 31 % je nach Betrachtung, Frage der Definition von E_F
 
 
