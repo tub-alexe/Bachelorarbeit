@@ -47,17 +47,17 @@ cmp_sh.set_attr(pr1=1, pr2=1)
 # connections
 
 # working fluid saturation state
-h_sat = CPSI("H", "Q", 0, "T", 273.15 + 70, wf) / 1e3
+h_sat = CPSI("H", "Q", 0, "T", 273.15 + 60, wf) / 1e3
 c11.set_attr(h=h_sat)
 
 # evaporation pressure drum
-p_evap = CPSI("P", "Q", 1, "T", 273.15 + 70, wf) / 1e5
+p_evap = CPSI("P", "Q", 1, "T", 273.15 + 60, wf) / 1e5
 # enthalpy drum
-h_drum = CPSI("H", "Q", 0.5, "T", 273.15 + 70, wf) / 1e3
+h_drum = CPSI("H", "Q", 0.5, "T", 273.15 + 60, wf) / 1e3
 c13.set_attr(h=h_drum, p=p_evap)
 
 # working fluid superheated
-h_sh = CPSI("H", "P", p_evap, "T", 273.15 + 75, wf) / 1e3 #muss der Druck 10^-5 muklipliziert werden?
+h_sh = CPSI("H", "P", p_evap, "T", 273.15 + 70, wf) / 1e3 #muss der Druck 10^-5 muklipliziert werden?
 c15.set_attr(h=h_sh, fluid=fld_wf)
 
 # waste heat water
@@ -69,14 +69,14 @@ c23.set_attr(T=70)
 nw.solve(mode='design')
 nw.print_results()
 
-#cmp_ev.set_attr(ttd_l=2)
-#cmp_sh.set_attr(ttd_u=5)
-#c11.set_attr(h=None, x=0)
-#c13.set_attr(h=None, p=None, x=1)
-#c15.set_attr(h=None)
+cmp_ev.set_attr(ttd_l=10)
+cmp_sh.set_attr(ttd_u=10)
+c11.set_attr(h=None, x=0)
+c13.set_attr(h=None, p=None, x=1)
+c15.set_attr(h=None)
 
-#nw.solve(mode='design')
-#nw.print_results()
+nw.solve(mode='design')
+nw.print_results()
 
 
 # funktioniert bei R365 MFC bei verändern der Temperatur um einen Kelvin, die anderen leider nicht

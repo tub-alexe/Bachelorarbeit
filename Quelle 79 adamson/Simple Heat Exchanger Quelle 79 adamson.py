@@ -2,8 +2,9 @@ from tespy.networks import Network
 from tespy.components import (HeatExchangerSimple, Source, Sink, Compressor, Valve, Drum)
 from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
-
-nw = Network(fluids=['H2O'], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
+wf = 'H2O'
+fld_wf = fld_wf = {wf: 1}
+nw = Network(fluids=[wf], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 # Komponenten
 
@@ -30,7 +31,7 @@ c2.set_attr(h=h_sat)
 p_vd = CPSI("P", "Q", 0.7, "T", 273.15 + 75, 'H2O') / 1e5
 # enthalpy drum
 h_dr = CPSI("H", "Q", 0.7, "T", 273.15 + 75, 'H2O') / 1e3
-c3.set_attr(h=h_dr, p=p_vd, fluid={'H2O': 1})
+c3.set_attr(h=h_dr, p=p_vd, fluid=fld_wf)
 #c2.set_attr(T=75, fluid={'H2O': 1})
 #c3.set_attr(x=0.7)
 

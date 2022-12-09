@@ -4,7 +4,7 @@ from tespy.connections import Connection
 from CoolProp.CoolProp import PropsSI as CPSI
 
 #R601
-km = 'R601'
+km = 'R1234ZE(Z)'
 wa = 'H2O'
 fld_wa = {km: 0, wa: 1}
 fld_km = {km: 1, wa: 0}
@@ -46,10 +46,10 @@ c4.set_attr(h=h_verd)
 
 # Zwischen Verdampfer und Überhitzer
 h_zw = CPSI("H", "Q", 1, "T", 273.15+70, km) * 1e-3
-c5.set_attr(h=h_zw, p=2.8)
+c5.set_attr(h=h_zw, p=6.7)
 
 # Nach dem Überhitzer
-h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
+h_uebe = CPSI("H", "P", 6.7 * 1e5, "T", 273.15+75, km) * 1e-3
 c6.set_attr(h=h_uebe, fluid=fld_km)
 
 #Parameter heiße Seite
