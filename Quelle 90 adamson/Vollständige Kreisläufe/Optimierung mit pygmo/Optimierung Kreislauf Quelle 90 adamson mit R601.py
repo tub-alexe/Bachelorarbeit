@@ -279,7 +279,6 @@ variables = {
     "Connections": {
         "2": {"p": {"min": 33.8, "max": 52.8}, "T": {"min": 100, "max": 110}},
         "3": {"p": {"min": 1.2, "max": 3.6}},
-        "5": {"Td_bp": {"min": 0.1, "max": 6}},
     }
 }
 constraints = {

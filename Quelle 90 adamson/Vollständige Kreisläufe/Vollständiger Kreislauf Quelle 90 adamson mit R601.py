@@ -93,10 +93,10 @@ nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
 #c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, p=44.8401, T=100.0061)
-c3.set_attr(p=3.2341)
+c2.set_attr(h=None, p=45.8645, T=100.0376)
+c3.set_attr(p=3.2366)
 c4.set_attr(h=None, x=1)
-c5.set_attr(h=None, Td_bp=5.0347)
+c5.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
 gk.set_attr(ttd_u=4)
 
