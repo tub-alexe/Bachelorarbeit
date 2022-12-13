@@ -121,7 +121,7 @@ class HeatPumpCycle:
 
         self.power_COP = Bus('power')
         self.power_COP.add_comps(
-            {'comp': kp, 'char': -1, 'base': 'bus'}
+            {'comp': kp, 'char': 1, 'base': 'bus'}
         )
 
         self.heat_product_COP = Bus('heat_product')
@@ -314,56 +314,29 @@ print(optimize.individuals)
 pop
 
 import matplotlib.pyplot as plt
-
+from mpl_toolkits import mplot3d
 
 # make text reasonably sized
-plt.rc("font", **{"size": 18})
+plt.rcParams["figure.figsize"] = [10.00, 8.50]
+fig = plt.figure()
 
-fig, ax = plt.subplots(1, figsize=(16, 8))
 
 filter_valid_constraint = optimize.individuals["valid"].values
 filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
-sc = ax.scatter(
-    data["Connections-2-p"],
-    data["Connections-3-p"],
-    c=1 / data["eta"],
-    s=100
-)
-cbar = plt.colorbar(sc)
+
+
+ax = plt.axes(projection='3d')
+x = data["Connections-2-p"]
+y = data["Connections-3-p"]
+z = data["Connections-2-T"]
+c = 1 / data["eta"]
+img = ax.scatter(x, y, z, c=c, cmap='YlOrRd', alpha=1)
+cbar = plt.colorbar(img)
+ax.set_xlabel("Druck Gaskühlerseite")
+ax.set_ylabel("Druck Verdampferseite ")
+ax.set_zlabel("Temperatur nach dem Gaskühler")
 cbar.set_label("eta")
-
-ax.set_axisbelow(True)
-ax.set_xlabel("Druck Gaskühler in bar")
-ax.set_ylabel("Druck Verdampfer in bar")
-plt.tight_layout()
-
-fig.savefig("pygmo_optimization_R601.svg")
-print(data.loc[data["eta"].values == data["eta"].min()])
-
-# make text reasonably sized
-plt.rc("font", **{"size": 18})
-
-fig, ax = plt.subplots(1, figsize=(16, 8))
-
-filter_valid_constraint = optimize.individuals["valid"].values
-filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
-data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
-
-sc = ax.scatter(
-    data["Connections-2-T"],
-    data["Connections-5-Td_bp"],
-    c=1 / data["eta"],
-    s=100
-)
-cbar = plt.colorbar(sc)
-cbar.set_label("eta")
-
-ax.set_axisbelow(True)
-ax.set_xlabel("Temperatur nach dem Gaskühler in Kelvin")
-ax.set_ylabel("Überhitzung in Kelvin ")
-plt.tight_layout()
-
-fig.savefig("pygmo_optimization_Temperatures_R601.svg")
-print(data.loc[data["eta"].values == data["eta"].min()])
+plt.show()
+fig.savefig('pygmo_optimization_R601.svg')

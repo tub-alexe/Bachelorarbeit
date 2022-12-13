@@ -151,53 +151,67 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.1, 2.8, 19),
-    'p_kond': np.linspace(36, 55, 20),
-    'eta_s': np.linspace(0.7, 0.82, 5) * 100
+    'p_verd': np.linspace(1.1, 3.3, 30),
+    'p_kond': np.linspace(35, 54, 20),
+    'T_kond': np.linspace(100.0061, 110, 10),
+    'Td_bp': np.linspace(0.1, 5.04, 10),
 }
-COP = {
+eta = {
     'p_verd': [],
     'p_kond': [],
-    'eta_s': []
+    'T_kond': [],
+    'Td_bp': []
 }
 description = {
     'p_verd': 'Verdampferdruck in bar',
     'p_kond': 'Kondensatordruck in bar',
-    'eta_s': 'Isentroper Wirkungsgrad in %'
+    'T_kond': 'Kondensatortemperatur in Celsius',
+    'Td_bp': 'Überhitzung in Kelvin'
 }
 
 for p in data['p_verd']:
     c3.set_attr(p=p)
     nw.solve('design')
-    COP['p_verd'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
 # reset to base temperature
-c3.set_attr(p=2.8)
+c3.set_attr(p=3.2341)
 
 for p in data['p_kond']:
     c2.set_attr(p=p)
     nw.solve('design')
-    COP['p_kond'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
 # reset to base temperature
-c2.set_attr(p=36)
+c2.set_attr(p=44.8401)
 
-for eta_s in data['eta_s']:
-    kp.set_attr(eta_s=eta_s / 100)
+for T in data['T_kond']:
+    c2.set_attr(T=T)
     nw.solve('design')
-    COP['eta_s'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['T_kond'] += [ean.network_data.loc['epsilon']]
 
-fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
+c2.set_attr(T=100.0061)
+
+for Td_bp in data['Td_bp']:
+    c5.set_attr(Td_bp=Td_bp)
+    nw.solve('design')
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['Td_bp'] += [ean.network_data.loc['epsilon']]
+
+fig, ax = plt.subplots(1, 4, sharey=True, figsize=(16, 8))
 
 [a.grid() for a in ax]
 
 i = 0
 for key in data:
-    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
+    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
     ax[i].set_xlabel(description[key])
     i += 1
 
-ax[0].set_ylabel('COP of the heat pump')
+ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 
