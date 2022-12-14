@@ -313,29 +313,50 @@ print(optimize.individuals)
 pop
 
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
+import matplotlib as mpl
 
 # make text reasonably sized
 plt.rcParams["figure.figsize"] = [10.00, 8.50]
 fig = plt.figure()
-
+ax = plt.axes(projection='3d')
 
 filter_valid_constraint = optimize.individuals["valid"].values
 filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
+colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick",]
+cmap = mpl.colors.ListedColormap(colors)
+cmap.set_under("lavender")
+cmap.set_over("darkred")
+bounds = [0.5, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75, 0.76, 0.765, 0.77]
+norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 
-ax = plt.axes(projection='3d')
 x = data["Connections-2-p"]
 y = data["Connections-3-p"]
 z = data["Connections-2-T"]
 c = 1 / data["eta"]
-img = ax.scatter(x, y, z, c=c, cmap='YlOrRd', alpha=1)
-cbar = plt.colorbar(img)
+
+im = ax.scatter(x, y, z, c=c, cmap=cmap, norm=norm)
+
+cbar = fig.colorbar(im, extend="both")
 ax.set_xlabel("Druck Gaskühlerseite")
 ax.set_ylabel("Druck Verdampferseite ")
 ax.set_zlabel("Temperatur nach dem Gaskühler")
 cbar.set_label("eta")
 plt.show()
 fig.savefig('pygmo_optimization_R601.svg')
+
+#ax = plt.axes(projection='3d')
+#x = data["Connections-2-p"]
+#y = data["Connections-3-p"]
+#z = data["Connections-2-T"]
+#c = 1 / data["eta"]
+#img = ax.scatter(x, y, z, c=c, cmap='YlOrRd', alpha=1)
+#cbar = plt.colorbar(img)
+#ax.set_xlabel("Druck Gaskühlerseite")
+#ax.set_ylabel("Druck Verdampferseite ")
+#ax.set_zlabel("Temperatur nach dem Gaskühler")
+#cbar.set_label("eta")
+#plt.show()
+#fig.savefig('pygmo_optimization_R601.svg')

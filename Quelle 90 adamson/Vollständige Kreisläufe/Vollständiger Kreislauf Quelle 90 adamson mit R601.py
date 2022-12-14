@@ -3,6 +3,7 @@ from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Sou
 from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
+from fluprodia import FluidPropertyDiagram
 
 km = 'R601'
 se = 'H2O'
@@ -93,8 +94,8 @@ nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
 #c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, p=45.8645, T=100.0376)
-c3.set_attr(p=3.2366)
+c2.set_attr(h=None, p=36, T=105)
+c3.set_attr(p=2.8)
 c4.set_attr(h=None, x=1)
 c5.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
@@ -154,19 +155,16 @@ data = {
     'p_verd': np.linspace(1.1, 3.3, 30),
     'p_kond': np.linspace(35, 54, 20),
     'T_kond': np.linspace(100.0061, 110, 10),
-    'Td_bp': np.linspace(0.1, 5.04, 10),
 }
 eta = {
     'p_verd': [],
     'p_kond': [],
     'T_kond': [],
-    'Td_bp': []
 }
 description = {
     'p_verd': 'Verdampferdruck in bar',
     'p_kond': 'Kondensatordruck in bar',
     'T_kond': 'Kondensatortemperatur in Celsius',
-    'Td_bp': 'Überhitzung in Kelvin'
 }
 
 for p in data['p_verd']:
@@ -176,7 +174,7 @@ for p in data['p_verd']:
     eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
 # reset to base temperature
-c3.set_attr(p=3.2341)
+c3.set_attr(p=2.8)
 
 for p in data['p_kond']:
     c2.set_attr(p=p)
@@ -185,7 +183,7 @@ for p in data['p_kond']:
     eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
 # reset to base temperature
-c2.set_attr(p=44.8401)
+c2.set_attr(p=36)
 
 for T in data['T_kond']:
     c2.set_attr(T=T)
@@ -193,15 +191,9 @@ for T in data['T_kond']:
     ean.analyse(pamb=pamb, Tamb=Tamb)
     eta['T_kond'] += [ean.network_data.loc['epsilon']]
 
-c2.set_attr(T=100.0061)
+c2.set_attr(T=105)
 
-for Td_bp in data['Td_bp']:
-    c5.set_attr(Td_bp=Td_bp)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['Td_bp'] += [ean.network_data.loc['epsilon']]
-
-fig, ax = plt.subplots(1, 4, sharey=True, figsize=(16, 8))
+fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
 
 [a.grid() for a in ax]
 
@@ -216,6 +208,33 @@ ax[0].set_ylabel('eta of the Heat Pump')
 plt.tight_layout()
 
 fig.savefig('Optimierung R601.svg')
+
+#log p,h
+
+result_dict = {}
+result_dict.update({vd.label: vd.get_plotting_data()[2]})
+result_dict.update({ue.label: ue.get_plotting_data()[2]})
+result_dict.update({kp.label: kp.get_plotting_data()[1]})
+result_dict.update({gk.label: gk.get_plotting_data()[1]})
+result_dict.update({exp.label: exp.get_plotting_data()[1]})
+
+diagram = FluidPropertyDiagram(km)
+diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
+
+for key, data in result_dict.items():
+    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
+
+diagram.calc_isolines()
+diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
+diagram.draw_isolines('logph')
+
+for key in result_dict.keys():
+    datapoints = result_dict[key]['datapoints']
+    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
+    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
+
+
+diagram.save('logph_R601.png', dpi=300)
 # h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
 # sinnvolles setzen der Massenströme wichtig
 #bei setzen des oderen Druckes auf 38,625 bar statt 36 wird der erwünschte Wirkungsgrad sowie der erwünschte COP erzielt ohne ihn vorzugeben
