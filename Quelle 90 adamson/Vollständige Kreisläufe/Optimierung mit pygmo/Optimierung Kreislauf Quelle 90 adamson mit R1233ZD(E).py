@@ -278,8 +278,7 @@ HeatPump.get_objective("eta")
 variables = {
     "Connections": {
         "2": {"p": {"min": 45, "max": 70}, "T": {"min": 100, "max": 110}},
-        "3": {"p": {"min": 2, "max": 6.5}},
-        "5": {"Td_bp": {"min": 0.1, "max": 6}},
+        "3": {"p": {"min": 2, "max": 6.5}}
     }
 }
 constraints = {
@@ -314,54 +313,36 @@ print(optimize.individuals)
 pop
 
 import matplotlib.pyplot as plt
-
+import matplotlib as mpl
 
 # make text reasonably sized
-plt.rc("font", **{"size": 18})
-
-fig, ax = plt.subplots(1, figsize=(16, 8))
-
-filter_valid_constraint = optimize.individuals["valid"].values
-filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
-data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
-
-sc = ax.scatter(
-    data["Connections-2-p"],
-    data["Connections-3-p"],
-    c=1 / data["eta"],
-    s=100
-)
-cbar = plt.colorbar(sc)
-cbar.set_label("eta")
-
-ax.set_axisbelow(True)
-ax.set_xlabel("Druck Gaskühler in bar")
-ax.set_ylabel("Druck Verdampfer in bar")
-plt.tight_layout()
-
-fig.savefig("pygmo_optimization_R1233ZD(E).svg")
-print(data.loc[data["eta"].values == data["eta"].min()])
-# %%[sec_6]
-
-fig, ax = plt.subplots(1, figsize=(16, 8))
+plt.rcParams["figure.figsize"] = [10.00, 8.50]
+fig = plt.figure()
+ax = plt.axes(projection='3d')
 
 filter_valid_constraint = optimize.individuals["valid"].values
 filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
-sc = ax.scatter(
-    data["Connections-2-T"],
-    data["Connections-5-Td_bp"],
-    c=1 / data["eta"],
-    s=100
-)
-cbar = plt.colorbar(sc)
+colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick",]
+cmap = mpl.colors.ListedColormap(colors)
+cmap.set_under("lavender")
+cmap.set_over("darkred")
+bounds = [0.5, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.74, 0.745, 0.75, 0.755]
+norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
+
+
+x = data["Connections-2-p"]
+y = data["Connections-3-p"]
+z = data["Connections-2-T"]
+c = 1 / data["eta"]
+
+im = ax.scatter(x, y, z, c=c, cmap=cmap, norm=norm)
+
+cbar = fig.colorbar(im, extend="both")
+ax.set_xlabel("Druck Gaskühlerseite")
+ax.set_ylabel("Druck Verdampferseite ")
+ax.set_zlabel("Temperatur nach dem Gaskühler")
 cbar.set_label("eta")
-
-ax.set_axisbelow(True)
-ax.set_xlabel("Temperatur nach dem Gaskühler in Kelvin")
-ax.set_ylabel("Überhitzung in Kelvin ")
-plt.tight_layout()
-
-fig.savefig("pygmo_optimization_Temperatures_R1233ZD(E).svg")
-print(data.loc[data["eta"].values == data["eta"].min()])
+plt.show()
+fig.savefig('pygmo_optimization_R1233ZD(E).svg')

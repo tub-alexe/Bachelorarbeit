@@ -324,7 +324,7 @@ filter_valid_constraint = optimize.individuals["valid"].values
 filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
 data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
 
-colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick",]
+colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick"]
 cmap = mpl.colors.ListedColormap(colors)
 cmap.set_under("lavender")
 cmap.set_over("darkred")

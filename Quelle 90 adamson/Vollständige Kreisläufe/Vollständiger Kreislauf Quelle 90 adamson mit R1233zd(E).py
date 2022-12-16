@@ -1,7 +1,9 @@
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink)
-from tespy.connections import Connection
+from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
+from tespy.tools import ExergyAnalysis
+from fluprodia import FluidPropertyDiagram
 
 km = 'R1233ZD(E)'
 se = 'H2O'
@@ -98,9 +100,44 @@ c5.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
 gk.set_attr(ttd_u=5)
 
+# busses
+power = Bus('power input')
+power.add_comps(
+    {'comp': kp, 'char': 1, 'base': 'bus'},
+    {'comp': ue_in, 'base': 'bus'},
+    {'comp': vd_aus})
+
+
+heat_product = Bus('heating')
+heat_product.add_comps(
+    {'comp': se_ein, 'base': 'bus'},
+    {'comp': se_aus})
+
+power_COP = Bus('power')
+power_COP.add_comps(
+        {'comp': kp, 'char': -1, 'base': 'bus'}
+)
+
+heat_product_COP = Bus('heat_product')
+heat_product_COP.add_comps(
+            {"comp": gk, "char": 1})
+
+nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+
 nw.solve(mode='design')
 nw.print_results()
-print(f'COP = {abs(gk.Q.val) / kp.P.val}')
+print('COP', heat_product_COP.P.val / power_COP.P.val)
+print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
+
+# Implementierung Exergie Analyse
+
+pamb = 1
+Tamb = 25
+
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
+ean.analyse(pamb=pamb, Tamb=Tamb)
+ean.print_results()
+print(ean.network_data.loc['epsilon'])
 
 #zweites Szenario funktioniert leider nicht
 
@@ -112,41 +149,46 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(3, 5, 15),
-    'p_kond': np.linspace(53, 65, 12),
-    'eta_s': np.linspace(0.7, 0.83, 14) * 100
+    'p_verd': np.linspace(3, 5.8, 15),
+    'p_kond': np.linspace(53, 72, 20),
+    'T_kond': np.linspace(100.0061, 110, 10)
 }
-COP = {
+eta = {
     'p_verd': [],
     'p_kond': [],
-    'eta_s': []
+    'T_kond': []
 }
 description = {
     'p_verd': 'Verdampferdruck in bar',
     'p_kond': 'Kondensatordruck in bar',
-    'eta_s': 'Isentroper Wirkungsgrad in %'
+    'T_kond': 'Kondensatortemperatur in Celsius'
 }
 
 for p in data['p_verd']:
     c3.set_attr(p=p)
     nw.solve('design')
-    COP['p_verd'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
-# reset to base pressure
+# reset to base temperature
 c3.set_attr(p=5.1)
 
 for p in data['p_kond']:
     c2.set_attr(p=p)
     nw.solve('design')
-    COP['p_kond'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
-# reset to base pressure
+# reset to base temperature
 c2.set_attr(p=56)
 
-for eta_s in data['eta_s']:
-    kp.set_attr(eta_s=eta_s / 100)
+for T in data['T_kond']:
+    c2.set_attr(T=T)
     nw.solve('design')
-    COP['eta_s'] += [abs(gk.Q.val) / kp.P.val]
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['T_kond'] += [ean.network_data.loc['epsilon']]
+
+c2.set_attr(T=105)
 
 fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
 
@@ -154,12 +196,12 @@ fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
 
 i = 0
 for key in data:
-    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
+    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
     ax[i].set_xlabel(description[key])
     i += 1
 
-ax[0].set_ylabel('COP of the heat pump')
+ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 
-fig.savefig('Optimierung R1233zd(E).svg')
+fig.savefig('Optimierung R1233ZD(E).svg')

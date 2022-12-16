@@ -22,64 +22,59 @@ ue_ein = Source('Überhitzer rein')
 vd_aus = Sink('Verdampfer raus')
 vd = HeatExchanger('Verdampfer')
 ue = HeatExchanger('Überhitzer')
-
+ihx = HeatExchanger("Internal Heat Exchanger")
 exp = Valve('Expansionsventil')
 kp = Compressor('Kompressor')
 cc = CycleCloser('Kreilaufzusammenschluss')
+kr_ein = Source('Kreislauf ein')
+kr_aus = Sink('Kreilauf aus')
+
 
 #Verbindungen Kreislauf
 
-c1 = Connection(cc, 'out1', gk, 'in1')
-c2 = Connection(gk, 'out1', exp, 'in1')
-c3 = Connection(exp, 'out1', vd, 'in2')
-c4 = Connection(vd, 'out2', ue, 'in2')
-c5 = Connection(ue, 'out2', kp, 'in1')
-c6 = Connection(kp, 'out1', cc, 'in1')
+c3 = Connection(gk, 'out1', ihx, 'in1')
+c4 = Connection(ihx, 'out1', exp, 'in1')
+c5 = Connection(exp, 'out1', vd, 'in2')
+c5_ue = Connection(vd, 'out2', ue, 'in2')
+c6 = Connection(ue, 'out2', ihx, 'in2')
+c1 = Connection(ihx, 'out2', kp, 'in1')
+c2cc = Connection(kp, 'out1', cc, 'in1')
+c2 = Connection(cc, 'out1', gk, 'in1')
 
-#Verbindungen kalte Seite Gaskühler
-
+#kalte Seite Gaskühler
 c7 = Connection(se_ein, 'out1', gk, 'in2')
 c8 = Connection(gk, 'out2', se_aus, 'in1')
 
+#Verbindungen heiße Seite
 
-#Verbindungen heiße Seite Verdampfer und Überhitzer
 c9 = Connection(ue_ein, 'out1', ue, 'in1')
 c10 = Connection(ue, 'out1', vd, 'in1')
 c11 = Connection(vd, 'out1', vd_aus, 'in1')
-nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
+
+nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
 
 #Parametrisierung Komponenten
-
 gk.set_attr(pr1=1, pr2=1)
+ihx.set_attr(pr1=1, pr2=1)
 vd.set_attr(pr1=1, pr2=1)
 ue.set_attr(pr1=1, pr2=1)
 kp.set_attr(eta_s=0.7)
-# Parametrisierung heiße Seite, vor dem Gaskühler
 
-#h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+200.734, km) * 1e-3
-#c1.set_attr(h=h_gk_vor)
+#Parametrisierung Verbindungen
+h_ihx_h_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+100, km) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid=fld_km)
 
-# Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
 
-h_gk_nach = CPSI("H", "P", 36 * 1e5, "T", 273.15+105, km) * 1e-3
-c2.set_attr(h=h_gk_nach, p=36)
+h_ihx_k_vor = CPSI("H", "P", 35 * 1e5, "T", 273.15+105, km) * 1e-3
+c3.set_attr(h=h_ihx_k_vor, p=35)
 
-# Parameter kalte Seite
-# Vor dem Verdampfer
-
-#h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
-c3.set_attr(p=2.8)
-
-# Zwischen Verdampfer und Überhitzer
 h_zw = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+70, km) * 1e-3
-c4.set_attr(h=h_zw)
+c5_ue.set_attr(h=h_zw)
 
-# Nach dem Überhitzer
-h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
-c5.set_attr(h=h_uebe, fluid=fld_km)
+h_ihx_k_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, km) * 1e-3
+c6.set_attr(h=h_ihx_k_nach)
 
-#Parametrisierung kalte Seite Gaskühler
-
+#kalte Seite Gaskühler
 c7.set_attr(T=100, p=20, fluid=fld_se)
 c8.set_attr(T=200)
 
@@ -87,20 +82,17 @@ c8.set_attr(T=200)
 c9.set_attr(T=80, m=5, p=5, fluid=fld_se)
 c11.set_attr(T=75)
 
-#Lösen
-
 nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
-#c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, p=36, T=105)
-c3.set_attr(p=2.8)
-c4.set_attr(h=None, x=1)
-c5.set_attr(h=None, Td_bp=5)
+c1.set_attr(p=2.8, h=None)
+ihx.set_attr(ttd_u=5)
+c3.set_attr(h=None, p=35, T=105)
+c5_ue.set_attr(h=None, x=1)
+c6.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
 gk.set_attr(ttd_u=4)
-
 # busses
 power = Bus('power input')
 power.add_comps(
@@ -139,10 +131,6 @@ ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
-# zwei verschiedene Exergiebetrachtungen, epsilon 72 % oder 31 % je nach Betrachtung, Frage der Definition von E_F
-
-
-#Parameteroptimierung
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -152,9 +140,9 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.1, 3.3, 30),
-    'p_kond': np.linspace(35, 54, 20),
-    'T_kond': np.linspace(100.0061, 110, 10)
+    'p_verd': np.linspace(1.7, 3.25, 10),
+    'p_kond': np.linspace(35, 45, 10),
+    'T_kond': np.linspace(101, 110, 10)
 }
 eta = {
     'p_verd': [],
@@ -168,30 +156,30 @@ description = {
 }
 
 for p in data['p_verd']:
-    c3.set_attr(p=p)
+    c1.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
 # reset to base temperature
-c3.set_attr(p=2.8)
+c1.set_attr(p=2.8)
 
 for p in data['p_kond']:
-    c2.set_attr(p=p)
+    c3.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
-# reset to base temperature
-c2.set_attr(p=36)
+# reset to base pressure
+c3.set_attr(p=35)
 
 for T in data['T_kond']:
-    c2.set_attr(T=T)
+    c3.set_attr(T=T)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     eta['T_kond'] += [ean.network_data.loc['epsilon']]
 
-c2.set_attr(T=105)
+c3.set_attr(T=105)
 
 fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
 
@@ -206,38 +194,5 @@ for key in data:
 ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
-
-fig.savefig('Optimierung R601.svg')
-
-#log p,h
-
-result_dict = {}
-result_dict.update({vd.label: vd.get_plotting_data()[2]})
-result_dict.update({ue.label: ue.get_plotting_data()[2]})
-result_dict.update({kp.label: kp.get_plotting_data()[1]})
-result_dict.update({gk.label: gk.get_plotting_data()[1]})
-result_dict.update({exp.label: exp.get_plotting_data()[1]})
-
-diagram = FluidPropertyDiagram(km)
-diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
-
-for key, data in result_dict.items():
-    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
-
-diagram.calc_isolines()
-diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
-diagram.draw_isolines('logph')
-
-for key in result_dict.keys():
-    datapoints = result_dict[key]['datapoints']
-    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
-    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
-
-
-diagram.save('logph_R601.png', dpi=300)
-# h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
-# sinnvolles setzen der Massenströme wichtig
-#bei setzen des oderen Druckes auf 38,625 bar statt 36 wird der erwünschte Wirkungsgrad sowie der erwünschte COP erzielt ohne ihn vorzugeben
-#wenn eta_s auf 0.7 gesetzt dann Tempertur vor Gaskühler 207 statt 204
-
-
+plt.show()
+#fig.savefig('Optimierung_IHX_R601.svg')
