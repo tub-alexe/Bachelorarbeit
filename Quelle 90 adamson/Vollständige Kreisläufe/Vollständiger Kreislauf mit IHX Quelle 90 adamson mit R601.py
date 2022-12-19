@@ -140,8 +140,8 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.7, 3.25, 10),
-    'p_kond': np.linspace(35, 45, 10),
+    'p_verd': np.linspace(1.7, 3.2, 10),
+    'p_kond': np.linspace(35, 41, 10),
     'T_kond': np.linspace(101, 110, 10)
 }
 eta = {
@@ -159,19 +159,22 @@ for p in data['p_verd']:
     c1.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
+    print(ean.network_data.loc['epsilon'])
     eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
-# reset to base temperature
-c1.set_attr(p=2.8)
+    c1.set_attr(p=2.8)
+
+    nw.solve(mode='design')
 
 for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
+    print(ean.network_data.loc['epsilon'])
     eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
-# reset to base pressure
-c3.set_attr(p=35)
+    # reset to base pressure
+    c3.set_attr(p=35)
 
 for T in data['T_kond']:
     c3.set_attr(T=T)
@@ -179,7 +182,6 @@ for T in data['T_kond']:
     ean.analyse(pamb=pamb, Tamb=Tamb)
     eta['T_kond'] += [ean.network_data.loc['epsilon']]
 
-c3.set_attr(T=105)
 
 fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
 
@@ -195,4 +197,4 @@ ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-#fig.savefig('Optimierung_IHX_R601.svg')
+fig.savefig('Optimierung_IHX_R601.svg')
