@@ -141,6 +141,32 @@ ean.print_results()
 print(ean.network_data.loc['epsilon'])
 # zwei verschiedene Exergiebetrachtungen, epsilon 72 % oder 31 % je nach Betrachtung, Frage der Definition von E_F
 
+#log p,h
+
+result_dict = {}
+result_dict.update({vd.label: vd.get_plotting_data()[2]})
+result_dict.update({ue.label: ue.get_plotting_data()[2]})
+result_dict.update({kp.label: kp.get_plotting_data()[1]})
+result_dict.update({gk.label: gk.get_plotting_data()[1]})
+result_dict.update({exp.label: exp.get_plotting_data()[1]})
+
+diagram = FluidPropertyDiagram(km)
+diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
+
+for key, data in result_dict.items():
+    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
+
+diagram.calc_isolines()
+diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
+diagram.draw_isolines('logph')
+
+for key in result_dict.keys():
+    datapoints = result_dict[key]['datapoints']
+    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
+    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
+
+
+diagram.save('logph_R601.png', dpi=300)
 
 #Parameteroptimierung
 
@@ -209,32 +235,7 @@ plt.tight_layout()
 
 fig.savefig('Optimierung R601.svg')
 
-#log p,h
 
-result_dict = {}
-result_dict.update({vd.label: vd.get_plotting_data()[2]})
-result_dict.update({ue.label: ue.get_plotting_data()[2]})
-result_dict.update({kp.label: kp.get_plotting_data()[1]})
-result_dict.update({gk.label: gk.get_plotting_data()[1]})
-result_dict.update({exp.label: exp.get_plotting_data()[1]})
-
-diagram = FluidPropertyDiagram(km)
-diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
-
-for key, data in result_dict.items():
-    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
-
-diagram.calc_isolines()
-diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
-diagram.draw_isolines('logph')
-
-for key in result_dict.keys():
-    datapoints = result_dict[key]['datapoints']
-    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
-    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
-
-
-diagram.save('logph_R601.png', dpi=300)
 # h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
 # sinnvolles setzen der Massenströme wichtig
 #bei setzen des oderen Druckes auf 38,625 bar statt 36 wird der erwünschte Wirkungsgrad sowie der erwünschte COP erzielt ohne ihn vorzugeben
