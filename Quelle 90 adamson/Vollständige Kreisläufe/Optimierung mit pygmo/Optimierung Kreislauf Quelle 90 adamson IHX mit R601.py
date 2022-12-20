@@ -318,7 +318,7 @@ colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", 
 cmap = mpl.colors.ListedColormap(colors)
 cmap.set_under("lavender")
 cmap.set_over("darkred")
-bounds = [0.5, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75, 0.76, 0.765, 0.77]
+bounds = [0.5, 0.6, 0.65, 0.675, 0.7, 0.725, 0.75, 0.76, 0.765, 0.77, 0.775]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 
