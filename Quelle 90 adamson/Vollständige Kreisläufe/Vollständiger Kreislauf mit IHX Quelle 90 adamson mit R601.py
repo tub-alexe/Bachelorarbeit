@@ -86,9 +86,9 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gk.Q.val) / kp.P.val}')
 
-c1.set_attr(p=2.8, h=None)
+c1.set_attr(p=3.2377, h=None)
 ihx.set_attr(ttd_u=5)
-c3.set_attr(h=None, p=35, T=105)
+c3.set_attr(h=None, p=44.059, T=100.0093)
 c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
@@ -161,69 +161,3 @@ for key in result_dict.keys():
 
 diagram.save('logph_IHX_R601.png', dpi=300)
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-# make text reasonably sized
-plt.rc('font', **{'size': 18})
-
-
-data = {
-    'p_verd': np.linspace(1.7, 3.2, 10),
-    'p_kond': np.linspace(35, 41, 10),
-    'T_kond': np.linspace(101, 110, 10)
-}
-eta = {
-    'p_verd': [],
-    'p_kond': [],
-    'T_kond': []
-}
-description = {
-    'p_verd': 'Verdampferdruck in bar',
-    'p_kond': 'Kondensatordruck in bar',
-    'T_kond': 'Kondensatortemperatur in Celsius'
-}
-
-for p in data['p_verd']:
-    c1.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    print(ean.network_data.loc['epsilon'])
-    eta['p_verd'] += [ean.network_data.loc['epsilon']]
-
-    c1.set_attr(p=2.8)
-
-    nw.solve(mode='design')
-
-for p in data['p_kond']:
-    c3.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    print(ean.network_data.loc['epsilon'])
-    eta['p_kond'] += [ean.network_data.loc['epsilon']]
-
-    # reset to base pressure
-    c3.set_attr(p=35)
-
-for T in data['T_kond']:
-    c3.set_attr(T=T)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['T_kond'] += [ean.network_data.loc['epsilon']]
-
-
-fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
-
-[a.grid() for a in ax]
-
-i = 0
-for key in data:
-    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
-    ax[i].set_xlabel(description[key])
-    i += 1
-
-ax[0].set_ylabel('eta of the Heat Pump')
-
-plt.tight_layout()
-plt.show()
-fig.savefig('Optimierung_IHX_R601.svg')

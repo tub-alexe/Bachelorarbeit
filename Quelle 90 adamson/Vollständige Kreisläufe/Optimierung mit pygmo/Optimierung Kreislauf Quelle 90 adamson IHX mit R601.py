@@ -77,8 +77,8 @@ class HeatPumpCycle:
         h_ihx_h_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 100, km) * 1e-3
         c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid=fld_km)
 
-        h_ihx_k_vor = CPSI("H", "P", 35 * 1e5, "T", 273.15 + 105, km) * 1e-3
-        c3.set_attr(h=h_ihx_k_vor, p=35)
+        h_ihx_k_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 105, km) * 1e-3
+        c3.set_attr(h=h_ihx_k_vor, p=36)
 
         h_zw = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 70, km) * 1e-3
         c5_ue.set_attr(h=h_zw)
@@ -126,7 +126,7 @@ class HeatPumpCycle:
 
         c1.set_attr(p=2.8, h=None)
         ihx.set_attr(ttd_u=5)
-        c3.set_attr(h=None, p=35, T=105)
+        c3.set_attr(h=None, p=36, T=105)
         c5_ue.set_attr(h=None, x=1)
         c6.set_attr(h=None, Td_bp=5)
         c8.set_attr(T=None)
@@ -191,7 +191,7 @@ class HeatPumpCycle:
 
         # Connection parameters
         c1.set_attr(p=2.8)
-        c3.set_attr(p=35, T=105)
+        c3.set_attr(p=36, T=105)
         c5_ue.set_attr(x=1)
         c6.set_attr(Td_bp=5)
 
@@ -267,17 +267,17 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "3": {"p": {"min": 35, "max": 42}, "T": {"min": 101, "max": 110}},
-        "1": {"p": {"min": 1.7, "max": 3.3}},
+        "3": {"p": {"min": 35, "max": 52.8}, "T": {"min": 100, "max": 110}},
+        "1": {"p": {"min": 1.7, "max": 3.4}}
     }
 }
 constraints = {
     "lower limits": {
         "Connections": {
-            "3": {"p": "ref1"}
+            "3": {"T": "ref1"}
         },
     },
-    "ref1": ["Connections", "1", "p"]
+    "ref1": ["Connections", "1", "T"]
 }
 
 optimize = OptimizationProblem(
@@ -285,7 +285,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 100
+num_gen = 200
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is

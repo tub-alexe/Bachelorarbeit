@@ -233,7 +233,7 @@ ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 
-fig.savefig('Optimierung R601.svg')
+#fig.savefig('Optimierung R601.svg')
 
 
 # h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
