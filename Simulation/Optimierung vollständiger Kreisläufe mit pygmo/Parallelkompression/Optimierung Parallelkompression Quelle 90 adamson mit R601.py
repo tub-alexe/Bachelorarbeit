@@ -2,12 +2,7 @@
 import numpy as np
 import pygmo as pg
 
-from tespy.components import CycleCloser
-from tespy.components import Sink
-from tespy.components import Source
-from tespy.components import HeatExchanger
-from tespy.components import Valve
-from tespy.components import Compressor
+from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink, DropletSeparator, Merge)
 from tespy.connections import Bus
 from tespy.connections import Connection
 from tespy.networks import Network
@@ -28,80 +23,115 @@ class HeatPumpCycle:
         self.nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', iterinfo=False)
 
         # Components
-        gc = HeatExchanger('Gas cooler')
+        fl = DropletSeparator('Flash Tank')
+        cp_1 = Compressor('Compressor 1')
+        cp_2 = Compressor('Compressor 2')
+        va_1 = Valve('Valve 1')
+        va_2 = Valve('Valve 2')
         ev = HeatExchanger('Evaporator')
         sup = HeatExchanger('Superheater')
-        va = Valve('Valve')
-        cp = Compressor('Compressor')
-        ihx = HeatExchanger("Internal Heat Exchanger")
-
-        # Sources, Sinks and CycleCloser
-
-        si_in = Source('Sink in')
-        si_out = Sink('Sink out')
+        gc = HeatExchanger('Gas Cooler')
+        ihx_1 = HeatExchanger('Internal Heat Exchanger 1')
+        ihx_2 = HeatExchanger('Internal Heat Exchanger 2')
 
         sou_in = Source('Source in')
         sou_out = Sink('Source out')
+        si_in = Source('Sink in')
+        si_out = Sink('Sink out')
+        mg = Merge('merge', num_in=2)
 
         cc = CycleCloser('CycleCloser')
 
+        # Connections
+        # Main Cycle
+        gc_ihx_2 = Connection(gc, 'out1', ihx_2, 'in1', label="1")
+        ihx_2_va_2 = Connection(ihx_2, 'out1', va_2, 'in1', label="2")
+        va_2_fl = Connection(va_2, 'out1', fl, 'in1', label="3")
+        fl_ihx_1 = Connection(fl, 'out1', ihx_1, 'in1', label="4")
+        ihx_1_va_1 = Connection(ihx_1, 'out1', va_1, 'in1', label="5")
+        va_1_ev = Connection(va_1, 'out1', ev, 'in2', label="6")
+        ev_sup = Connection(ev, 'out2', sup, 'in2', label="7")
+        sup_ihx_1 = Connection(sup, 'out2', ihx_1, 'in2', label="8")
+        ihx_1_cp_1 = Connection(ihx_1, 'out2', cp_1, 'in1', label="9")
+        cp_1_mg = Connection(cp_1, 'out1', mg, 'in1', label="10")
+        fl_ihx_2 = Connection(fl, 'out2', ihx_2, 'in2', label="11")
+        ihx_2_cp_2 = Connection(ihx_2, 'out2', cp_2, 'in1', label="12")
+        cp_2_mg = Connection(cp_2, 'out1', mg, 'in2', label="13")
+        mg_cc = Connection(mg, 'out1', cc, 'in1', label="14")
+        cc_gc = Connection(cc, 'out1', gc, 'in1', label="15")
 
-        #Connections Cycle
+        # Source
+        sou_in_sup = Connection(sou_in, 'out1', sup, 'in1', label="16")
+        ev_sup_sou = Connection(sup, 'out1', ev, 'in1', label="17")
+        ev_sou_out = Connection(ev, 'out1', sou_out, 'in1', label="18")
 
-        c1 = Connection(ihx, 'out2', cp, 'in1', label="1")
-        c2cc = Connection(cp, 'out1', cc, 'in1', label="2cc")
-        c2 = Connection(cc, 'out1', gc, 'in1', label="2")
-        c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
-        c4 = Connection(ihx, 'out1', va, 'in1', label="4")
-        c5 = Connection(va, 'out1', ev, 'in2', label="5")
-        c5_ue = Connection(ev, 'out2', sup, 'in2', label="5_ue")
-        c6 = Connection(sup, 'out2', ihx, 'in2', label="6")
+        # Sink
+        si_in_gc = Connection(si_in, 'out1', gc, 'in2', label="19")
+        gc_si_out = Connection(gc, 'out2', si_out, 'in1', label="20")
 
-
-        # Connections Sink
-        c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
-        c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
-
-        # Connections Source
-        c9 = Connection(sou_in, 'out1', sup, 'in1', label="9")
-        c10 = Connection(sup, 'out1', ev, 'in1', label="10")
-        c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
-
-        self.nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
+        self.nw.add_conns(gc_ihx_2, ihx_2_va_2, va_2_fl, fl_ihx_1, ihx_1_va_1, va_1_ev, ev_sup, sup_ihx_1, ihx_1_cp_1,
+                          cp_1_mg, fl_ihx_2, ihx_2_cp_2, cp_2_mg, mg_cc, cc_gc, sou_in_sup, ev_sup_sou, ev_sou_out,
+                          si_in_gc, gc_si_out)
 
         # Starting Parameters Components
-        gc.set_attr(pr1=1, pr2=1)
-        ihx.set_attr(pr1=1, pr2=1)
         ev.set_attr(pr1=1, pr2=1)
         sup.set_attr(pr1=1, pr2=1)
-        cp.set_attr(eta_s=0.7)
+        gc.set_attr(pr1=1, pr2=1)
+        ihx_1.set_attr(pr1=1, pr2=1)
+        ihx_2.set_attr(pr1=1, pr2=1)
+        cp_1.set_attr(eta_s=0.7)
+        cp_2.set_attr(eta_s=0.7)
 
         # Starting Parameters Connections Cycle
-        h_ihx_h_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 100, wf) * 1e-3
-        c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid=fld_wf)
+        # Main Cycle
+        h_gc_ihx_2 = CPSI("H", "P", 34 * 1e5, "T", 273.15 + 115, wf) * 1e-3
+        gc_ihx_2.set_attr(h=h_gc_ihx_2, p=34)
 
-        h_ihx_k_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 105, wf) * 1e-3
-        c3.set_attr(h=h_ihx_k_vor, p=36)
+        # h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
+        va_2_fl.set_attr(p=7.3, fluid=fld_wf)
 
-        h_zw = CPSI("H", "Q", 1, "T", 273.15 + 70, wf) * 1e-3
-        c5_ue.set_attr(h=h_zw)
+        h_ihx_2_cp_2 = CPSI("H", "P", 7.3 * 1e5, "T", 273.15 + 110, wf) * 1e-3
+        ihx_2_cp_2.set_attr(h=h_ihx_2_cp_2)
 
-        h_ihx_k_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 75, wf) * 1e-3
-        c6.set_attr(h=h_ihx_k_nach)
+        h_ev_sup = CPSI("H", "Q", 1, "T", 273.15 + 70, wf) * 1e-3
+        ev_sup.set_attr(h=h_ev_sup, p=2.8)
 
-        # Starting Parameters Connection Sink
-        c7.set_attr(T=100, p=20, fluid=fld_si)
-        c8.set_attr(T=200)
+        h_sup_ihx_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 75, wf) * 1e-3
+        sup_ihx_1.set_attr(h=h_sup_ihx_1)
 
-        # Starting Parameters Connection Source
-        c9.set_attr(T=80, m=5, p=5, fluid=fld_si)
-        c11.set_attr(T=75)
+        h_ihx_1_cp_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 104.5, wf) * 1e-3
+        ihx_1_cp_1.set_attr(h=h_ihx_1_cp_1)
+
+        # Source
+        sou_in_sup.set_attr(T=80, m=5, p=5, fluid=fld_si)
+        ev_sou_out.set_attr(T=75)
+
+        # Sink
+        si_in_gc.set_attr(T=100, p=20, fluid=fld_si)
+        gc_si_out.set_attr(T=200)
+
+        #Solve
+
+        self.nw.solve(mode='design')
+        self.nw.print_results()
+
+        # New Parameters
+        gc_ihx_2.set_attr(h=None, T=115, p=34)
+        va_2_fl.set_attr(p=7.3)
+        ihx_2_cp_2.set_attr(h=None)
+        ihx_2.set_attr(ttd_u=5)
+        ev_sup.set_attr(h=None, x=1, p=2.8)
+        sup_ihx_1.set_attr(h=None, Td_bp=5)
+        ihx_1_cp_1.set_attr(h=None)
+        ihx_1.set_attr(ttd_u=5)
+        gc_si_out.set_attr(T=None)
+        gc.set_attr(ttd_u=5)
 
         # busses
-
         self.power = Bus('power input')
         self.power.add_comps(
-            {'comp': cp, 'char': 1, 'base': 'bus'},
+            {'comp': cp_1, 'char': 1, 'base': 'bus'},
+            {'comp': cp_2, 'char': 1, 'base': 'bus'},
             {'comp': sou_in, 'base': 'bus'},
             {'comp': sou_out})
 
@@ -112,28 +142,15 @@ class HeatPumpCycle:
 
         self.power_COP = Bus('power')
         self.power_COP.add_comps(
-            {'comp': cp, 'char': 1, 'base': 'bus'}
+            {'comp': cp_1, 'char': -1, 'base': 'bus'},
+            {'comp': cp_2, 'char': -1, 'base': 'bus'}
         )
 
         self.heat_product_COP = Bus('heat_product')
         self.heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
-        self.nw.add_busses(self.heat_product_COP, self.power_COP, self.heat_product, self.power)
-
-        #Solve
-
-        self.nw.solve(mode='design')
-        self.nw.print_results()
-        print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
-
-        c1.set_attr(p=2.8, h=None)
-        ihx.set_attr(ttd_u=5)
-        c3.set_attr(h=None, p=35, T=105)
-        c5_ue.set_attr(h=None, x=1)
-        c6.set_attr(h=None, Td_bp=5)
-        c8.set_attr(T=None)
-        gc.set_attr(ttd_u=4)
+        self.nw.add_busses(self.power, self.heat_product, self.power_COP, self.heat_product_COP)
 
         self.nw.solve(mode='design')
         self.nw.print_results()
@@ -148,10 +165,11 @@ class HeatPumpCycle:
         self.ean = ExergyAnalysis(self.nw, E_P=[self.heat_product], E_F=[self.power])
         self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
         self.ean.print_results()
-        print(f'COP = {abs(gc.Q.val) / cp.P.val}')
+        print(self.ean.network_data.loc['epsilon'])
+        print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
- # %%[sec_2]
 
+# %%[sec_2]
     def get_param(self, obj, label, parameter):
         """Get the value of a parameter in the network"s unit system.
 
@@ -188,27 +206,30 @@ class HeatPumpCycle:
 
     def reset_boundary_conditions(self):
 
-        c1, c3, c5_ue, c6 = self.nw.get_conn(
-            ["1", "3", "5_ue", "6"]
+        gc_ihx_2, va_2_fl, ev_sup, sup_ihx_1 = self.nw.get_conn(
+            ["1", "3", "7", "8"]
         )
 
         # Connection parameters
-        c1.set_attr(p=2.8)
-        c3.set_attr(p=35, T=105)
-        c5_ue.set_attr(x=1)
-        c6.set_attr(Td_bp=5)
+        gc_ihx_2.set_attr(T=115, p=34)
+        va_2_fl.set_attr(p=7.3)
+        ev_sup.set_attr(x=1, p=2.8)
+        sup_ihx_1.set_attr(Td_bp=5)
 
-        gc, ihx, ev, sup, cp = self.nw.get_comp(
+        gc, ihx_1, ihx_2, ev, sup, cp_1, cp_2 = self.nw.get_comp(
             [
-                "Gas cooler", "Internal Heat Exchanger", "Evaporator", "Superheater", "Compressor"
+                "Gas Cooler", "Internal Heat Exchanger 1", "Internal Heat Exchanger 2", "Evaporator", "Superheater",
+                "Compressor 1", "Compressor 2"
             ]
         )
         # Component parameters
-        gc.set_attr(pr1=1, pr2=1, ttd_u=4)
-        ihx.set_attr(pr1=1, pr2=1, ttd_u=5)
+        gc.set_attr(pr1=1, pr2=1, ttd_u=5)
+        ihx_1.set_attr(pr1=1, pr2=1, ttd_u=5)
+        ihx_2.set_attr(pr1=1, pr2=1, ttd_u=5)
         ev.set_attr(pr1=1, pr2=1)
         sup.set_attr(pr1=1, pr2=1)
-        cp.set_attr(eta_s=0.7)
+        cp_1.set_attr(eta_s=0.7)
+        cp_2.set_attr(eta_s=0.7)
 
     def solve_model(self, **kwargs):
         """
@@ -270,25 +291,24 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "3": {"p": {"min": 35, "max": 52.8}, "T": {"min": 100, "max": 110}},
-        "1": {"p": {"min": 1.7, "max": 3.4}}
+        "1": {"p": {"min": 34, "max": 40.5}, "T": {"min": 115, "max": 120}},
+        "7": {"p": {"min": 1.7, "max": 3.3}}
     }
 }
 constraints = {
     "lower limits": {
         "Connections": {
-            "3": {"p": "ref1"}
+            "1": {"p": "ref1"}
         },
     },
-    "ref1": ["Connections", "1", "p"]
+    "ref1": ["Connections", "7", "p"]
 }
-
 optimize = OptimizationProblem(
     HeatPump, variables, constraints, objective="eta"
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 150
+num_gen = 72
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is
@@ -321,13 +341,13 @@ colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", 
 cmap = mpl.colors.ListedColormap(colors)
 cmap.set_under("lavender")
 cmap.set_over("darkred")
-bounds = [0.69, 0.7, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.765, 0.77, 0.775]
+bounds = [0.69, 0.695, 0.7, 0.705, 0.71, 0.715, 0.72, 0.725, 0.73, 0.7325, 0.735]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 
-x = data["Connections-3-p"]
-y = data["Connections-1-p"]
-z = data["Connections-3-T"]
+x = data["Connections-1-p"]
+y = data["Connections-7-p"]
+z = data["Connections-1-T"]
 c = 1 / data["eta"]
 
 im = ax.scatter(x, y, z, c=c, cmap=cmap, norm=norm)
@@ -338,4 +358,4 @@ ax.set_ylabel("Druck Verdampferseite ")
 ax.set_zlabel("Temperatur nach dem Gaskühler")
 cbar.set_label("eta")
 plt.show()
-fig.savefig('pygmo_optimization_IHX_R601.svg')
+fig.savefig('pygmo_optimization_Parallel_R601.svg')
