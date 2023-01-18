@@ -11,11 +11,12 @@ from tespy.tools import ExergyAnalysis
 from tespy.tools.optimization import OptimizationProblem
 
 
+
 class HeatPumpCycle:
     """Class template for TESPy model usage in optimization module."""
     def __init__(self):
 
-        wf = 'R601'
+        wf = 'R600'
         si = 'H2O'
         fld_wf = {wf: 1, si: 0}
         fld_si = {wf: 0, si: 1}
@@ -84,22 +85,22 @@ class HeatPumpCycle:
 
         # Starting Parameters Connections Cycle
         # Main Cycle
-        h_gc_ihx_2 = CPSI("H", "P", 34 * 1e5, "T", 273.15 + 115, wf) * 1e-3
-        gc_ihx_2.set_attr(h=h_gc_ihx_2, p=34)
+        h_gc_ihx_2 = CPSI("H", "P", 68 * 1e5, "T", 273.15 + 105, wf) * 1e-3
+        gc_ihx_2.set_attr(h=h_gc_ihx_2, p=68)
 
         # h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
-        va_2_fl.set_attr(p=7.3, fluid=fld_wf)
+        va_2_fl.set_attr(p=15.2, fluid=fld_wf)
 
-        h_ihx_2_cp_2 = CPSI("H", "P", 7.3 * 1e5, "T", 273.15 + 110, wf) * 1e-3
+        h_ihx_2_cp_2 = CPSI("H", "P", 15.2 * 1e5, "T", 273.15 + 100, wf) * 1e-3
         ihx_2_cp_2.set_attr(h=h_ihx_2_cp_2)
 
         h_ev_sup = CPSI("H", "Q", 1, "T", 273.15 + 70, wf) * 1e-3
-        ev_sup.set_attr(h=h_ev_sup, p=2.8)
+        ev_sup.set_attr(h=h_ev_sup, p=8.1)
 
-        h_sup_ihx_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 75, wf) * 1e-3
+        h_sup_ihx_1 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 75, wf) * 1e-3
         sup_ihx_1.set_attr(h=h_sup_ihx_1)
 
-        h_ihx_1_cp_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 104.5, wf) * 1e-3
+        h_ihx_1_cp_1 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 94.8, wf) * 1e-3
         ihx_1_cp_1.set_attr(h=h_ihx_1_cp_1)
 
         # Source
@@ -116,16 +117,16 @@ class HeatPumpCycle:
         self.nw.print_results()
 
         # New Parameters
-        gc_ihx_2.set_attr(h=None, T=115, p=34)
-        va_2_fl.set_attr(p=7.3)
+        gc_ihx_2.set_attr(h=None, T=105, p=68)
+        va_2_fl.set_attr(p=15.2)
         ihx_2_cp_2.set_attr(h=None)
         ihx_2.set_attr(ttd_u=5)
-        ev_sup.set_attr(h=None, x=1, p=2.8)
+        ev_sup.set_attr(h=None, x=1, p=8.1)
         sup_ihx_1.set_attr(h=None, Td_bp=5)
         ihx_1_cp_1.set_attr(h=None)
         ihx_1.set_attr(ttd_u=5)
         gc_si_out.set_attr(T=None)
-        gc.set_attr(ttd_u=5)
+        gc.set_attr(ttd_u=10)
 
         # busses
         self.power = Bus('power input')
@@ -169,7 +170,6 @@ class HeatPumpCycle:
         print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
 
-# %%[sec_2]
     def get_param(self, obj, label, parameter):
         """Get the value of a parameter in the network"s unit system.
 
@@ -211,9 +211,9 @@ class HeatPumpCycle:
         )
 
         # Connection parameters
-        gc_ihx_2.set_attr(T=115, p=34)
-        va_2_fl.set_attr(p=7.3)
-        ev_sup.set_attr(x=1, p=2.8)
+        gc_ihx_2.set_attr(h=None, T=105, p=68)
+        va_2_fl.set_attr(p=15.2)
+        ev_sup.set_attr(x=1, p=8.1)
         sup_ihx_1.set_attr(Td_bp=5)
 
         gc, ihx_1, ihx_2, ev, sup, cp_1, cp_2 = self.nw.get_comp(
@@ -223,7 +223,7 @@ class HeatPumpCycle:
             ]
         )
         # Component parameters
-        gc.set_attr(pr1=1, pr2=1, ttd_u=5)
+        gc.set_attr(pr1=1, pr2=1, ttd_u=10)
         ihx_1.set_attr(pr1=1, pr2=1, ttd_u=5)
         ihx_2.set_attr(pr1=1, pr2=1, ttd_u=5)
         ev.set_attr(pr1=1, pr2=1)
@@ -291,8 +291,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "1": {"p": {"min": 34, "max": 40.5}, "T": {"min": 115.1, "max": 120}},
-        "7": {"p": {"min": 1.7, "max": 3.3}}
+        "1": {"p": {"min": 64, "max": 78}, "T": {"min": 105, "max": 115}},
+        "7": {"p": {"min": 7, "max": 9.1}}
     }
 }
 constraints = {
@@ -308,7 +308,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 72
+num_gen = 100
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is
@@ -341,7 +341,7 @@ colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", 
 cmap = mpl.colors.ListedColormap(colors)
 cmap.set_under("lavender")
 cmap.set_over("darkred")
-bounds = [0.69, 0.695, 0.7, 0.705, 0.71, 0.715, 0.72, 0.725, 0.73, 0.7325, 0.735]
+bounds = [0.68, 0.69, 0.7, 0.705, 0.71, 0.715, 0.72, 0.7225, 0.725, 0.7275, 0.73]
 norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
 
@@ -358,4 +358,5 @@ ax.set_ylabel("Druck Verdampferseite ")
 ax.set_zlabel("Temperatur nach dem Gaskühler")
 cbar.set_label("eta")
 plt.show()
-fig.savefig('pygmo_optimization_Parallel_R601.svg')
+#fig.savefig('pygmo_optimization_Parallel_R600.svg')
+

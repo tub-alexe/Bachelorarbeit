@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 
-wf = 'R601'
+wf = 'R600'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
@@ -74,29 +74,29 @@ cp_2.set_attr(eta_s=0.7)
 
 #Paramters Connections
 #Main Cycle
-h_gc_ihx_2 = CPSI("H", "P", 34 * 1e5, "T", 273.15+115, wf) * 1e-3
-gc_ihx_2.set_attr(h=h_gc_ihx_2, p=34)
+h_gc_ihx_2 = CPSI("H", "P", 68 * 1e5, "T", 273.15 + 105, wf) * 1e-3
+gc_ihx_2.set_attr(h=h_gc_ihx_2, p=68)
 
-#h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
-va_2_fl.set_attr(p=7.3, fluid=fld_wf)
+# h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
+va_2_fl.set_attr(p=15.2, fluid=fld_wf)
 
-h_ihx_2_cp_2 = CPSI("H", "P", 7.3 * 1e5, "T", 273.15+110, wf) * 1e-3
+h_ihx_2_cp_2 = CPSI("H", "P", 15.2 * 1e5, "T", 273.15 + 100, wf) * 1e-3
 ihx_2_cp_2.set_attr(h=h_ihx_2_cp_2)
 
-h_ev_sup = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
-ev_sup.set_attr(h=h_ev_sup, p=2.8)
+h_ev_sup = CPSI("H", "Q", 1, "T", 273.15 + 70, wf) * 1e-3
+ev_sup.set_attr(h=h_ev_sup, p=8.1)
 
-h_sup_ihx_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
+h_sup_ihx_1 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 75, wf) * 1e-3
 sup_ihx_1.set_attr(h=h_sup_ihx_1)
 
-h_ihx_1_cp_1 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+104.5, wf) * 1e-3
+h_ihx_1_cp_1 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 94.8, wf) * 1e-3
 ihx_1_cp_1.set_attr(h=h_ihx_1_cp_1)
 
-#Source
+# Source
 sou_in_sup.set_attr(T=80, m=5, p=5, fluid=fld_si)
 ev_sou_out.set_attr(T=75)
 
-#Sink
+# Sink
 si_in_gc.set_attr(T=100, p=20, fluid=fld_si)
 gc_si_out.set_attr(T=200)
 
@@ -106,19 +106,17 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-gc_ihx_2.set_attr(h=None, T=115, p=34)
-va_2_fl.set_attr(p=7.3)
+gc_ihx_2.set_attr(h=None, T=105, p=68)
+va_2_fl.set_attr(p=15.2)
 ihx_2_cp_2.set_attr(h=None)
 ihx_2.set_attr(ttd_u=5)
-ev_sup.set_attr(h=None, x=1, p=2.8)
+ev_sup.set_attr(h=None, x=1, p=8.1)
 sup_ihx_1.set_attr(h=None, Td_bp=5)
 ihx_1_cp_1.set_attr(h=None)
 ihx_1.set_attr(ttd_u=5)
 gc_si_out.set_attr(T=None)
-gc.set_attr(ttd_u=5)
+gc.set_attr(ttd_u=10)
 
-nw.solve(mode='design')
-nw.print_results()
 
 # busses
 power = Bus('power input')
@@ -188,7 +186,7 @@ for key, data in result_dict.items():
     result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
 
 diagram.calc_isolines()
-diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
+diagram.set_limits(x_min=0, x_max=900, y_min=1e-1, y_max=2e2)
 diagram.draw_isolines('logph')
 
 for key in result_dict.keys():
@@ -197,7 +195,7 @@ for key in result_dict.keys():
     diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
 
 
-diagram.save('logph_Parallel_R601.png', dpi=300)
+diagram.save('logph_Parallel_R600.png', dpi=300)
 
 #parameter optimization
 import matplotlib.pyplot as plt
@@ -208,9 +206,9 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.7, 3.2, 10),
-    'p_kond': np.linspace(34, 41, 10),
-    'T_kond': np.linspace(115, 120, 10)
+    'p_verd': np.linspace(7, 8.2, 10),
+    'p_kond': np.linspace(68, 78, 10),
+    'T_kond': np.linspace(105, 115, 10)
 }
 eta = {
     'p_verd': [],
@@ -230,7 +228,7 @@ for p in data['p_verd']:
     print(ean.network_data.loc['epsilon'])
     eta['p_verd'] += [ean.network_data.loc['epsilon']]
 
-    ev_sup.set_attr(p=2.8)
+    ev_sup.set_attr(p=8.1)
 
     nw.solve(mode='design')
 
@@ -242,7 +240,7 @@ for p in data['p_kond']:
     eta['p_kond'] += [ean.network_data.loc['epsilon']]
 
     # reset to base pressure
-    gc_ihx_2.set_attr(p=34)
+    gc_ihx_2.set_attr(p=41)
 
 for T in data['T_kond']:
     gc_ihx_2.set_attr(T=T)
@@ -265,4 +263,4 @@ ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung_Parallel_R601.svg')
+fig.savefig('Optimierung_Parallel_R600.svg')
