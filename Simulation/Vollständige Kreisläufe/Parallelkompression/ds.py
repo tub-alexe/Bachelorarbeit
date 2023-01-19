@@ -23,10 +23,16 @@ c4 = Connection(sp, 'out2', Si2, 'in1')
 nw.add_conns(c1, c2, c3, c4)
 
 h_c1 = CPSI("H", "P", 41 * 1e5, "T", 273.15+118, wf) * 1e-3
-#h_c1 = CPSI("H", "P", 10 * 1e5, "Q", 0, wf) * 1e-3
 c1.set_attr(h=h_c1-0.1, p=41, m=10, fluid=fld_wf)
 
 c2.set_attr(p=8.1)
 
-nw.solve(mode='design')
-nw.print_results()
+try:
+    nw.solve(mode='design')
+except ValueError:
+    pass
+
+for c in nw.conns["object"]:
+    print(c.label, c.h.val_SI)
+    # die folgende zeile dann mal auskommentiert und sehen was passiert
+    # print(CPSI("T", "P", c.p.val_SI, "H", c.h.val_SI, wf))
