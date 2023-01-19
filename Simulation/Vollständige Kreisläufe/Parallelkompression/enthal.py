@@ -16,8 +16,11 @@ nw.add_conns(c1)
 
 print(CPSI("H", "P", 13.9 * 1e5, "Q", 0, f) * 1e-3)
 
+print(CPSI("H", "T", 120 + 273.15, "P", 41 * 1e5, f) * 1e-3)
+
+
 h_c1 = CPSI("H", "P", 13.9 * 1e5, "Q", 0, f) * 1e-3
-c1.set_attr(h=h_c1, p=13.9, m=10, fluid=fld_f)
+c1.set_attr(h=h_c1-0.001, p=13.9, m=10, fluid=fld_f)
 
 nw.solve(mode='design')
 nw.print_results()
