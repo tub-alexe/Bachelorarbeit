@@ -66,7 +66,7 @@ h_ihx_h_nach = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+100, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=5.1, fluid=fld_wf)
 
 
-h_ihx_k_vor = CPSI("H", "P", 44 * 1e5, "T", 273.15+105, wf) * 1e-3
+h_ihx_k_vor = CPSI("H", "P", 44 * 1e5, "T", 273.15+106, wf) * 1e-3
 c3.set_attr(h=h_ihx_k_vor, p=44)
 
 h_zw = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+70, wf) * 1e-3
@@ -89,9 +89,9 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=5.6228, h=None)
+c1.set_attr(p=5.1, h=None)
 ihx.set_attr(ttd_u=5)
-c3.set_attr(h=None, p=35.2816, T=105.7899)
+c3.set_attr(h=None, p=44, T=106)
 c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
