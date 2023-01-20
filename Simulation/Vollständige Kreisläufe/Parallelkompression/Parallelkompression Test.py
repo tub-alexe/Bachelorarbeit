@@ -36,9 +36,9 @@ ihx_1.set_attr(pr1=1, pr2=1)
 ihx_2.set_attr(pr1=1, pr2=1)
 
 h_c1 = CPSI("H", "P", 41 * 1e5, "T", 273.15+118, wf) * 1e-3
-c1.set_attr(h=h_c1, p=41, m=10, fluid=fld_wf)
+c1.set_attr(h=h_c1-0.1, p=41, m=10, fluid=fld_wf)
 
-c2.set_attr(p=12.6)
+c2.set_attr(p=8.1)
 #ohne Phasentrenner bis 12.6 möglich, mit Phasentrenner erst ab 8 bar möglich
 
 nw.solve(mode='design')

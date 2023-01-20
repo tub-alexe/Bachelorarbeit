@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 
-wf = 'R1233ZD(E)'
+wf = 'REFPROP::R1233ZD(E)'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
@@ -76,13 +76,13 @@ cp_2.set_attr(eta_s=0.7)
 
 #Paramters Connections
 #Main Cycle
-h_gc_ihx_2 = CPSI("H", "P", 47.8 * 1e5, "T", 273.15 + 119, wf) * 1e-3
-gc_ihx_2.set_attr(h=h_gc_ihx_2, p=47.8)
+h_gc_ihx_2 = CPSI("H", "P", 41 * 1e5, "T", 273.15 + 119, wf) * 1e-3
+gc_ihx_2.set_attr(h=h_gc_ihx_2, p=41)
 
 # h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
-va_2_fl.set_attr(p=8, fluid=fld_wf)
+va_2_fl.set_attr(p=13.9, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
-h_ihx_2_cp_2 = CPSI("H", "P", 8 * 1e5, "T", 273.15 + 114, wf) * 1e-3
+h_ihx_2_cp_2 = CPSI("H", "P", 13.9 * 1e5, "T", 273.15 + 114, wf) * 1e-3
 ihx_2_cp_2.set_attr(h=h_ihx_2_cp_2)
 
 h_ev_sup = CPSI("H", "Q", 1, "T", 273.15 + 70, wf) * 1e-3
@@ -91,15 +91,15 @@ ev_sup.set_attr(h=h_ev_sup, p=5.1)
 h_sup_ihx_1 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 75, wf) * 1e-3
 sup_ihx_1.set_attr(h=h_sup_ihx_1)
 
-h_ihx_1_cp_1 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 82.23, wf) * 1e-3
+h_ihx_1_cp_1 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 108.7, wf) * 1e-3
 ihx_1_cp_1.set_attr(h=h_ihx_1_cp_1)
 
 # Source
-sou_in_sup.set_attr(T=80, m=5, p=5, fluid=fld_si)
+sou_in_sup.set_attr(T=80, m=5, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 ev_sou_out.set_attr(T=75)
 
 # Sink
-si_in_gc.set_attr(T=100, p=20, fluid=fld_si)
+si_in_gc.set_attr(T=100, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 gc_si_out.set_attr(T=200)
 
 
@@ -108,31 +108,84 @@ gc_si_out.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
-#gc_ihx_2.set_attr(h=None, T=119, p=47.8)
-#va_2_fl.set_attr(p=8)
-#ihx_2_cp_2.set_attr(h=None)
-#ihx_2.set_attr(ttd_u=5)
-#ev_sup.set_attr(h=None, x=1, p=5.1)
-#sup_ihx_1.set_attr(h=None, Td_bp=5)
-#ihx_1_cp_1.set_attr(h=None)
-#ihx_1.set_attr(ttd_u=6)
-#gc_si_out.set_attr(T=None)
-#gc.set_attr(ttd_u=5)
+gc_ihx_2.set_attr(h=None, T=119, p=41)
+va_2_fl.set_attr(p=13.9)
+ihx_2_cp_2.set_attr(h=None)
+ihx_2.set_attr(ttd_u=5)
+ev_sup.set_attr(h=None, x=1, p=5.1)
+sup_ihx_1.set_attr(h=None, Td_bp=5)
+ihx_1_cp_1.set_attr(h=None)
+ihx_1.set_attr(ttd_u=5)
+gc_si_out.set_attr(T=None)
+gc.set_attr(ttd_u=5)
 
-#nw.solve(mode='design')
-#nw.print_results()
+nw.solve(mode='design')
+nw.print_results()
 
+# busses
+power = Bus('power input')
+power.add_comps(
+    {'comp': cp_1, 'char': 1, 'base': 'bus'},
+    {'comp': cp_2, 'char': 1, 'base': 'bus'},
+    {'comp': sou_in, 'base': 'bus'},
+    {'comp': sou_out})
+
+
+heat_product = Bus('heating')
+heat_product.add_comps(
+    {'comp': si_in, 'base': 'bus'},
+    {'comp': si_out})
+
+power_COP = Bus('power')
+power_COP.add_comps(
+        {'comp': cp_1, 'char': -1, 'base': 'bus'},
+        {'comp': cp_2, 'char': -1, 'base': 'bus'}
+)
+
+heat_product_COP = Bus('heat_product')
+heat_product_COP.add_comps(
+            {"comp": gc, "char": 1})
+
+nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+
+nw.solve(mode='design')
+nw.print_results()
+print('COP', heat_product_COP.P.val / power_COP.P.val)
+print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
+
+# Exergy Analysis
+
+pamb = 1
+Tamb = 25
+
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
+ean.analyse(pamb=pamb, Tamb=Tamb)
+ean.print_results()
+print(ean.network_data.loc['epsilon'])
+
+
 
 
 #log p,h- diagram
 result_dict = {}
+result_dict.update({ev.label: ev.get_plotting_data()[2]})
+result_dict.update({sup.label: sup.get_plotting_data()[2]})
+result_dict.update({ihx_1.label: ihx_1.get_plotting_data()[2]})
+result_dict.update({cp_1.label: cp_1.get_plotting_data()[1]})
+result_dict.update({mg.label: mg.get_plotting_data()[1]})
 result_dict.update({gc.label: gc.get_plotting_data()[1]})
 result_dict.update({ihx_2.label: ihx_2.get_plotting_data()[1]})
 result_dict.update({va_2.label: va_2.get_plotting_data()[1]})
+result_dict.update({fl.label: fl.get_plotting_data()[2]})
 result_dict.update({ihx_2.label: ihx_2.get_plotting_data()[2]})
+result_dict.update({cp_2.label: cp_2.get_plotting_data()[1]})
+result_dict.update({mg.label: mg.get_plotting_data()[2]})
+result_dict.update({fl.label: fl.get_plotting_data()[1]})
+result_dict.update({ihx_1.label: ihx_1.get_plotting_data()[1]})
+result_dict.update({va_1.label: va_1.get_plotting_data()[1]})
 
-diagram = FluidPropertyDiagram(wf)
+diagram = FluidPropertyDiagram('R1233ZD(E)')
 diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
 
 for key, data in result_dict.items():
@@ -148,4 +201,70 @@ for key in result_dict.keys():
     diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
 
 
-diagram.save('Test.png', dpi=300)
+diagram.save('logph_Parallel_R1233ZD(E).png', dpi=300)
+
+#parameter optimization
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.rc('font', **{'size': 18})
+
+
+data = {
+    'p_verd': np.linspace(4, 5.3, 10),
+    'p_kond': np.linspace(39, 46, 10),
+    'T_kond': np.linspace(119, 125, 10)
+}
+eta = {
+    'p_verd': [],
+    'p_kond': [],
+    'T_kond': []
+}
+description = {
+    'p_verd': 'Verdampferdruck in bar',
+    'p_kond': 'Kondensatordruck in bar',
+    'T_kond': 'Kondensatortemperatur in Celsius'
+}
+
+for p in data['p_verd']:
+    ev_sup.set_attr(p=p)
+    nw.solve('design')
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['p_verd'] += [ean.network_data.loc['epsilon']]
+
+    ev_sup.set_attr(p=5.1)
+
+    nw.solve(mode='design')
+
+for p in data['p_kond']:
+    gc_ihx_2.set_attr(p=p)
+    nw.solve('design')
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    print(ean.network_data.loc['epsilon'])
+    eta['p_kond'] += [ean.network_data.loc['epsilon']]
+
+    # reset to base pressure
+    gc_ihx_2.set_attr(p=41)
+
+for T in data['T_kond']:
+    gc_ihx_2.set_attr(T=T)
+    nw.solve('design')
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    eta['T_kond'] += [ean.network_data.loc['epsilon']]
+
+
+fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
+
+[a.grid() for a in ax]
+
+i = 0
+for key in data:
+    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
+    ax[i].set_xlabel(description[key])
+    i += 1
+
+ax[0].set_ylabel('eta of the Heat Pump')
+
+plt.tight_layout()
+plt.show()
+#fig.savefig('Optimierung_Parallel_R1233ZD(E).svg')
