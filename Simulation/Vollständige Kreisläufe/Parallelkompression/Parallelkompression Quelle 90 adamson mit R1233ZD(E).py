@@ -267,4 +267,4 @@ ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-#fig.savefig('Optimierung_Parallel_R1233ZD(E).svg')
+fig.savefig('Optimierung_Parallel_R1233ZD(E).svg')

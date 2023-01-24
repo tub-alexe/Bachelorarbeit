@@ -88,8 +88,8 @@ nw.print_results()
 
 # New Parameters
 #c1.set_attr(h=None, T=204)
-c2.set_attr(h=None, T=100.0175, p=57.1529)
-c3.set_attr(p=9.0614)
+c2.set_attr(h=None, T=105, p=93)
+c3.set_attr(p=8.1)
 c4.set_attr(h=None, x=1)
 c5.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
