@@ -1,5 +1,5 @@
 import numpy as np
-import pygmo as pg
+#import pygmo as pg
 
 from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink, Splitter, DropletSeparator, Separator)
 from tespy.connections import Bus
