@@ -69,7 +69,7 @@ c2.set_attr(h=h_gk_nach, p=36)
 #h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
 c3.set_attr(p=2.8)
 
-h_zw = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+70, wf) * 1e-3
+h_zw = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
 c4.set_attr(h=h_zw)
 
 h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3

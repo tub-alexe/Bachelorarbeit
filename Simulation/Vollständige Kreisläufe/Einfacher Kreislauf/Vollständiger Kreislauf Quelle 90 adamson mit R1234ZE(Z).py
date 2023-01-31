@@ -1,100 +1,90 @@
 from tespy.networks import Network
 from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink)
-from tespy.connections import Connection
+from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
+from tespy.tools import ExergyAnalysis
+from fluprodia import FluidPropertyDiagram
 
-km = 'R1234ZE(Z)'
-se = 'H2O'
-fld_km = {km: 1, se: 0}
-fld_se = {km: 0, se: 1}
+wf = 'R1234ZE(Z)'
+si = 'H2O'
+fld_wf = {wf: 1, si: 0}
+fld_si = {wf: 0, si: 1}
 
-nw = Network(fluids=[km, se], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
+nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
-# Komponenten
+# Components
 
-gk = HeatExchanger('Gaskühler')
-se_ein = Source('Senke ein')
-se_aus = Sink('Senke aus')
+gc = HeatExchanger('Gas cooler')
+ev = HeatExchanger('Evaporator')
+sup = HeatExchanger('Superheater')
+va = Valve('Valve')
+cp = Compressor('Compressor')
 
-ue_in = Source('Verdampfer rein')
-vd_aus = Sink('Überhitzer raus')
-vd = HeatExchanger('Verdampfer')
-ue = HeatExchanger('Überhitzer')
+#Sources, Sinks and CycleCloser
 
-exp = Valve('Expansionsventil')
-anfang = Source('Kreislauf rein')
-ende = Sink('Kreislauf raus')
+si_in = Source('Sink in')
+si_out = Sink('Sink out')
 
-#Verbindungen Kreislauf
+sou_in = Source('Source in')
+sou_out = Sink('Source out')
 
-c1 = Connection(anfang, 'out1', gk, 'in1')
-c2 = Connection(gk, 'out1', exp, 'in1')
-c3 = Connection(exp, 'out1', vd, 'in2')
-c4 = Connection(vd, 'out2', ue, 'in2')
-c5 = Connection(ue, 'out2', ende, 'in1')
+cc = CycleCloser('CycleCloser')
 
-#Verbindungen kalte Seite Gaskühler
+# Connections Cycle
 
-c7 = Connection(se_ein, 'out1', gk, 'in2')
-c8 = Connection(gk, 'out2', se_aus, 'in1')
+c1 = Connection(cc, 'out1', gc, 'in1', label="1")
+c2 = Connection(gc, 'out1', va, 'in1', label="2")
+c3 = Connection(va, 'out1', ev, 'in2', label="3")
+c4 = Connection(ev, 'out2', sup, 'in2', label="4")
+c5 = Connection(sup, 'out2', cp, 'in1', label="5")
+c6 = Connection(cp, 'out1', cc, 'in1', label="6")
 
+# Connections Sink
 
-#Verbindungen heiße Seite Verdampfer und Überhitzer
-c9 = Connection(ue_in, 'out1', ue, 'in1')
-c10 = Connection(ue, 'out1', vd, 'in1')
-c11 = Connection(vd, 'out1', vd_aus, 'in1')
-nw.add_conns(c1, c2, c3, c4, c5, c7, c8, c9, c10, c11)
+c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
+c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 
-#Parametrisierung Komponenten
+# Connections Source
 
-gk.set_attr(pr1=1, pr2=1)
-vd.set_attr(pr1=1, pr2=1)
-ue.set_attr(pr1=1, pr2=1)
-# Parametrisierung heiße Seite, vor dem Gaskühler
+c9 = Connection(sou_in, 'out1', sup, 'in1', label="9")
+c10 = Connection(sup, 'out1', ev, 'in1', label="10")
+c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
+nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
 
-h_gk_vor = CPSI("H", "P", 56 * 1e5, "T", 273.15+208, km) * 1e-3
-c1.set_attr(h=h_gk_vor)
+# Starting Parameters Components
 
-# Parametrisierung heiße Seite, nach dem Gaskühler, Druck bleibt konstant im Gaskühler
+gc.set_attr(pr1=1, pr2=1)
+ev.set_attr(pr1=1, pr2=1)
+sup.set_attr(pr1=1, pr2=1)
+cp.set_attr(eta_s=0.7)
 
-h_gk_nach = CPSI("H", "P", 56 * 1e5, "T", 273.15+105, km) * 1e-3
+# Starting Parameters Connections Cycle
+
+#h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+200.734, km) * 1e-3
+#c1.set_attr(h=h_gk_vor)
+
+h_gk_nach = CPSI("H", "P", 56 * 1e5, "T", 273.15+105, wf) * 1e-3
 c2.set_attr(h=h_gk_nach, p=56)
-
-# Parameter kalte Seite
-# Vor dem Verdampfer
 
 #h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
 c3.set_attr(p=6.7)
 
-# Zwischen Verdampfer und Überhitzer
-h_zw = CPSI("H", "P",  6.7 * 1e5, "T", 273.15+70, km) * 1e-3
+h_zw = CPSI("H", "P", 6.7 * 1e5, "T", 273.15+70, wf) * 1e-3
 c4.set_attr(h=h_zw)
 
-# Nach dem Überhitzer
-h_uebe = CPSI("H", "P", 6.7 * 1e5, "T", 273.15+75, km) * 1e-3
-c5.set_attr(h=h_uebe, fluid=fld_km)
+h_uebe = CPSI("H", "P", 6.7 * 1e5, "T", 273.15+75, wf) * 1e-3
+c5.set_attr(h=h_uebe, fluid=fld_wf)
 
-#Parametrisierung kalte Seite Gaskühler
-
-c7.set_attr(T=100, p=20, fluid=fld_se)
+# Starting Parameters Connection Sink
+c7.set_attr(T=100, p=20, fluid=fld_si)
 c8.set_attr(T=200)
 
-#Parameter heiße Seite Verdampfer
-c9.set_attr(T=80, m=5, p=5, fluid=fld_se)
+# Starting Parameters Connection Source
+c9.set_attr(T=80, m=5, p=5, fluid=fld_si)
 c11.set_attr(T=75)
 
-#Lösen
+#Solve Model
 
 nw.solve(mode='design')
 nw.print_results()
-
-c1.set_attr(h=None, T=208)
-c2.set_attr(h=None, T=105)
-c4.set_attr(h=None, T=70)
-c5.set_attr(h=None, T=75)
-
-nw.solve(mode='design')
-nw.print_results()
-# Temperaturen in Gaskühler werden automatisch nach oben korrigiert
-# erste Enthalpie kann nicht ohne Fehler ersetzt werden
-#Maximaltemperatur bei 166 °C
+print(f'COP = {abs(gc.Q.val) / cp.P.val}')

@@ -60,7 +60,7 @@ cp.set_attr(eta_s=0.7)
 
 # Starting Parameters Connections Cycle
 
-h_gk_vor = CPSI("H", "P", 56 * 1e5, "T", 273.15+205, wf) * 1e-3
+#h_gk_vor = CPSI("H", "P", 56 * 1e5, "T", 273.15+205, wf) * 1e-3
 #c1.set_attr(h=h_gk_vor)
 
 # Starting Parameters Connections Cycle

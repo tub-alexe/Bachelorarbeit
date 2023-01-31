@@ -285,9 +285,9 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "4": {"p": {"min": 53, "max": 62}, "T": {"min": 100, "max": 106}},
+        "4": {"p": {"min": 50, "max": 56}, "T": {"min": 100, "max": 106}},
         "1": {"p": {"min": 7.6, "max": 8.8}},
-        "1_co": {"p": {"min": 40, "max": 43}}
+        "1_co": {"p": {"min": 39, "max": 43}}
     }
 }
 constraints = {
@@ -304,7 +304,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 200
+num_gen = 100
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is
