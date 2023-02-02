@@ -99,8 +99,6 @@ c17.set_attr(h=h_c17, p=10, fluid=fld_wf)
 c19.set_attr(p=30)
 geo.solve(mode='design')
 geo.print_results()
-geo.solve(mode='design')
-geo.print_results()
 
 
 c1.set_attr(h=None, x=0.45)
@@ -117,7 +115,10 @@ c17.set_attr(h=None, T=15)
 power_output = Bus('power output')
 power_output.add_comps(
     {'comp': tu},
-    {'comp': tu2})
+    {'comp': tu2},
+    {'comp': pu1, 'base': 'bus'},
+    {'comp': pu2, 'base': 'bus'}
+)
 
 
 heat_product = Bus('heating')
