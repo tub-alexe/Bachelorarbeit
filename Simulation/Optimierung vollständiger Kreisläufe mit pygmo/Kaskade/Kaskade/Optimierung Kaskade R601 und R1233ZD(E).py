@@ -94,7 +94,7 @@ class HeatPumpCycle:
         ev2.set_attr(pr1=1, pr2=1)
         sup2.set_attr(pr1=1, pr2=1)
 
-        h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 140, wf1) * 1e-3
+        h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 145, wf1) * 1e-3
         c1.set_attr(h=h_c1, p=36, fluid={'Pentane': 1, 'R1233ZD(E)': 0, 'H2O': 0})
 
         # h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+135, wf1) * 1e-3
@@ -167,7 +167,7 @@ class HeatPumpCycle:
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
 
         # New Parameters
-        c1.set_attr(h=None, T=140, p=36)
+        c1.set_attr(h=None, T=145, p=36)
         c3.set_attr(p=2.8)
         c3_sup.set_attr(h=None, x=1)
         c4.set_attr(h=None, Td_bp=5)
@@ -240,7 +240,7 @@ class HeatPumpCycle:
         )
 
         # Connection parameters
-        c1.set_attr(T=140, p=36)
+        c1.set_attr(T=145, p=36)
         c3.set_attr(p=2.8)
         c3_sup.set_attr(x=1)
         c4.set_attr(Td_bp=5)

@@ -80,7 +80,7 @@ sup1.set_attr(pr1=1, pr2=1)
 ev2.set_attr(pr1=1, pr2=1)
 sup2.set_attr(pr1=1, pr2=1)
 
-h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15+140, wf1) * 1e-3
+h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15+145, wf1) * 1e-3
 c1.set_attr(h=h_c1, p=36, fluid={'Pentane': 1, 'R1233ZD(E)': 0, 'H2O': 0})
 
 #h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+135, wf1) * 1e-3
@@ -125,7 +125,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #New Parameters
-c1.set_attr(h=None, T=140, p=36)
+c1.set_attr(h=None, T=145, p=36)
 c3.set_attr(p=2.8)
 c3_sup.set_attr(h=None, x=1)
 c4.set_attr(h=None, Td_bp=5)
