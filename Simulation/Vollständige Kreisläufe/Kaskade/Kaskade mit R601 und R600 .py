@@ -6,7 +6,7 @@ from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 
 wf1 = 'REFPROP::Pentane'
-wf2 = 'REFPROP::R1233ZD(E)'
+wf2 = 'REFPROP::Butane'
 si = 'H2O'
 
 nw = Network(fluids=[wf1, wf2, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
@@ -27,7 +27,10 @@ ev2 = HeatExchanger('Evaporator2')
 sup2 = HeatExchanger('Superheater2')
 
 #Sources, Sinks and CycleCloser
-
+si1 = Sink('Sink1')
+si2 = Sink('Sink2')
+sou1 = Source('Source1')
+sou2 = Source('Source2')
 si_in = Source('Sink in')
 si_out = Sink('Sink out')
 sou_in1 = Source('Source in1')
@@ -81,10 +84,10 @@ sup1.set_attr(pr1=1, pr2=1)
 ev2.set_attr(pr1=1, pr2=1)
 sup2.set_attr(pr1=1, pr2=1)
 
-h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15+145, wf1) * 1e-3
-c1.set_attr(h=h_c1, p=36, fluid={'Pentane': 1, 'R1233ZD(E)': 0, 'H2O': 0})
+h_c1 = CPSI("H", "P", 39.1 * 1e5, "T", 273.15+135, wf1) * 1e-3
+c1.set_attr(h=h_c1, p=39.1, fluid={'Pentane': 1, 'Butane': 0, 'H2O': 0})
 
-#h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+135, wf1) * 1e-3
+#h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+127, wf1) * 1e-3
 #c2.set_attr(h=h_c2)
 
 c3.set_attr(p=2.8)
@@ -95,30 +98,29 @@ c3_sup.set_attr(h=h_c3_sup)
 h_c4 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf1) * 1e-3
 c4.set_attr(h=h_c4)
 
-#h_c6 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+75, wf2) * 1e-3
-c6.set_attr(p=5.1, fluid={'Pentane': 0, 'R1233ZD(E)': 1, 'H2O': 0})
+h_c6 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+75, wf2) * 1e-3
+c6.set_attr(p=8.1, fluid={'Pentane': 0, 'Butane': 1, 'H2O': 0})
 
-h_c7 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+92, wf2) * 1e-3
+h_c7 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+104, wf2) * 1e-3
 c7.set_attr(h=h_c7)
 
-c8.set_attr(p=20.553)
-h_c9 = CPSI("H", "P", 20.553 * 1e5, "T", 273.15+105, wf2) * 1e-3
+c8.set_attr(p=23.442)
+h_c9 = CPSI("H", "P", 23.442 * 1e5, "T", 273.15+105, wf2) * 1e-3
 c9.set_attr(h=h_c9)
-
 
 h_c10_sup = CPSI("H", "Q", 1, "T", 273.15+70, wf2) * 1e-3
 c10_sup.set_attr(h=h_c10_sup)
 
-h_c11_cc = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+75, wf2) * 1e-3
+h_c11_cc = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+75, wf2) * 1e-3
 c11_cc.set_attr(h=h_c11_cc)
 
-c11.set_attr(T=100, p=20, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
-c12.set_attr(T=135)
+c11.set_attr(T=100, p=20, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
+c12.set_attr(T=130)
 c13.set_attr(T=200)
 
-c14.set_attr(T=80, m=5, p=5, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
+c14.set_attr(T=80, m=5, p=5, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
 c16.set_attr(T=75)
-c17.set_attr(T=80, p=5, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
+c17.set_attr(T=80, p=5, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
 c19.set_attr(T=75)
 
 #Solve Model
@@ -126,20 +128,24 @@ nw.solve(mode='design')
 nw.print_results()
 
 #New Parameters
-c1.set_attr(h=None, T=145, p=36)
+c1.set_attr(h=None, T=135, p=36)
 c3.set_attr(p=2.8)
 c3_sup.set_attr(h=None, x=1)
 c4.set_attr(h=None, Td_bp=5)
-c6.set_attr(p=5.1)
-c7.set_attr(h=None, T=92)
-c8.set_attr(p=20.553)
+c6.set_attr(p=8.1)
+c7.set_attr(h=None, T=104)
+c8.set_attr(p=23.442)
 c9.set_attr(h=None, T=105)
 c10_sup.set_attr(h=None, x=1)
 c11_cc.set_attr(h=None, Td_bp=5)
 c12.set_attr(T=None)
-gc1.set_attr(ttd_u=15)
+gc1.set_attr(ttd_u=22)
 c13.set_attr(T=None)
 gc2.set_attr(ttd_u=5)
+
+nw.solve(mode='design')
+nw.print_results()
+
 # busses
 power = Bus('power input')
 power.add_comps(
@@ -210,7 +216,7 @@ for key in result_dict.keys():
     diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
 
 
-diagram.save('logph_Cascade_R601 mit R1233ZD(E)_R601.png', dpi=300)
+diagram.save('logph_Cascade_R601 mit R600_R601.png', dpi=300)
 
 result_dict = {}
 result_dict.update({ca.label: ca.get_plotting_data()[2]})
@@ -221,14 +227,14 @@ result_dict.update({ev1.label: ev1.get_plotting_data()[2]})
 result_dict.update({sup1.label: sup1.get_plotting_data()[2]})
 
 
-diagram = FluidPropertyDiagram('R1233ZD(E)')
+diagram = FluidPropertyDiagram('Butane')
 diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
 
 for key, data in result_dict.items():
     result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
 
 diagram.calc_isolines()
-diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
+diagram.set_limits(x_min=0, x_max=900, y_min=1e-1, y_max=2e2)
 diagram.draw_isolines('logph')
 
 for key in result_dict.keys():
@@ -237,4 +243,5 @@ for key in result_dict.keys():
     diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
 
 
-diagram.save('logph_Cascade_R601 mit R1233ZD(E)_R1233ZD(E).png', dpi=300)
+diagram.save('logph_Cascade_R601 mit R600_R600.png', dpi=300)
+

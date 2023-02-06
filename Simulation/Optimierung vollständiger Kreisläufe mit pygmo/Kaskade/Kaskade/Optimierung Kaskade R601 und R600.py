@@ -19,10 +19,11 @@ class HeatPumpCycle:
     def __init__(self):
 
         wf1 = 'REFPROP::Pentane'
-        wf2 = 'REFPROP::R1233ZD(E)'
+        wf2 = 'REFPROP::Butane'
         si = 'H2O'
 
-        self.nw = Network(fluids=[wf1, wf2, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', iterinfo=False)
+        self.nw = Network(fluids=[wf1, wf2, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s',
+                          iterinfo=False)
 
         # Components
         ca = HeatExchanger('Cascade HeatExchanger')
@@ -91,10 +92,10 @@ class HeatPumpCycle:
         ev2.set_attr(pr1=1, pr2=1)
         sup2.set_attr(pr1=1, pr2=1)
 
-        h_c1 = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 145, wf1) * 1e-3
-        c1.set_attr(h=h_c1, p=36, fluid={'Pentane': 1, 'R1233ZD(E)': 0, 'H2O': 0})
+        h_c1 = CPSI("H", "P", 39.1 * 1e5, "T", 273.15 + 135, wf1) * 1e-3
+        c1.set_attr(h=h_c1, p=39.1, fluid={'Pentane': 1, 'Butane': 0, 'H2O': 0})
 
-        # h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+135, wf1) * 1e-3
+        # h_c2 = CPSI("H", "P", 36 * 1e5, "T", 273.15+127, wf1) * 1e-3
         # c2.set_attr(h=h_c2)
 
         c3.set_attr(p=2.8)
@@ -105,29 +106,29 @@ class HeatPumpCycle:
         h_c4 = CPSI("H", "P", 2.8 * 1e5, "T", 273.15 + 75, wf1) * 1e-3
         c4.set_attr(h=h_c4)
 
-        # h_c6 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+75, wf2) * 1e-3
-        c6.set_attr(p=5.1, fluid={'Pentane': 0, 'R1233ZD(E)': 1, 'H2O': 0})
+        h_c6 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 75, wf2) * 1e-3
+        c6.set_attr(p=8.1, fluid={'Pentane': 0, 'Butane': 1, 'H2O': 0})
 
-        h_c7 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 92, wf2) * 1e-3
+        h_c7 = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 104, wf2) * 1e-3
         c7.set_attr(h=h_c7)
 
-        c8.set_attr(p=20.553)
-        h_c9 = CPSI("H", "P", 20.553 * 1e5, "T", 273.15 + 105, wf2) * 1e-3
+        c8.set_attr(p=23.442)
+        h_c9 = CPSI("H", "P", 23.442 * 1e5, "T", 273.15 + 105, wf2) * 1e-3
         c9.set_attr(h=h_c9)
 
         h_c10_sup = CPSI("H", "Q", 1, "T", 273.15 + 70, wf2) * 1e-3
         c10_sup.set_attr(h=h_c10_sup)
 
-        h_c11_cc = CPSI("H", "P", 5.1 * 1e5, "T", 273.15 + 75, wf2) * 1e-3
+        h_c11_cc = CPSI("H", "P", 8.1 * 1e5, "T", 273.15 + 75, wf2) * 1e-3
         c11_cc.set_attr(h=h_c11_cc)
 
-        c11.set_attr(T=100, p=20, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
-        c12.set_attr(T=135)
+        c11.set_attr(T=100, p=20, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
+        c12.set_attr(T=130)
         c13.set_attr(T=200)
 
-        c14.set_attr(T=80, m=5, p=5, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
+        c14.set_attr(T=80, m=5, p=5, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
         c16.set_attr(T=75)
-        c17.set_attr(T=80, p=5, fluid={'Pentane': 0, 'R1233ZD(E)': 0, 'H2O': 1})
+        c17.set_attr(T=80, p=5, fluid={'Pentane': 0, 'Butane': 0, 'H2O': 1})
         c19.set_attr(T=75)
 
         # busses
@@ -164,18 +165,18 @@ class HeatPumpCycle:
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
 
         # New Parameters
-        c1.set_attr(h=None, T=145, p=36)
+        c1.set_attr(h=None, T=135, p=36)
         c3.set_attr(p=2.8)
         c3_sup.set_attr(h=None, x=1)
         c4.set_attr(h=None, Td_bp=5)
-        c6.set_attr(p=5.1)
-        c7.set_attr(h=None, T=92)
-        c8.set_attr(p=20.553)
+        c6.set_attr(p=8.1)
+        c7.set_attr(h=None, T=104)
+        c8.set_attr(p=23.442)
         c9.set_attr(h=None, T=105)
         c10_sup.set_attr(h=None, x=1)
         c11_cc.set_attr(h=None, Td_bp=5)
         c12.set_attr(T=None)
-        gc1.set_attr(ttd_u=15)
+        gc1.set_attr(ttd_u=22)
         c13.set_attr(T=None)
         gc2.set_attr(ttd_u=5)
 
@@ -193,8 +194,7 @@ class HeatPumpCycle:
         self.ean.analyse(pamb=self.pamb, Tamb=self.Tamb)
         self.ean.print_results()
         print(f'COP = {abs(self.nw.busses["heat_product"].P.val) / abs(self.nw.busses["power"].P.val)}')
-
- # %%[sec_2]
+# %%[sec_2]
 
     def get_param(self, obj, label, parameter):
         """Get the value of a parameter in the network"s unit system.
@@ -237,13 +237,13 @@ class HeatPumpCycle:
         )
 
         # Connection parameters
-        c1.set_attr(T=145, p=36)
+        c1.set_attr(T=135, p=36)
         c3.set_attr(p=2.8)
         c3_sup.set_attr(x=1)
         c4.set_attr(Td_bp=5)
-        c6.set_attr(p=5.1)
-        c7.set_attr(T=92)
-        c8.set_attr(p=20.553)
+        c6.set_attr(p=8.1)
+        c7.set_attr(T=104)
+        c8.set_attr(p=23.442)
         c9.set_attr(T=105)
         c10_sup.set_attr(x=1)
         c11_cc.set_attr(Td_bp=5)
@@ -256,7 +256,7 @@ class HeatPumpCycle:
             ]
         )
         # Component parameters
-        gc1.set_attr(pr1=1, pr2=1, ttd_u=15)
+        gc1.set_attr(pr1=1, pr2=1, ttd_u=22)
         gc2.set_attr(ttd_u=5)
         ca.set_attr(pr1=1, pr2=1)
         cp1.set_attr(eta_s=0.7)
@@ -321,19 +321,21 @@ class HeatPumpCycle:
                 raise NotImplementedError(msg)
         else:
             return np.nan
+
+
 HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "1": {"T": {"min": 140, "max": 146}, "p": {"min": 35, "max": 43}},
-        "3": {"p": {"min": 2.7, "max": 3.24}},
-        "6": {"p": {"min": 5, "max": 5.22}},
-        "7": {"T": {"min": 92, "max": 94}},
-        "8": {"p": {"min": 20, "max": 20.5}},
+        "1": {"T": {"min": 130, "max": 136}, "p": {"min": 35, "max": 44}},
+        "3": {"p": {"min": 2.7, "max": 3.3}},
+        "6": {"p": {"min": 8, "max": 8.22}},
+        "7": {"T": {"min": 103, "max": 106}},
+        "8": {"p": {"min": 22, "max": 24}},
         "9": {"T": {"min": 100, "max": 107}}
     },
     "Components": {
-        "GasCooler1": {"ttd_u": {"min": 14.2, "max": 15.5}},
+        "GasCooler1": {"ttd_u": {"min": 21, "max": 23}},
     }
 }
 constraints = {
