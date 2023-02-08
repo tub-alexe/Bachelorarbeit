@@ -286,8 +286,7 @@ HeatPump.get_objective("eta")
 variables = {
     "Connections": {
         "4": {"p": {"min": 50, "max": 56}, "T": {"min": 100, "max": 106}},
-        "1": {"p": {"min": 7.6, "max": 8.8}},
-        "1_co": {"p": {"min": 39, "max": 43}}
+        "1": {"p": {"min": 7.6, "max": 8.96}}
     }
 }
 constraints = {
@@ -320,3 +319,40 @@ optimize.run(algo, pop, num_ind, num_gen)
 print(optimize.individuals)
 # check pygmo documentation to see, what you can get from the population
 pop
+
+#plot the graphic
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+# make text reasonably sized
+plt.rcParams["figure.figsize"] = [10.00, 8.50]
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+
+filter_valid_constraint = optimize.individuals["valid"].values
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
+data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
+
+colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick"]
+cmap = mpl.colors.ListedColormap(colors)
+cmap.set_under("lavender")
+cmap.set_over("darkred")
+bounds = [0.66, 0.68, 0.7, 0.73, 0.7325, 0.735, 0.736, 0.737, 0.738, 0.739, 0.74]
+norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
+
+
+x = data["Connections-4-p"]
+y = data["Connections-1-p"]
+z = data["Connections-4-T"]
+c = 1 / data["eta"]
+
+im = ax.scatter(x, y, z, c=c, cmap=cmap, norm=norm)
+
+cbar = fig.colorbar(im, extend="both")
+ax.set_xlabel("Druck Gaskühlerseite")
+ax.set_ylabel("Druck Verdampferseite ")
+ax.set_zlabel("Temperatur nach dem Gaskühler")
+cbar.set_label("eta")
+plt.show()
+#fig.savefig('pygmo_optimization_Zweistufen_R600.svg')

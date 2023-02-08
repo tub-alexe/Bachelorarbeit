@@ -285,9 +285,8 @@ HeatPump = HeatPumpCycle()
 HeatPump.get_objective("eta")
 variables = {
     "Connections": {
-        "4": {"p": {"min": 36, "max": 43}, "T": {"min": 100, "max": 106}},
-        "1": {"p": {"min": 3, "max": 3.3}},
-        "1_co": {"p": {"min": 12.5, "max": 14}}
+        "4": {"p": {"min": 36, "max": 44}, "T": {"min": 100, "max": 106}},
+        "1": {"p": {"min": 3, "max": 3.24}},
     }
 }
 constraints = {
@@ -304,7 +303,7 @@ optimize = OptimizationProblem(
 )
 # %%[sec_4]
 num_ind = 10
-num_gen = 100
+num_gen = 78
 
 # for algorithm selection and parametrization please consider the pygmo
 # documentation! The number of generations indicated in the algorithm is
@@ -320,3 +319,40 @@ optimize.run(algo, pop, num_ind, num_gen)
 print(optimize.individuals)
 # check pygmo documentation to see, what you can get from the population
 pop
+
+#plot the graphic
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+# make text reasonably sized
+plt.rcParams["figure.figsize"] = [10.00, 8.50]
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+
+filter_valid_constraint = optimize.individuals["valid"].values
+filter_valid_result = ~np.isnan(optimize.individuals["eta"].values)
+data = optimize.individuals.loc[filter_valid_constraint & filter_valid_result]
+
+colors = ["mediumturquoise", "palegreen", "lawngreen", "greenyellow", "yellow", "gold", "orange", "darkorange", "orangered", "firebrick"]
+cmap = mpl.colors.ListedColormap(colors)
+cmap.set_under("lavender")
+cmap.set_over("darkred")
+bounds = [0.67, 0.69, 0.71, 0.72, 0.73, 0.74, 0.75, 0.7525, 0.755, 0.756, 0.757]
+norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
+
+
+x = data["Connections-4-p"]
+y = data["Connections-1-p"]
+z = data["Connections-4-T"]
+c = 1 / data["eta"]
+
+im = ax.scatter(x, y, z, c=c, cmap=cmap, norm=norm)
+
+cbar = fig.colorbar(im, extend="both")
+ax.set_xlabel("Druck Gaskühlerseite")
+ax.set_ylabel("Druck Verdampferseite ")
+ax.set_zlabel("Temperatur nach dem Gaskühler")
+cbar.set_label("eta")
+plt.show()
+fig.savefig('pygmo_optimization_Zweistufen_R601.svg')

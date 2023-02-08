@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 
-wf = 'REFPROP::R245fa'
+wf = 'REFPROP::R1336mzz(Z)'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
@@ -63,27 +63,75 @@ cp.set_attr(eta_s=0.7)
 #h_gk_vor = CPSI("H", "P", 36 * 1e5, "T", 273.15+200.734, km) * 1e-3
 #c1.set_attr(h=h_gk_vor)
 
-h_gk_nach = CPSI("H", "P", 89 * 1e5, "T", 273.15+105, wf) * 1e-3
-c2.set_attr(h=h_gk_nach, p=89)
+h_gk_nach = CPSI("H", "P", 53.5 * 1e5, "T", 273.15+105, wf) * 1e-3
+c2.set_attr(h=h_gk_nach, p=53.5)
 
 #h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
-c3.set_attr(p=6.1)
+c3.set_attr(p=2.8)
 
-h_zw = CPSI("H", "P", 6.1 * 1e5, "T", 273.15+70, wf) * 1e-3
+h_zw = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+70, wf) * 1e-3
 c4.set_attr(h=h_zw)
 
-h_uebe = CPSI("H", "P", 6.1 * 1e5, "T", 273.15+75, wf) * 1e-3
-c5.set_attr(h=h_uebe, fluid={'R245fa': 1, 'H2O': 0})
+h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
+c5.set_attr(h=h_uebe, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, p=20, fluid={'R245fa': 0, 'H2O': 1})
+c7.set_attr(T=100, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
-c9.set_attr(T=80, m=5, p=5, fluid={'R245fa': 0, 'H2O': 1})
+c9.set_attr(T=80, m=5, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
 c11.set_attr(T=75)
 
 #Solve Model
 
 nw.solve(mode='design')
 nw.print_results()
+c2.set_attr(h=None, p=45.3224, T=100.0175)
+c3.set_attr(p=3.7594)
+c4.set_attr(h=None, x=1)
+c5.set_attr(h=None, Td_bp=5)
+c8.set_attr(T=None)
+gc.set_attr(ttd_u=5)
+
+# busses
+power = Bus('power input')
+power.add_comps(
+    {'comp': cp, 'char': 1, 'base': 'bus'},
+    {'comp': sou_in, 'base': 'bus'},
+    {'comp': sou_out})
+
+
+heat_product = Bus('heating')
+heat_product.add_comps(
+    {'comp': si_in, 'base': 'bus'},
+    {'comp': si_out})
+
+power_COP = Bus('power')
+power_COP.add_comps(
+        {'comp': cp, 'char': -1, 'base': 'bus'}
+)
+
+heat_product_COP = Bus('heat_product')
+heat_product_COP.add_comps(
+            {"comp": gc, "char": 1})
+
+nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+
+#Solve Model
+
+nw.solve(mode='design')
+nw.print_results()
+print('COP', heat_product_COP.P.val / power_COP.P.val)
+print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
+
+# Exergy Analysis
+
+pamb = 1
+Tamb = 25
+
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
+ean.analyse(pamb=pamb, Tamb=Tamb)
+ean.print_results()
+print(ean.network_data.loc['epsilon'])
+# zwei verschiedene Exergiebetrachtungen, epsilon 72 % oder 31 % je nach Betrachtung, Frage der Definition von E_F
