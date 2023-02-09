@@ -76,11 +76,11 @@ h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
 c5.set_attr(h=h_uebe, fluid=fld_wf)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, p=20, fluid=fld_si)
+c7.set_attr(T=100, m=500, p=20, fluid=fld_si)
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
-c9.set_attr(T=80, m=5, p=5, fluid=fld_si)
+c9.set_attr(T=80, p=5, fluid=fld_si)
 c11.set_attr(T=75)
 
 #Solve Model
@@ -95,8 +95,8 @@ c2.set_attr(h=None, p=36, T=105)
 c3.set_attr(p=2.8)
 c4.set_attr(h=None, x=1)
 c5.set_attr(h=None, Td_bp=5)
-c8.set_attr(T=None)
-gc.set_attr(ttd_u=4)
+#c8.set_attr(T=None)
+#gc.set_attr(ttd_u=5)
 
 # busses
 power = Bus('power input')
@@ -177,48 +177,23 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.1, 3.3, 30),
-    'p_kond': np.linspace(35, 54, 20),
-    'T_kond': np.linspace(100.0061, 110, 10)
+    'p_kond': np.linspace(35, 55, 40)
 }
 eta = {
-    'p_verd': [],
-    'p_kond': [],
-    'T_kond': []
+    'p_kond': []
 }
 description = {
-    'p_verd': 'Verdampferdruck in bar',
     'p_kond': 'Kondensatordruck in bar',
-    'T_kond': 'Kondensatortemperatur in Celsius'
 }
-
-for p in data['p_verd']:
-    c3.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['p_verd'] += [ean.network_data.loc['epsilon']]
-
-# reset to base temperature
-c3.set_attr(p=2.8)
 
 for p in data['p_kond']:
     c2.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['p_kond'] += [ean.network_data.loc['epsilon']]
+    eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
 
-# reset to base temperature
-c2.set_attr(p=36)
 
-for T in data['T_kond']:
-    c2.set_attr(T=T)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['T_kond'] += [ean.network_data.loc['epsilon']]
-
-c2.set_attr(T=105)
-
-fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
+fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
 
 [a.grid() for a in ax]
 
@@ -231,8 +206,48 @@ for key in data:
 ax[0].set_ylabel('eta of the Heat Pump')
 
 plt.tight_layout()
+plt.show()
+fig.savefig('Optimierung R601.svg')
 
-#fig.savefig('Optimierung R601.svg')
+c2.set_attr(p=36)
+
+# make text reasonably sized
+plt.rc('font', **{'size': 18})
+
+
+data = {
+    'p_kond': np.linspace(35, 55, 20)
+}
+COP = {
+    'p_kond': []
+}
+description = {
+    'p_kond': 'Kondensatordruck in bar',
+}
+
+for p in data['p_kond']:
+    c2.set_attr(p=p)
+    nw.solve('design')
+    nw.print_results()
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+    COP['p_kond'] += [nw.busses["heat_product"].P.val / nw.busses["power"].P.val]
+
+
+fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
+
+[a.grid() for a in ax]
+
+i = 0
+for key in data:
+    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
+    ax[i].set_xlabel(description[key])
+    i += 1
+
+ax[0].set_ylabel('COP of the Heat Pump')
+
+plt.tight_layout()
+plt.show()
+fig.savefig('Optimierung COP R601.svg')
 
 
 # h_verd und m von c6 oder c8 entfernen dann funktioniert die Simulation
