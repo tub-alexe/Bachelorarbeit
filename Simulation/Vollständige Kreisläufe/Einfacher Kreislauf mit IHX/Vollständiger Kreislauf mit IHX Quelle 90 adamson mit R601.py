@@ -5,7 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 
-wf = 'R601'
+wf = 'REFPROP::Pentane'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
@@ -63,7 +63,7 @@ cp.set_attr(eta_s=0.7)
 
 # Starting Parameters Connections Cycle
 h_ihx_h_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+100, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid=fld_wf)
+c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid={'Pentane': 1, 'H2O': 0})
 
 
 h_ihx_k_vor = CPSI("H", "P", 35 * 1e5, "T", 273.15+105, wf) * 1e-3
@@ -76,11 +76,11 @@ h_ihx_k_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, p=20, fluid=fld_si)
+c7.set_attr(T=100, m=500, p=20, fluid={'Pentane': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
-c9.set_attr(T=80, m=5, p=5, fluid=fld_si)
+c9.set_attr(T=80, p=5, fluid={'Pentane': 0, 'H2O': 1})
 c11.set_attr(T=75)
 
 #Solve Model
@@ -149,7 +149,7 @@ result_dict.update({gc.label: gc.get_plotting_data()[1]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[1]})
 result_dict.update({va.label: va.get_plotting_data()[1]})
 
-diagram = FluidPropertyDiagram(wf)
+diagram = FluidPropertyDiagram('Pentane')
 diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
 
 for key, data in result_dict.items():
@@ -171,66 +171,42 @@ diagram.save('logph_IHX_R601.png', dpi=300)
 import matplotlib.pyplot as plt
 import numpy as np
 
+c3.set_attr(p=35)
+
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_verd': np.linspace(1.7, 3.2, 10),
-    'p_kond': np.linspace(35, 41, 10),
-    'T_kond': np.linspace(101, 110, 10)
+    'p_kond': np.linspace(34, 40, 20)
 }
-eta = {
-    'p_verd': [],
-    'p_kond': [],
-    'T_kond': []
+COP = {
+    'p_kond': []
 }
 description = {
-    'p_verd': 'Verdampferdruck in bar',
     'p_kond': 'Kondensatordruck in bar',
-    'T_kond': 'Kondensatortemperatur in Celsius'
 }
-
-for p in data['p_verd']:
-    c1.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    print(ean.network_data.loc['epsilon'])
-    eta['p_verd'] += [ean.network_data.loc['epsilon']]
-
-    c1.set_attr(p=2.8)
-
-    nw.solve(mode='design')
 
 for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
+    nw.print_results()
     ean.analyse(pamb=pamb, Tamb=Tamb)
-    print(ean.network_data.loc['epsilon'])
-    eta['p_kond'] += [ean.network_data.loc['epsilon']]
-
-    # reset to base pressure
-    c3.set_attr(p=35)
-
-for T in data['T_kond']:
-    c3.set_attr(T=T)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['T_kond'] += [ean.network_data.loc['epsilon']]
+    COP['p_kond'] += [nw.busses["heat_product"].P.val / nw.busses["power"].P.val]
 
 
-fig, ax = plt.subplots(1, 3, sharey=True, figsize=(16, 8))
+fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
 
 [a.grid() for a in ax]
 
 i = 0
 for key in data:
-    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
+    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
     ax[i].set_xlabel(description[key])
     i += 1
 
-ax[0].set_ylabel('eta of the Heat Pump')
+ax[0].set_ylabel('COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung_IHX_R601.svg')
+fig.savefig('Optimierung COP R601.svg')

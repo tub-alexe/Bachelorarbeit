@@ -53,10 +53,10 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11)
 
 # Starting Parameters Components
 
-gc.set_attr(pr1=1, pr2=1)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
-cp.set_attr(eta_s=0.7)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
 
@@ -76,7 +76,7 @@ h_uebe = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
 c5.set_attr(h=h_uebe, fluid=fld_wf)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, m=500, p=20, fluid=fld_si)
+c7.set_attr(T=100, p=20, fluid=fld_si)
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
@@ -95,8 +95,8 @@ c2.set_attr(h=None, p=36, T=105)
 c3.set_attr(p=2.8)
 c4.set_attr(h=None, x=1)
 c5.set_attr(h=None, Td_bp=5)
-#c8.set_attr(T=None)
-#gc.set_attr(ttd_u=5)
+c8.set_attr(T=None)
+gc.set_attr(ttd_u=5)
 
 # busses
 power = Bus('power input')
@@ -177,7 +177,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(35, 55, 40)
+    'p_kond': np.linspace(36, 50, 20)
 }
 eta = {
     'p_kond': []
@@ -216,7 +216,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(35, 55, 20)
+    'p_kond': np.linspace(36, 50, 20)
 }
 COP = {
     'p_kond': []
