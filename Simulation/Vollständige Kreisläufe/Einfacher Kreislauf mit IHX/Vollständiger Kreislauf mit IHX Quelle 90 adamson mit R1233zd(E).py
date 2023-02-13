@@ -98,24 +98,27 @@ c8.set_attr(T=None)
 gc.set_attr(ttd_u=39)
 
 # busses
-power = Bus('power input')
+power = Bus('power')
 power.add_comps(
-    {'comp': cp, 'char': 1, 'base': 'bus'},
+    {'comp': cp, 'char': 1, 'base': 'bus'})
+
+heat_source = Bus('heat_source')
+heat_source.add_comps(
     {'comp': sou_in, 'base': 'bus'},
     {'comp': sou_out})
 
-
-heat_product = Bus('heating')
+heat_product = Bus('heat_product')
 heat_product.add_comps(
     {'comp': si_in, 'base': 'bus'},
     {'comp': si_out})
 
-power_COP = Bus('power')
+
+power_COP = Bus('power_COP')
 power_COP.add_comps(
         {'comp': cp, 'char': -1, 'base': 'bus'}
 )
 
-heat_product_COP = Bus('heat_product')
+heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
@@ -124,17 +127,46 @@ nw.add_busses(power, heat_product, power_COP, heat_product_COP)
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
+print('COP', nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val)
 
 # Implementierung Exergie Analyse
 
 pamb = 1
 Tamb = 25
 
-ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power, heat_source])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
+
+#log p,h
+
+result_dict = {}
+result_dict.update({ev.label: ev.get_plotting_data()[2]})
+result_dict.update({sup.label: sup.get_plotting_data()[2]})
+result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
+result_dict.update({cp.label: cp.get_plotting_data()[1]})
+result_dict.update({gc.label: gc.get_plotting_data()[1]})
+result_dict.update({ihx.label: ihx.get_plotting_data()[1]})
+result_dict.update({va.label: va.get_plotting_data()[1]})
+
+diagram = FluidPropertyDiagram('R1233ZD(E)')
+diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
+
+for key, data in result_dict.items():
+    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
+
+diagram.calc_isolines()
+diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
+diagram.draw_isolines('logph')
+
+for key in result_dict.keys():
+    datapoints = result_dict[key]['datapoints']
+    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
+    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
+
+
+diagram.save('logph_IHX_R601.png', dpi=300)
 
 #parameter optimization
 import matplotlib.pyplot as plt
@@ -159,7 +191,7 @@ for p in data['p_kond']:
     nw.solve('design')
     nw.print_results()
     ean.analyse(pamb=pamb, Tamb=Tamb)
-    COP['p_kond'] += [nw.busses["heat_product"].P.val / nw.busses["power"].P.val]
+    COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
 
 
 fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
