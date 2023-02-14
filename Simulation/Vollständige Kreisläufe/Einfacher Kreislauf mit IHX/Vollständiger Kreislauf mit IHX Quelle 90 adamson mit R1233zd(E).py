@@ -4,6 +4,7 @@ from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
+import math
 
 wf = 'REFPROP::R1233ZD(E)'
 si = 'H2O'
@@ -33,24 +34,24 @@ cc = CycleCloser('CycleCloser')
 
 
 # Connections Cycle
-c1 = Connection(ihx, 'out2', cp, 'in1')
-c2cc = Connection(cp, 'out1', cc, 'in1')
-c2 = Connection(cc, 'out1', gc, 'in1')
-c3 = Connection(gc, 'out1', ihx, 'in1')
-c4 = Connection(ihx, 'out1', va, 'in1')
-c5 = Connection(va, 'out1', ev, 'in2')
-c5_ue = Connection(ev, 'out2', sup, 'in2')
-c6 = Connection(sup, 'out2', ihx, 'in2')
+c1 = Connection(ihx, 'out2', cp, 'in1', label="1")
+c2cc = Connection(cp, 'out1', cc, 'in1', label="2cc")
+c2 = Connection(cc, 'out1', gc, 'in1', label="2")
+c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
+c4 = Connection(ihx, 'out1', va, 'in1', label="4")
+c5 = Connection(va, 'out1', ev, 'in2', label="5")
+c5_ue = Connection(ev, 'out2', sup, 'in2', label="5_ue")
+c6 = Connection(sup, 'out2', ihx, 'in2', label="6")
 
 
 # Connections Sink
-c7 = Connection(si_in, 'out1', gc, 'in2')
-c8 = Connection(gc, 'out2', si_out, 'in1')
+c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
+c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 
 # Connections Source
-c9 = Connection(sou_in, 'out1', sup, 'in1')
-c10 = Connection(sup, 'out1', ev, 'in1')
-c11 = Connection(ev, 'out1', sou_out, 'in1')
+c9 = Connection(sou_in, 'out1', sup, 'in1', label="9")
+c10 = Connection(sup, 'out1', ev, 'in1', label="10")
+c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
 
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
 
@@ -128,7 +129,16 @@ nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
 print('COP', nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val)
-
+print(nw.get_conn("5_ue").get_attr("T").val)
+print(nw.get_conn("2").get_attr("T").val)
+print(nw.get_conn("3").get_attr("T").val)
+print((nw.get_conn("2").get_attr("T").val - nw.get_conn("3").get_attr("T").val) /
+      math.log(nw.get_conn("2").get_attr("T").val/nw.get_conn("3").get_attr("T").val))
+print((((nw.get_conn("2").get_attr("T").val +273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
+      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) /
+      ((((nw.get_conn("2").get_attr("T").val + 273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
+      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) -
+       ((nw.get_conn("5_ue").get_attr("T").val + 273.15))))
 # Implementierung Exergie Analyse
 
 pamb = 1
@@ -248,3 +258,47 @@ ax[0].set_ylabel('eta of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung eta R1233ZD(E).svg')
+
+
+
+# make text reasonably sized
+plt.rc('font', **{'size': 18})
+
+
+data = {
+    'p_kond': np.linspace(36, 50, 40)
+}
+Lorenz_COP = {
+    'p_kond': []
+}
+description = {
+    'p_kond': 'Kondensatordruck in bar',
+}
+
+for p in data['p_kond']:
+    c3.set_attr(p=p)
+    nw.solve('design')
+    ean.analyse(pamb=pamb, Tamb=Tamb)
+
+    Lorenz_COP['p_kond'] += [(((nw.get_conn("2").get_attr("T").val +273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
+      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) /
+      ((((nw.get_conn("2").get_attr("T").val + 273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
+      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) -
+       ((nw.get_conn("5_ue").get_attr("T").val + 273.15)))]
+
+
+fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
+
+[a.grid() for a in ax]
+
+i = 0
+for key in data:
+    ax[i].scatter(data[key], Lorenz_COP[key], s=100, color="#1f567d")
+    ax[i].set_xlabel(description[key])
+    i += 1
+
+ax[0].set_ylabel('Lorenz-COP')
+
+plt.tight_layout()
+plt.show()
+fig.savefig('Optimierung Lorenz-COP R1233ZD(E).svg')
