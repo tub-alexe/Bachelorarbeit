@@ -77,7 +77,7 @@ h_ihx_k_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c7.set_attr(T=160, p=30, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
@@ -96,7 +96,7 @@ c3.set_attr(h=None, p=44, T=165)
 c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=39)
+gc.set_attr(ttd_u=10)
 
 # busses
 power = Bus('power')
@@ -127,18 +127,10 @@ nw.add_busses(power, heat_product, power_COP, heat_product_COP)
 
 nw.solve(mode='design')
 nw.print_results()
+
 print('COP', heat_product_COP.P.val / power_COP.P.val)
 print('COP', nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val)
-print(nw.get_conn("5_ue").get_attr("T").val)
-print(nw.get_conn("2").get_attr("T").val)
-print(nw.get_conn("3").get_attr("T").val)
-print((nw.get_conn("2").get_attr("T").val - nw.get_conn("3").get_attr("T").val) /
-      math.log(nw.get_conn("2").get_attr("T").val/nw.get_conn("3").get_attr("T").val))
-print((((nw.get_conn("2").get_attr("T").val +273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
-      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) /
-      ((((nw.get_conn("2").get_attr("T").val + 273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
-      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) -
-       ((nw.get_conn("5_ue").get_attr("T").val + 273.15))))
+
 # Implementierung Exergie Analyse
 
 pamb = 1
@@ -187,7 +179,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(36, 50, 40)
+    'p_kond': np.linspace(36, 48, 40)
 }
 COP = {
     'p_kond': []
@@ -199,7 +191,6 @@ description = {
 for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
-    nw.print_results()
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
 
@@ -227,7 +218,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(36, 50, 40)
+    'p_kond': np.linspace(36, 48, 40)
 }
 eta = {
     'p_kond': []
@@ -266,7 +257,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(36, 50, 40)
+    'p_kond': np.linspace(36, 48, 40)
 }
 Lorenz_COP = {
     'p_kond': []
@@ -280,11 +271,14 @@ for p in data['p_kond']:
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
 
-    Lorenz_COP['p_kond'] += [(((nw.get_conn("2").get_attr("T").val +273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
-      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) /
-      ((((nw.get_conn("2").get_attr("T").val + 273.15) - (nw.get_conn("3").get_attr("T").val + 273.15)) /
-      math.log((nw.get_conn("2").get_attr("T").val + 273.15)/(nw.get_conn("3").get_attr("T").val + 273.15))) -
-       ((nw.get_conn("5_ue").get_attr("T").val + 273.15)))]
+    T_2 = nw.get_conn("2").get_attr("T").val + 273.15
+    T_3 = nw.get_conn("3").get_attr("T").val + 273.15
+    T_5 = nw.get_conn("5_ue").get_attr("T").val + 273.15
+    T_H = (T_2 - T_3) / math.log(T_2 / T_3)
+
+    print(T_H)
+
+    Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
 
 
 fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
