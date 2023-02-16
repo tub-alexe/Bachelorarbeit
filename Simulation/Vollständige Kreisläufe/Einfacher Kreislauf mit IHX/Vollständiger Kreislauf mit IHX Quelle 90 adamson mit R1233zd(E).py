@@ -96,7 +96,7 @@ c3.set_attr(h=None, p=44, T=165)
 c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=10)
+gc.set_attr(ttd_u=20)
 
 # busses
 power = Bus('power')
@@ -127,9 +127,6 @@ nw.add_busses(power, heat_product, power_COP, heat_product_COP)
 
 nw.solve(mode='design')
 nw.print_results()
-
-print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val)
 
 # Implementierung Exergie Analyse
 
@@ -176,10 +173,10 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-
+iterations = 20
 
 data = {
-    'p_kond': np.linspace(36, 48, 40)
+    'p_kond': np.linspace(36, 48, iterations)
 }
 COP = {
     'p_kond': []
@@ -195,8 +192,8 @@ for p in data['p_kond']:
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
 
 
-fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
-
+fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
+ax = [ax]
 [a.grid() for a in ax]
 
 i = 0
@@ -218,7 +215,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(36, 48, 40)
+    'p_kond': np.linspace(36, 48, iterations)
 }
 eta = {
     'p_kond': []
@@ -234,8 +231,8 @@ for p in data['p_kond']:
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
 
 
-fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
-
+fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
+ax = [ax]
 [a.grid() for a in ax]
 
 i = 0
@@ -257,7 +254,7 @@ plt.rc('font', **{'size': 18})
 
 
 data = {
-    'p_kond': np.linspace(36, 48, 40)
+    'p_kond': np.linspace(36, 48, iterations)
 }
 Lorenz_COP = {
     'p_kond': []
@@ -281,8 +278,8 @@ for p in data['p_kond']:
     Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
 
 
-fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
-
+fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
+ax = [ax]
 [a.grid() for a in ax]
 
 i = 0
@@ -296,3 +293,32 @@ ax[0].set_ylabel('Lorenz-COP')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Lorenz-COP R1233ZD(E).svg')
+
+dat = tuple(data['p_kond'])
+E_D_Lists = {}
+for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
+    E_D_List = []
+    for p in data['p_kond']:
+        c3.set_attr(p=p)
+        nw.solve('design')
+        ean.analyse(pamb=pamb, Tamb=Tamb)
+        E_D_List += [ean.component_data['E_D'][name] * 1e-6]
+
+    E_D_Lists[name] = E_D_List
+
+
+width = 0.1
+
+fig, ax = plt.subplots()
+bottom = np.zeros(iterations)
+
+for boolean, E_D_List in E_D_Lists.items():
+    p = ax.bar(dat, E_D_List, width, label=boolean, bottom=bottom)
+    bottom += E_D_List
+
+ax.set_xlabel('Kondensatordruck in bar')
+ax.set_ylabel('Exergievernichtung in MW')
+ax.legend(loc="best")
+
+plt.show()
+fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
