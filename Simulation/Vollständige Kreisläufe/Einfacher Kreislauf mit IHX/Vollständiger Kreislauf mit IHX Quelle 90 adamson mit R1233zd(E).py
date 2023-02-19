@@ -173,89 +173,20 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 data = {
     'p_kond': np.linspace(36, 48, iterations)
 }
+
 COP = {
     'p_kond': []
 }
-description = {
-    'p_kond': 'Kondensatordruck in bar',
-}
 
-for p in data['p_kond']:
-    c3.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
-
-
-fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
-ax = [ax]
-[a.grid() for a in ax]
-
-i = 0
-for key in data:
-    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
-    ax[i].set_xlabel(description[key])
-    i += 1
-
-ax[0].set_ylabel('COP of the Heat Pump')
-
-plt.tight_layout()
-plt.show()
-fig.savefig('Optimierung COP R1233ZD(E).svg')
-
-c3.set_attr(p=44)
-
-# make text reasonably sized
-plt.rc('font', **{'size': 18})
-
-
-data = {
-    'p_kond': np.linspace(36, 48, iterations)
-}
 eta = {
     'p_kond': []
 }
-description = {
-    'p_kond': 'Kondensatordruck in bar',
-}
 
-for p in data['p_kond']:
-    c3.set_attr(p=p)
-    nw.solve('design')
-    ean.analyse(pamb=pamb, Tamb=Tamb)
-    eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
-
-
-fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
-ax = [ax]
-[a.grid() for a in ax]
-
-i = 0
-for key in data:
-    ax[i].scatter(data[key], eta[key], s=100, color="#1f567d")
-    ax[i].set_xlabel(description[key])
-    i += 1
-
-ax[0].set_ylabel('eta of the Heat Pump')
-
-plt.tight_layout()
-plt.show()
-fig.savefig('Optimierung eta R1233ZD(E).svg')
-
-
-
-# make text reasonably sized
-plt.rc('font', **{'size': 18})
-
-
-data = {
-    'p_kond': np.linspace(36, 48, iterations)
-}
 Lorenz_COP = {
     'p_kond': []
 }
@@ -267,32 +198,32 @@ for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
-
+    COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
+    eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
     T_2 = nw.get_conn("2").get_attr("T").val + 273.15
     T_3 = nw.get_conn("3").get_attr("T").val + 273.15
     T_5 = nw.get_conn("5_ue").get_attr("T").val + 273.15
     T_H = (T_2 - T_3) / math.log(T_2 / T_3)
-
-    print(T_H)
-
     Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
 
 
-fig, ax = plt.subplots(1, 1, sharey=True, figsize=(16, 8))
-ax = [ax]
+fig, ax = plt.subplots(1, 3, figsize=(16, 8))
+#ax = [ax]
 [a.grid() for a in ax]
 
-i = 0
-for key in data:
-    ax[i].scatter(data[key], Lorenz_COP[key], s=100, color="#1f567d")
-    ax[i].set_xlabel(description[key])
-    i += 1
+for i, dictionary in enumerate([eta, COP, Lorenz_COP]):
 
-ax[0].set_ylabel('Lorenz-COP')
+    for key in data:
+        ax[i].scatter(data[key], dictionary[key], s=100, color="#1f567d")
+        ax[i].set_xlabel(description[key])
+
+ax[0].set_ylabel('COP of the Heat Pump')
+ax[1].set_ylabel('eta of the Heat Pump')
+ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung Lorenz-COP R1233ZD(E).svg')
+fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
