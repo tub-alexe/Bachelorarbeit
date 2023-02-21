@@ -40,8 +40,8 @@ c2 = Connection(cc, 'out1', gc, 'in1', label="2")
 c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
 c4 = Connection(ihx, 'out1', va, 'in1', label="4")
 c5 = Connection(va, 'out1', ev, 'in2', label="5")
-c5_ue = Connection(ev, 'out2', sup, 'in2', label="5_ue")
-c6 = Connection(sup, 'out2', ihx, 'in2', label="6")
+#c5_ue = Connection(ev, 'out2', sup, 'in2', label="5_ue")
+c6 = Connection(ev, 'out2', ihx, 'in2', label="6")
 
 
 # Connections Sink
@@ -49,11 +49,11 @@ c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
 c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 
 # Connections Source
-c9 = Connection(sou_in, 'out1', sup, 'in1', label="9")
-c10 = Connection(sup, 'out1', ev, 'in1', label="10")
-c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
+c9 = Connection(sou_in, 'out1', ev, 'in1', label="9")
+c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
+#c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
 
-nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
+nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
@@ -63,17 +63,17 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+160, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=8.33, fluid={'R1233ZD(E)': 1, 'H2O': 0})
+h_ihx_h_nach = CPSI("H", "P", 8 * 1e5, "T", 273.15+160, wf) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=8, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 
 h_ihx_k_vor = CPSI("H", "P", 44 * 1e5, "T", 273.15+165, wf) * 1e-3
 c3.set_attr(h=h_ihx_k_vor, p=44)
 
-h_zw = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+90, wf) * 1e-3
-c5_ue.set_attr(h=h_zw)
+#h_zw = CPSI("H", "P", 8 * 1e5, "T", 273.15+90, wf) * 1e-3
+#c5_ue.set_attr(h=h_zw)
 
-h_ihx_k_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_ihx_k_nach = CPSI("H", "P", 8 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
@@ -82,7 +82,7 @@ c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c11.set_attr(T=90)
+c10.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
@@ -90,10 +90,10 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=8.33, h=None)
+c1.set_attr(p=7.42, h=None)
 ihx.set_attr(ttd_u=5)
 c3.set_attr(h=None, p=44, T=165)
-c5_ue.set_attr(h=None, x=1)
+#c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
 gc.set_attr(ttd_u=20)
@@ -142,7 +142,7 @@ print(ean.network_data.loc['epsilon'])
 
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
-result_dict.update({sup.label: sup.get_plotting_data()[2]})
+#result_dict.update({sup.label: sup.get_plotting_data()[2]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
 result_dict.update({cp.label: cp.get_plotting_data()[1]})
 result_dict.update({gc.label: gc.get_plotting_data()[1]})
@@ -200,15 +200,10 @@ for p in data['p_kond']:
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
-#    T_2 = nw.get_conn("2").get_attr("T").val + 273.15
-#    T_3 = nw.get_conn("3").get_attr("T").val + 273.15
-#    T_5 = nw.get_conn("5_ue").get_attr("T").val + 273.15
-#    T_H = (T_2 - T_3) / math.log(T_2 / T_3)
-#    Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
     T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
     T_Ho = nw.get_conn("8").get_attr("T").val + 273.15
     T_Ci = nw.get_conn("9").get_attr("T").val + 273.15
-    T_Co = nw.get_conn("11").get_attr("T").val + 273.15
+    T_Co = nw.get_conn("10").get_attr("T").val + 273.15
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]

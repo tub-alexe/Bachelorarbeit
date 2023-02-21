@@ -133,7 +133,7 @@ D1.set_attr(h=None, x=0.45)
 D3.set_attr(p=None, x=0.95)
 D4.set_attr(h=None)
 iwü.set_attr(ttd_l=20)
-D7.set_attr(h=None, x=0.913)
+D7.set_attr(h=None, T=97.86)
 W8.set_attr(h=None, T=55)
 W9.set_attr(h=None, T=55)
 W12.set_attr(h=None, T=55)
@@ -144,12 +144,12 @@ K5.set_attr(h=None, T=15)
 # busses
 power_output = Bus('power output')
 power_output.add_comps(
-    {'comp': tu1, 'char': 0.985},
-    {'comp': tu2, 'char': 0.985},
-    {'comp': tu3, 'char': 0.985},
-    {'comp': pu1, 'char': 0.975, 'base': 'bus'},
-    {'comp': pu2, 'char': 0.975, 'base': 'bus'},
-    {'comp': pu3, 'char': 0.975, 'base': 'bus'})
+    {'comp': tu1, 'char': 0.985 * 0.99},
+    {'comp': tu2, 'char': 0.985 * 0.99},
+    {'comp': tu3, 'char': 0.985 * 0.99},
+    {'comp': pu1, 'char': 0.975 * 0.99, 'base': 'bus'},
+    {'comp': pu2, 'char': 0.975 * 0.99, 'base': 'bus'},
+    {'comp': pu3, 'char': 0.975 * 0.99, 'base': 'bus'})
 
 
 heat_product = Bus('heating')

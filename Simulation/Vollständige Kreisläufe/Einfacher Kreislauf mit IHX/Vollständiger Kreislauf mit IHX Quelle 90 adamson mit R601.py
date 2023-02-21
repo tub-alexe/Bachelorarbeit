@@ -4,6 +4,7 @@ from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
+import math
 
 wf = 'REFPROP::Pentane'
 si = 'H2O'
@@ -33,55 +34,54 @@ cc = CycleCloser('CycleCloser')
 
 
 # Connections Cycle
-c1 = Connection(ihx, 'out2', cp, 'in1')
-c2cc = Connection(cp, 'out1', cc, 'in1')
-c2 = Connection(cc, 'out1', gc, 'in1')
-c3 = Connection(gc, 'out1', ihx, 'in1')
-c4 = Connection(ihx, 'out1', va, 'in1')
-c5 = Connection(va, 'out1', ev, 'in2')
-c5_ue = Connection(ev, 'out2', sup, 'in2')
-c6 = Connection(sup, 'out2', ihx, 'in2')
+c1 = Connection(ihx, 'out2', cp, 'in1', label="1")
+c2cc = Connection(cp, 'out1', cc, 'in1', label="2cc")
+c2 = Connection(cc, 'out1', gc, 'in1', label="2")
+c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
+c4 = Connection(ihx, 'out1', va, 'in1', label="4")
+c5 = Connection(va, 'out1', ev, 'in2', label="5")
+c6 = Connection(ev, 'out2', ihx, 'in2', label="6")
 
 
 # Connections Sink
-c7 = Connection(si_in, 'out1', gc, 'in2')
-c8 = Connection(gc, 'out2', si_out, 'in1')
+c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
+c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 
 # Connections Source
-c9 = Connection(sou_in, 'out1', sup, 'in1')
-c10 = Connection(sup, 'out1', ev, 'in1')
-c11 = Connection(ev, 'out1', sou_out, 'in1')
+c9 = Connection(sou_in, 'out1', ev, 'in1', label="9")
+c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
+#c11 = Connection(ev, 'out1', sou_out, 'in1')
 
-nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
+nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
-cp.set_attr(eta_s=0.7)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+100, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=2.8, fluid={'Pentane': 1, 'H2O': 0})
+h_ihx_h_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+160, wf) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=4.7, fluid={'Pentane': 1, 'H2O': 0})
 
 
-h_ihx_k_vor = CPSI("H", "P", 35 * 1e5, "T", 273.15+105, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=35)
+h_ihx_k_vor = CPSI("H", "P", 28 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_ihx_k_vor, p=28)
 
-h_zw = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
-c5_ue.set_attr(h=h_zw)
+#h_zw = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
 
-h_ihx_k_nach = CPSI("H", "P", 2.8 * 1e5, "T", 273.15+75, wf) * 1e-3
+
+h_ihx_k_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, m=500, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c7.set_attr(T=160, p=30, fluid={'Pentane': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
-c9.set_attr(T=80, p=5, fluid={'Pentane': 0, 'H2O': 1})
-c11.set_attr(T=75)
+c9.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
+c10.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
@@ -89,33 +89,35 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=2.8, h=None)
+c1.set_attr(p=4.7, h=None)
 ihx.set_attr(ttd_u=5)
-c3.set_attr(h=None, p=35, T=105)
-c5_ue.set_attr(h=None, x=1)
-c6.set_attr(h=None, Td_bp=5)
+c3.set_attr(h=None, p=28, T=165)
+c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=4)
+gc.set_attr(ttd_u=20)
 
 # busses
-power = Bus('power input')
+power = Bus('power')
 power.add_comps(
-    {'comp': cp, 'char': 1, 'base': 'bus'},
+    {'comp': cp, 'char': 1, 'base': 'bus'})
+
+heat_source = Bus('heat_source')
+heat_source.add_comps(
     {'comp': sou_in, 'base': 'bus'},
     {'comp': sou_out})
 
-
-heat_product = Bus('heating')
+heat_product = Bus('heat_product')
 heat_product.add_comps(
     {'comp': si_in, 'base': 'bus'},
     {'comp': si_out})
 
-power_COP = Bus('power')
+
+power_COP = Bus('power_COP')
 power_COP.add_comps(
         {'comp': cp, 'char': -1, 'base': 'bus'}
 )
 
-heat_product_COP = Bus('heat_product')
+heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
@@ -133,7 +135,7 @@ print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 pamb = 1
 Tamb = 25
 
-ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power])
+ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power, heat_source])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
@@ -142,7 +144,6 @@ print(ean.network_data.loc['epsilon'])
 
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
-result_dict.update({sup.label: sup.get_plotting_data()[2]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
 result_dict.update({cp.label: cp.get_plotting_data()[1]})
 result_dict.update({gc.label: gc.get_plotting_data()[1]})
@@ -171,16 +172,23 @@ diagram.save('logph_IHX_R601.png', dpi=300)
 import matplotlib.pyplot as plt
 import numpy as np
 
-c3.set_attr(p=35)
-
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-
+iterations = 40
 
 data = {
-    'p_kond': np.linspace(34, 40, 20)
+    'p_kond': np.linspace(21, 40, iterations)
 }
+
 COP = {
+    'p_kond': []
+}
+
+eta = {
+    'p_kond': []
+}
+
+Lorenz_COP = {
     'p_kond': []
 }
 description = {
@@ -190,23 +198,61 @@ description = {
 for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
-    nw.print_results()
     ean.analyse(pamb=pamb, Tamb=Tamb)
-    COP['p_kond'] += [nw.busses["heat_product"].P.val / nw.busses["power"].P.val]
+    COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
+    eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
+    T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
+    T_Ho = nw.get_conn("8").get_attr("T").val + 273.15
+    T_Ci = nw.get_conn("9").get_attr("T").val + 273.15
+    T_Co = nw.get_conn("10").get_attr("T").val + 273.15
+    diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
+    diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
+    Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
 
 
-fig, ax = plt.subplots(1, 2, sharey=True, figsize=(16, 8))
-
+fig, ax = plt.subplots(1, 3, figsize=(16, 8))
+#ax = [ax]
 [a.grid() for a in ax]
 
-i = 0
-for key in data:
-    ax[i].scatter(data[key], COP[key], s=100, color="#1f567d")
-    ax[i].set_xlabel(description[key])
-    i += 1
+for i, dictionary in enumerate([eta, COP, Lorenz_COP]):
+
+    for key in data:
+        ax[i].scatter(data[key], dictionary[key], s=100, color="#1f567d")
+        ax[i].set_xlabel(description[key])
 
 ax[0].set_ylabel('COP of the Heat Pump')
+ax[1].set_ylabel('eta of the Heat Pump')
+ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung COP R601.svg')
+#fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
+
+dat = tuple(data['p_kond'])
+E_D_Lists = {}
+for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
+    E_D_List = []
+    for p in data['p_kond']:
+        c3.set_attr(p=p)
+        nw.solve('design')
+        ean.analyse(pamb=pamb, Tamb=Tamb)
+        E_D_List += [ean.component_data['E_D'][name] * 1e-6]
+
+    E_D_Lists[name] = E_D_List
+
+
+width = 0.1
+
+fig, ax = plt.subplots()
+bottom = np.zeros(iterations)
+
+for boolean, E_D_List in E_D_Lists.items():
+    p = ax.bar(dat, E_D_List, width, label=boolean, bottom=bottom)
+    bottom += E_D_List
+
+ax.set_xlabel('Kondensatordruck in bar')
+ax.set_ylabel('Exergievernichtung in MW')
+ax.legend(loc="best")
+
+plt.show()
+#fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')

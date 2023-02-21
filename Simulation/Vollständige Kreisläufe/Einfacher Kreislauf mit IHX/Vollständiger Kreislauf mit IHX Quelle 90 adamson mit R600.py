@@ -33,44 +33,41 @@ cc = CycleCloser('CycleCloser')
 
 
 # Connections Cycle
-c1 = Connection(ihx, 'out2', cp, 'in1')
-c2cc = Connection(cp, 'out1', cc, 'in1')
-c2 = Connection(cc, 'out1', gc, 'in1')
-c3 = Connection(gc, 'out1', ihx, 'in1')
-c4 = Connection(ihx, 'out1', va, 'in1')
-c5 = Connection(va, 'out1', ev, 'in2')
-c5_ue = Connection(ev, 'out2', sup, 'in2')
-c6 = Connection(sup, 'out2', ihx, 'in2')
+c1 = Connection(ihx, 'out2', cp, 'in1', label="1")
+c2cc = Connection(cp, 'out1', cc, 'in1', label="2cc")
+c2 = Connection(cc, 'out1', gc, 'in1', label="2")
+c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
+c4 = Connection(ihx, 'out1', va, 'in1', label="4")
+c5 = Connection(va, 'out1', ev, 'in2', label="5")
+c6 = Connection(ev, 'out2', ihx, 'in2', label="6")
 
 
 # Connections Sink
-c7 = Connection(si_in, 'out1', gc, 'in2')
-c8 = Connection(gc, 'out2', si_out, 'in1')
+c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
+c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 
 # Connections Source
-c9 = Connection(sou_in, 'out1', sup, 'in1')
-c10 = Connection(sup, 'out1', ev, 'in1')
-c11 = Connection(ev, 'out1', sou_out, 'in1')
+c9 = Connection(sou_in, 'out1', ev, 'in1', label="9")
+c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
 
-nw.add_conns(c1, c2, c2cc, c3, c4, c5, c5_ue, c6, c7, c8, c9, c10, c11)
+
+nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.7)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+100, wf) * 1e-3
+h_ihx_h_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+160, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=8.1, fluid=fld_wf)
 
 
-h_ihx_k_vor = CPSI("H", "P", 62 * 1e5, "T", 273.15+106, wf) * 1e-3
+h_ihx_k_vor = CPSI("H", "P", 62 * 1e5, "T", 273.15+165, wf) * 1e-3
 c3.set_attr(h=h_ihx_k_vor, p=62)
 
-h_zw = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
-c5_ue.set_attr(h=h_zw)
 
 h_ihx_k_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+75, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
@@ -81,7 +78,7 @@ c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=80, m=5, p=5, fluid=fld_si)
-c11.set_attr(T=75)
+c10.set_attr(T=75)
 
 #Solve Model
 nw.solve(mode='design')
@@ -92,10 +89,9 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=8.1, h=None)
 ihx.set_attr(ttd_u=5)
 c3.set_attr(h=None, p=62, T=106)
-c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=5)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=5)
+gc.set_attr(ttd_u=20)
 
 # busses
 power = Bus('power input')
