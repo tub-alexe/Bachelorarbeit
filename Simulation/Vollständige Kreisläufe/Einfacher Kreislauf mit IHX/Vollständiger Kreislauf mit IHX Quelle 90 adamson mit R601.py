@@ -62,7 +62,7 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+160, wf) * 1e-3
+h_ihx_h_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+155, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=4.7, fluid={'Pentane': 1, 'H2O': 0})
 
 
@@ -90,7 +90,7 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
 c1.set_attr(p=4.7, h=None)
-ihx.set_attr(ttd_u=5)
+ihx.set_attr(ttd_u=10)
 c3.set_attr(h=None, p=28, T=165)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)

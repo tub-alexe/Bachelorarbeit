@@ -56,15 +56,15 @@ c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1, Q=-1e7)
+gc.set_attr(pr1=1, pr2=1, Q=-1e6)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 8 * 1e5, "T", 273.15+160, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=8, fluid={'R1233ZD(E)': 1, 'H2O': 0})
+h_ihx_h_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+155, wf) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=8.33, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 
 h_ihx_k_vor = CPSI("H", "P", 44 * 1e5, "T", 273.15+165, wf) * 1e-3
@@ -73,7 +73,7 @@ c3.set_attr(h=h_ihx_k_vor, p=44)
 #h_zw = CPSI("H", "P", 8 * 1e5, "T", 273.15+90, wf) * 1e-3
 #c5_ue.set_attr(h=h_zw)
 
-h_ihx_k_nach = CPSI("H", "P", 8 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_ihx_k_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
@@ -82,7 +82,7 @@ c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c10.set_attr(T=90)
+c10.set_attr(T=94)
 
 #Solve Model
 nw.solve(mode='design')
@@ -90,8 +90,8 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=7.42, h=None)
-ihx.set_attr(ttd_u=5)
+c1.set_attr(p=8.33, h=None)
+ihx.set_attr(ttd_u=10)
 c3.set_attr(h=None, p=44, T=165)
 #c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=0.1)
@@ -176,7 +176,7 @@ plt.rc('font', **{'size': 18})
 iterations = 40
 
 data = {
-    'p_kond': np.linspace(36, 48, iterations)
+    'p_kond': np.linspace(36, 50, iterations)
 }
 
 COP = {
@@ -213,7 +213,7 @@ fig, ax = plt.subplots(1, 3, figsize=(16, 8))
 #ax = [ax]
 [a.grid() for a in ax]
 
-for i, dictionary in enumerate([eta, COP, Lorenz_COP]):
+for i, dictionary in enumerate([COP, eta, Lorenz_COP]):
 
     for key in data:
         ax[i].scatter(data[key], dictionary[key], s=100, color="#1f567d")
