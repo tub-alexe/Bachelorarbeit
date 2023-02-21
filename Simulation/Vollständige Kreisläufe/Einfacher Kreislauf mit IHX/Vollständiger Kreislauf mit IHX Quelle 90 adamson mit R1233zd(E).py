@@ -200,11 +200,18 @@ for p in data['p_kond']:
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
-    T_2 = nw.get_conn("2").get_attr("T").val + 273.15
-    T_3 = nw.get_conn("3").get_attr("T").val + 273.15
-    T_5 = nw.get_conn("5_ue").get_attr("T").val + 273.15
-    T_H = (T_2 - T_3) / math.log(T_2 / T_3)
-    Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
+#    T_2 = nw.get_conn("2").get_attr("T").val + 273.15
+#    T_3 = nw.get_conn("3").get_attr("T").val + 273.15
+#    T_5 = nw.get_conn("5_ue").get_attr("T").val + 273.15
+#    T_H = (T_2 - T_3) / math.log(T_2 / T_3)
+#    Lorenz_COP['p_kond'] += [T_H / (T_H - T_5)]
+    T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
+    T_Ho = nw.get_conn("8").get_attr("T").val + 273.15
+    T_Ci = nw.get_conn("9").get_attr("T").val + 273.15
+    T_Co = nw.get_conn("11").get_attr("T").val + 273.15
+    diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
+    diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
+    Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
