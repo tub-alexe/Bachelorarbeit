@@ -59,22 +59,22 @@ gc.set_attr(pr1=1, pr2=1, Q=-1e6)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
-cp.set_attr(eta_s=0.7)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
 h_ihx_h_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+160, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=8.1, fluid={'Butane': 1, 'H2O': 0})
 
 
-h_ihx_k_vor = CPSI("H", "P", 55 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=55)
+h_ihx_k_vor = CPSI("H", "P", 50 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_ihx_k_vor, p=50)
 
 
 h_ihx_k_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=100, p=20, fluid={'Butane': 0, 'H2O': 1})
+c7.set_attr(T=160, p=41, fluid={'Butane': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
@@ -88,11 +88,11 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
 c1.set_attr(p=8.1, h=None)
-ihx.set_attr(ttd_u=5)
-c3.set_attr(h=None, p=55, T=165)
+ihx.set_attr(ttd_u=10)
+c3.set_attr(h=None, p=50, T=165)
 c6.set_attr(h=None, Td_bp=0.1)
-#c8.set_attr(T=None)
-#gc.set_attr(ttd_u=50)
+c8.set_attr(T=None)
+gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -175,7 +175,7 @@ plt.rc('font', **{'size': 18})
 iterations = 40
 
 data = {
-    'p_kond': np.linspace(50, 70, iterations)
+    'p_kond': np.linspace(50, 120, iterations)
 }
 
 COP = {
@@ -224,7 +224,7 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-#fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
+fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R600.svg')
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -239,7 +239,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat E
     E_D_Lists[name] = E_D_List
 
 
-width = 0.1
+width = 0.2
 
 fig, ax = plt.subplots()
 bottom = np.zeros(iterations)
@@ -253,4 +253,4 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc="best")
 
 plt.show()
-#fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
+fig.savefig('Optimierung IHX Exergievernichtung R600.svg')

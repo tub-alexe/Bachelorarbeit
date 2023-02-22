@@ -225,7 +225,7 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
+fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R1233ZD(E).svg')
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -254,4 +254,4 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc="best")
 
 plt.show()
-fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
+fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E).svg')

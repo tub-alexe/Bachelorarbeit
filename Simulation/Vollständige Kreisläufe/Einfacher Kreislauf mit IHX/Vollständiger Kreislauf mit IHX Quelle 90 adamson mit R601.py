@@ -55,7 +55,7 @@ c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1, Q=-1e7)
+gc.set_attr(pr1=1, pr2=1, Q=-1e6)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
@@ -66,8 +66,8 @@ h_ihx_h_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+155, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=4.7, fluid={'Pentane': 1, 'H2O': 0})
 
 
-h_ihx_k_vor = CPSI("H", "P", 28 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=28)
+h_ihx_k_vor = CPSI("H", "P", 21 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_ihx_k_vor, p=21)
 
 #h_zw = CPSI("H", "Q", 1, "T", 273.15+70, wf) * 1e-3
 
@@ -76,12 +76,12 @@ h_ihx_k_nach = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=160, p=30, fluid={'Pentane': 0, 'H2O': 1})
+c7.set_attr(T=160, p=35, fluid={'Pentane': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
-c10.set_attr(T=90)
+c10.set_attr(T=94)
 
 #Solve Model
 nw.solve(mode='design')
@@ -91,10 +91,10 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 # New Parameters
 c1.set_attr(p=4.7, h=None)
 ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=28, T=165)
+c3.set_attr(h=None, p=21, T=165)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=20)
+gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -214,7 +214,7 @@ fig, ax = plt.subplots(1, 3, figsize=(16, 8))
 #ax = [ax]
 [a.grid() for a in ax]
 
-for i, dictionary in enumerate([eta, COP, Lorenz_COP]):
+for i, dictionary in enumerate([COP, eta, Lorenz_COP]):
 
     for key in data:
         ax[i].scatter(data[key], dictionary[key], s=100, color="#1f567d")
@@ -226,7 +226,7 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-#fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
+fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R601.svg')
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -255,4 +255,4 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc="best")
 
 plt.show()
-#fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
+fig.savefig('Optimierung IHX Exergievernichtung R601.svg')
