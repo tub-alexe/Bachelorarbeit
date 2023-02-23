@@ -123,7 +123,7 @@ heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
-nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+nw.add_busses(power, heat_product, heat_source, power_COP, heat_product_COP)
 
 nw.solve(mode='design')
 nw.print_results()

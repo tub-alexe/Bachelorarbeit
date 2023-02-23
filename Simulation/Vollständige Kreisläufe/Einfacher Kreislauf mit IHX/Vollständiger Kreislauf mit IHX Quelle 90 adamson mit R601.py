@@ -50,7 +50,6 @@ c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 # Connections Source
 c9 = Connection(sou_in, 'out1', ev, 'in1', label="9")
 c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
-#c11 = Connection(ev, 'out1', sou_out, 'in1')
 
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
@@ -121,7 +120,7 @@ heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
-nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+nw.add_busses(power, heat_source, heat_product, power_COP, heat_product_COP)
 
 # Solve Model
 nw.solve(mode='design')

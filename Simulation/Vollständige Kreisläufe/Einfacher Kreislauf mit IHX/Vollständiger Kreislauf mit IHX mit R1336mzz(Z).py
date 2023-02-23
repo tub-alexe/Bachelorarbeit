@@ -61,13 +61,13 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 4.95 * 1e5, "T", 273.15+155, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=4.95, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
+h_ihx_h_nach = CPSI("H", "P", 5.52 * 1e5, "T", 273.15+155, wf) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=5.52, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
-h_ihx_k_vor = CPSI("H", "P", 35 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=35)
+h_ihx_k_vor = CPSI("H", "P", 26 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_ihx_k_vor, p=26)
 
-h_ihx_k_nach = CPSI("H", "P", 4.95 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_ihx_k_nach = CPSI("H", "P", 5.52 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
@@ -84,12 +84,12 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=4.95, h=None)
+c1.set_attr(p=5.52, h=None)
 ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=35, T=165)
+c3.set_attr(h=None, p=26, T=165)
 c6.set_attr(h=None, Td_bp=5)
-#c8.set_attr(T=None)
-#gc.set_attr(ttd_u=5)
+c8.set_attr(T=None)
+gc.set_attr(ttd_u=20)
 
 # busses
 power = Bus('power')
@@ -116,7 +116,7 @@ heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
-nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+nw.add_busses(power, heat_product, heat_source, power_COP, heat_product_COP)
 
 # Solve Model
 nw.solve(mode='design')
@@ -144,7 +144,7 @@ plt.rc('font', **{'size': 18})
 iterations = 15
 
 data = {
-    'p_kond': np.linspace(35, 50, iterations)
+    'p_kond': np.linspace(26, 37, iterations)
 }
 
 COP = {
@@ -193,7 +193,7 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-#fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R1233ZD(E).svg')
+fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R1336mzz(Z).svg')
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -222,7 +222,7 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc="best")
 
 plt.show()
-#fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E).svg')
+fig.savefig('Optimierung IHX Exergievernichtung R1336mzz(Z).svg')
 
 
 

@@ -62,15 +62,15 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+160, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=8.1, fluid={'Butane': 1, 'H2O': 0})
+h_ihx_h_nach = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+160, wf) * 1e-3
+c1.set_attr(h=h_ihx_h_nach, p=12.49, fluid={'Butane': 1, 'H2O': 0})
 
 
 h_ihx_k_vor = CPSI("H", "P", 50 * 1e5, "T", 273.15+165, wf) * 1e-3
 c3.set_attr(h=h_ihx_k_vor, p=50)
 
 
-h_ihx_k_nach = CPSI("H", "P", 8.1 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_ihx_k_nach = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_ihx_k_nach)
 
 # Starting Parameters Connection Sink
@@ -87,7 +87,7 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=8.1, h=None)
+c1.set_attr(p=12.49, h=None)
 ihx.set_attr(ttd_u=10)
 c3.set_attr(h=None, p=50, T=165)
 c6.set_attr(h=None, Td_bp=0.1)
@@ -119,7 +119,7 @@ heat_product_COP = Bus('heat_product_COP')
 heat_product_COP.add_comps(
             {"comp": gc, "char": 1})
 
-nw.add_busses(power, heat_product, power_COP, heat_product_COP)
+nw.add_busses(power, heat_product, heat_source, power_COP, heat_product_COP)
 
 # Solve Model
 nw.solve(mode='design')
