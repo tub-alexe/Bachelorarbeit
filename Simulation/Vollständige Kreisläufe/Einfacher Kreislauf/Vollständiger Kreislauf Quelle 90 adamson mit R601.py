@@ -161,7 +161,6 @@ diagram.save('logph_R601.png', dpi=300)
 
 #Parameter optmization
 
-#parameter optimization
 import matplotlib.pyplot as plt
 import numpy as np
 

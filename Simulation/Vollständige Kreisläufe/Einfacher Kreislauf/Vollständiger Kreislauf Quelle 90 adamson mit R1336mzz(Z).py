@@ -59,8 +59,8 @@ cp.set_attr(eta_s=0.7)
 
 # Starting Parameters Connections Cycle
 
-h_c2 = CPSI("H", "P", 53.5 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_c2, p=53.5)
+h_c2 = CPSI("H", "P", 57 * 1e5, "T", 273.15+165, wf) * 1e-3
+c2.set_attr(h=h_c2, p=57)
 
 c3.set_attr(p=5.52)
 
@@ -80,7 +80,7 @@ c9.set_attr(T=94)
 nw.solve(mode='design')
 nw.print_results()
 
-c2.set_attr(h=None, p=53.5, T=165)
+c2.set_attr(h=None, p=57, T=165)
 c3.set_attr(p=5.52)
 c4.set_attr(h=None, Td_bp=0.1)
 c7.set_attr(T=None)
