@@ -173,7 +173,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 15
 
 data = {
     'p_kond': np.linspace(21, 40, iterations)

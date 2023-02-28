@@ -67,8 +67,8 @@ h_ihx_h_nach = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+155, wf) * 1e-3
 c1.set_attr(h=h_ihx_h_nach, p=8.33, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 
-h_ihx_k_vor = CPSI("H", "P", 44 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=44)
+h_c3 = CPSI("H", "P", 44 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_c3, p=44)
 
 #h_zw = CPSI("H", "P", 8 * 1e5, "T", 273.15+90, wf) * 1e-3
 #c5_ue.set_attr(h=h_zw)
