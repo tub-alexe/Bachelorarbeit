@@ -54,7 +54,7 @@ c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1, Q=-1e6)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
@@ -173,7 +173,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 15
+iterations = 20
 
 data = {
     'p_kond': np.linspace(21, 40, iterations)
@@ -227,6 +227,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R601.svg')
 
+c3.set_attr(p=21)
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
@@ -240,7 +242,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat E
     E_D_Lists[name] = E_D_List
 
 
-width = 0.1
+width = 0.2
 
 fig, ax = plt.subplots()
 bottom = np.zeros(iterations)
@@ -251,7 +253,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R601.svg')

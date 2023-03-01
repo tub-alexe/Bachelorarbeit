@@ -152,7 +152,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 25
+iterations = 20
 
 data = {
     'p_kond': np.linspace(26, 41, iterations)
@@ -206,6 +206,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R1336mzz(Z).svg')
 
+c6.set_attr(p=26)
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -231,7 +233,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R1336mzz(Z).svg')

@@ -204,7 +204,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 15
+iterations = 20
 
 data = {
     'p_kond': np.linspace(21, 50, iterations)
@@ -258,6 +258,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 
+c1.set_attr(p=30)
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -283,7 +285,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R601.svg')

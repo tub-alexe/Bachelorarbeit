@@ -95,7 +95,7 @@ nw.print_results()
 
 c1.set_attr(p=12.49, h=None)
 ihx.set_attr(ttd_u=10)
-c2.set_attr(p=24)
+c2.set_attr(p=18)
 c6.set_attr(h=None, p=50, T=165)
 c11.set_attr(h=None, Td_bp=0.1)
 c13.set_attr(T=None)
@@ -184,10 +184,10 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 15
+iterations = 20
 
 data = {
-    'p_kond': np.linspace(46, 50, iterations)
+    'p_kond': np.linspace(50, 125, iterations)
 }
 
 COP = {
@@ -238,6 +238,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R600.svg')
 
+c6.set_attr(p=50)
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -263,7 +265,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R600.svg')

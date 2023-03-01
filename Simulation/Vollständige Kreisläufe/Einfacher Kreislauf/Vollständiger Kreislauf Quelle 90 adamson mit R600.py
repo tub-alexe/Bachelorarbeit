@@ -51,7 +51,7 @@ c9 = Connection(ev, 'out1', sou_out, 'in1', label="9")
 nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1, Q=-1e6)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.7)
@@ -84,7 +84,7 @@ c2.set_attr(h=None, T=165, p=93)
 c3.set_attr(p=12.49)
 c4.set_attr(h=None, Td_bp=0.1)
 c7.set_attr(T=None)
-gc.set_attr(ttd_u=10)
+gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -158,7 +158,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 20
 
 data = {
     'p_kond': np.linspace(60, 145, iterations)
@@ -212,6 +212,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung eta, COP, Lorenz-COP R600.svg')
 
+c2.set_attr(p=93)
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor']:
@@ -236,7 +238,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung Exergievernichtung R600.svg')

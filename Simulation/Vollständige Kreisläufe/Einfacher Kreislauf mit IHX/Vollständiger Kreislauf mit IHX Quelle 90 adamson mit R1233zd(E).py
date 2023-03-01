@@ -56,7 +56,7 @@ c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
 nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
-gc.set_attr(pr1=1, pr2=1, Q=-1e6)
+gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
@@ -93,10 +93,9 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=8.33, h=None)
 ihx.set_attr(ttd_u=10)
 c3.set_attr(h=None, p=44, T=165)
-#c5_ue.set_attr(h=None, x=1)
 c6.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(T=None)
-gc.set_attr(ttd_u=20)
+gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -142,7 +141,6 @@ print(ean.network_data.loc['epsilon'])
 
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
-#result_dict.update({sup.label: sup.get_plotting_data()[2]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
 result_dict.update({cp.label: cp.get_plotting_data()[1]})
 result_dict.update({gc.label: gc.get_plotting_data()[1]})
@@ -173,7 +171,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 20
 
 data = {
     'p_kond': np.linspace(36, 50, iterations)
@@ -198,6 +196,12 @@ for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
+    #print('E_D', ean.network_data.loc['E_D'])
+    #print('E_F', ean.network_data.loc['E_F'])
+    #print('E_P', ean.network_data.loc['E_P'])
+    #print('eta', ean.network_data.loc['epsilon'])
+    #print('heat_product', nw.busses["heat_product_COP"].P.val)
+    #print('power', nw.busses["power_COP"].P.val)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
     T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
@@ -207,6 +211,7 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -226,6 +231,8 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R1233ZD(E).svg')
+
+c3.set_attr(p=44)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -251,7 +258,7 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc="best")
+ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E).svg')
