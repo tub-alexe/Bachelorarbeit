@@ -196,12 +196,6 @@ for p in data['p_kond']:
     c3.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
-    #print('E_D', ean.network_data.loc['E_D'])
-    #print('E_F', ean.network_data.loc['E_F'])
-    #print('E_P', ean.network_data.loc['E_P'])
-    #print('eta', ean.network_data.loc['epsilon'])
-    #print('heat_product', nw.busses["heat_product_COP"].P.val)
-    #print('power', nw.busses["power_COP"].P.val)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
     T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
@@ -211,6 +205,18 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    #print('E_D', ean.network_data.loc['E_D'])
+    #print('E_F', ean.network_data.loc['E_F'])
+    #print('E_P', ean.network_data.loc['E_P'])
+    #print('eta', ean.network_data.loc['epsilon'])
+    #print('heat_product', abs(nw.busses["heat_product_COP"].P.val))
+    #print('power', abs(nw.busses["power_COP"].P.val))
+    #print('Massenstrom Kreislauf', nw.get_conn("1").get_attr("m").val)
+    #print('Massenstrom Senke', nw.get_conn("7").get_attr("m").val)
+    #print('Massenstrom Quelle', nw.get_conn("9").get_attr("m").val)
+    #print('COP', [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val])
+    #print('eta', ean.network_data.loc['epsilon'] * 100)
+    #print('Lorenz-COP', [diff_T_H / (diff_T_H - diff_T_C)])
 
 
 

@@ -87,7 +87,7 @@ wü1.set_attr(pr1=1, pr2=1, ttd_u=5)
 wü2.set_attr(pr1=1, pr2=1)
 kd1.set_attr(pr1=1, pr2=1, ttd_u=10)
 kd2.set_attr(pr1=1, pr2=1, ttd_u=25)
-kd3.set_attr(pr1=1, pr2=1, ttd_u=5)
+kd3.set_attr(pr1=1, pr2=1, ttd_u=25)
 
 h_D1 = CPSI("H", "P", 10.8 * 1e5, "Q", 0.45, wa) * 1e-3
 D1.set_attr(h=h_D1, p=10.8, m=500, fluid=fld_wa)
@@ -118,12 +118,12 @@ W9.set_attr(h=h_W9)
 h_K1 = CPSI("H", "P", 1.013 * 1e5, "T", 273.15 + 15, wa) * 1e-3
 K1.set_attr(h=h_K1, p=1.013, fluid=fld_wa)
 
-h_K3 = CPSI("H", "P", 1.013 * 1e5, "T", 273.15 + 15, lu) * 1e-3
+h_K3 = CPSI("H", "P", 1.013 * 1e5, "T", 273.15 + 15, 'air') * 1e-3
 K3.set_attr(h=h_K3, p=1.013, fluid=fld_lu)
 
 W10.set_attr(p=30)
 
-h_K5 = CPSI("H", "P", 1.013 * 1e5, "T", 273.15 + 15, lu) * 1e-3
+h_K5 = CPSI("H", "P", 1.013 * 1e5, "T", 273.15 + 15, 'air') * 1e-3
 K5.set_attr(h=h_K5, p=1.013, fluid=fld_lu)
 geo.solve(mode='design')
 geo.print_results()
@@ -191,11 +191,53 @@ ean = ExergyAnalysis(geo, E_P=[heat_product, power_output], E_F=[geo_input], E_L
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 
-print(ean.network_data.loc['epsilon'])
-print('elektrische Leistung', abs(power_output.P.val * 1e-6))
-print('thermische Leistung', abs(heat_product_eta.P.val * 1e-6))
-a = abs(power_output.P.val * 1e-6)
-b = abs(heat_product_eta.P.val * 1e-6)
-c = (geo.get_conn("D1").get_attr("h").val * geo.get_conn("D1").get_attr("m").val -geo.get_conn("W14").get_attr("h").val * geo.get_conn("W14").get_attr("m").val) * 1e-3
 
-print('Wirkungsgrad', (a+b)/c)
+#log p,h diagram
+
+result_dict = {}
+result_dict.update({pht.label: pht.get_plotting_data()[1]})
+result_dict.update({pht.label: pht.get_plotting_data()[2]})
+result_dict.update({tu1.label: tu1.get_plotting_data()[1]})
+result_dict.update({iwü.label: iwü.get_plotting_data()[2]})
+result_dict.update({tu2.label: tu2.get_plotting_data()[1]})
+result_dict.update({tu3.label: tu3.get_plotting_data()[1]})
+result_dict.update({tu3.label: tu3.get_plotting_data()[1]})
+result_dict.update({iwü.label: iwü.get_plotting_data()[1]})
+result_dict.update({wü1.label: wü1.get_plotting_data()[1]})
+result_dict.update({wü2.label: wü2.get_plotting_data()[1]})
+result_dict.update({kd1.label: kd1.get_plotting_data()[1]})
+result_dict.update({wü2.label: wü2.get_plotting_data()[1]})
+result_dict.update({kd1.label: kd1.get_plotting_data()[1]})
+result_dict.update({kd2.label: kd2.get_plotting_data()[1]})
+result_dict.update({kd3.label: kd3.get_plotting_data()[1]})
+result_dict.update({pu1.label: pu1.get_plotting_data()[1]})
+result_dict.update({pu2.label: pu2.get_plotting_data()[1]})
+result_dict.update({pu3.label: pu3.get_plotting_data()[1]})
+result_dict.update({zu.label: zu.get_plotting_data()[1]})
+result_dict.update({zu.label: zu.get_plotting_data()[2]})
+result_dict.update({zu.label: zu.get_plotting_data()[3]})
+
+diagram = FluidPropertyDiagram('H2O')
+diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
+
+for key, data in result_dict.items():
+    result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
+
+diagram.calc_isolines()
+diagram.set_limits(x_min=0, x_max=3000, y_min=1e-1, y_max=2e2)
+diagram.draw_isolines('logph')
+
+for key in result_dict.keys():
+    datapoints = result_dict[key]['datapoints']
+    diagram.ax.plot(datapoints['h'], datapoints['p'], color='#ff0000')
+    diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
+
+
+#diagram.save('Geo.png', dpi=300)
+
+#exergteischer Wirkunggrad mit Berücksichtigung der 3 MW Nebenanlage
+
+print('exergetischer Wirkungsgrad', (ean.network_data.loc['E_P'] - 3 * 1e6) / (ean.network_data.loc['E_F']))
+print('elektrische Leistung in MW', abs(power_output.P.val * 1e-6) - 3)
+print('thermische Leistung in MW', abs(heat_product_eta.P.val * 1e-6))
+
