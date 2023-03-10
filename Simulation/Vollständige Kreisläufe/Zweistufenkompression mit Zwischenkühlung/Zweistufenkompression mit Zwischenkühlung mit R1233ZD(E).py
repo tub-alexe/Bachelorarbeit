@@ -75,8 +75,8 @@ c1.set_attr(h=h_ihx_h_nach, p=8.33, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 c2.set_attr(p=14.5)
 
-h_c6 = CPSI("H", "P", 44 * 1e5, "T", 273.15+165, wf) * 1e-3
-c6.set_attr(h=h_c6, p=44)
+h_c6 = CPSI("H", "P", 38 * 1e5, "T", 273.15+165, wf) * 1e-3
+c6.set_attr(h=h_c6, p=38)
 
 h_c11 = CPSI("H", "P", 8.33 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
@@ -86,7 +86,7 @@ c13.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c15.set_attr(T=94)
+c15.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
@@ -95,7 +95,7 @@ nw.print_results()
 c1.set_attr(p=8.33, h=None)
 ihx.set_attr(ttd_u=10)
 c2.set_attr(p=14.5)
-c6.set_attr(h=None, p=37, T=165)
+c6.set_attr(h=None, p=38, T=165)
 c11.set_attr(h=None, Td_bp=0.1)
 c13.set_attr(T=None)
 gc.set_attr(ttd_u=30)
