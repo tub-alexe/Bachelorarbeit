@@ -58,12 +58,12 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_gk_nach = CPSI("H", "P", 56 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_gk_nach, p=56)
+h_gk_nach = CPSI("H", "P", 57 * 1e5, "T", 273.15+165, wf) * 1e-3
+c2.set_attr(h=h_gk_nach, p=57)
 
-c3.set_attr(p=5.1)
+c3.set_attr(p=8.334)
 
-h_c4 = CPSI("H", "P", 5.1 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c4 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
@@ -72,7 +72,7 @@ c7.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c8.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c9.set_attr(T=94)
+c9.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
@@ -80,11 +80,11 @@ nw.print_results()
 
 #New Parameters
 
-c2.set_attr(h=None, p=56, T=165)
-c3.set_attr(p=5.1)
+c2.set_attr(h=None, p=57)
+gc.set_attr(ttd_l=5)
+c3.set_attr(p=None)
+ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
-c7.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -164,7 +164,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(52, 96, iterations)
+    'p_kond': np.linspace(57, 110, iterations)
 }
 
 COP = {
@@ -214,8 +214,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung eta, COP, Lorenz-COP R1233ZD(E).svg')
-
-c2.set_attr(p=56)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}

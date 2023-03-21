@@ -6,21 +6,21 @@ from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
 
+#Fluids
 wf = 'R1233ZD(E)'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
 
+#Network
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 # Components
-
 gc = HeatExchanger('Gas cooler')
 ev = HeatExchanger('Evaporator')
 sup = HeatExchanger('Superheater')
 va = Valve('Valve')
-cp1 = Compressor('Compressor1')
-cp2 = Compressor('Compressor2')
+cp = Compressor('Compressor')
 ihx = HeatExchanger("Internal Heat Exchanger")
 
 #Sources, Sinks and CycleCloser
@@ -35,16 +35,13 @@ cc = CycleCloser('CycleCloser')
 
 
 # Connections Cycle
-c1 = Connection(ihx, 'out2', cp1, 'in1', label="1")
-c1_cp2 = Connection(cp1, 'out1', cp2, 'in1', label="1_cp2")
-c2cc = Connection(cp2, 'out1', cc, 'in1', label="2cc")
+c1 = Connection(ihx, 'out2', cp, 'in1', label="1")
+c2cc = Connection(cp, 'out1', cc, 'in1', label="2cc")
 c2 = Connection(cc, 'out1', gc, 'in1', label="2")
 c3 = Connection(gc, 'out1', ihx, 'in1', label="3")
 c4 = Connection(ihx, 'out1', va, 'in1', label="4")
 c5 = Connection(va, 'out1', ev, 'in2', label="5")
-#c5_ue = Connection(ev, 'out2', sup, 'in2', label="5_ue")
 c6 = Connection(ev, 'out2', ihx, 'in2', label="6")
-
 
 # Connections Sink
 c7 = Connection(si_in, 'out1', gc, 'in2', label="7")
@@ -53,32 +50,24 @@ c8 = Connection(gc, 'out2', si_out, 'in1', label="8")
 # Connections Source
 c9 = Connection(sou_in, 'out1', ev, 'in1', label="9")
 c10 = Connection(ev, 'out1', sou_out, 'in1', label="10")
-#c11 = Connection(ev, 'out1', sou_out, 'in1', label="11")
 
-nw.add_conns(c1, c1_cp2, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
+nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 
 # Starting Parameters Components
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
-sup.set_attr(pr1=1, pr2=1)
-cp1.set_attr(eta_s=0.76)
-cp2.set_attr(eta_s=0.76)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
 h_c1 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+155, wf) * 1e-3
 c1.set_attr(h=h_c1, p=8.334, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
-c1_cp2.set_attr(p=19.6)
-
 h_c3 = CPSI("H", "P", 46 * 1e5, "T", 273.15+165, wf) * 1e-3
 c3.set_attr(h=h_c3, p=46)
 
-#h_zw = CPSI("H", "P", 8 * 1e5, "T", 273.15+90, wf) * 1e-3
-#c5_ue.set_attr(h=h_zw)
-
-h_ihx_k_nach = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c6.set_attr(h=h_ihx_k_nach)
+h_c6 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
 c7.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
@@ -91,22 +80,20 @@ c10.set_attr(T=90)
 #Solve Model
 nw.solve(mode='design')
 nw.print_results()
-print(f'COP = {abs(gc.Q.val) / (cp1.P.val + cp2.P.val)}')
+print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-#T=163.5 ergibt sich aus der Enthalpie von 52 kj/kg am Austritt der kalten Seite des Gaskühlers
-c1.set_attr(p=8.334, h=None)
+c1.set_attr(p=None, h=None)
+ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=46, T=165)
+c3.set_attr(h=None, p=46)
+gc.set_attr(ttd_l=5)
 c6.set_attr(h=None, Td_bp=0.1)
-#c8.set_attr(T=None)
-#gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
 power.add_comps(
-    {'comp': cp1, 'char': 1, 'base': 'bus'},
-    {'comp': cp2, 'char': 1, 'base': 'bus'})
+    {'comp': cp, 'char': 1, 'base': 'bus'})
 
 heat_source = Bus('heat_source')
 heat_source.add_comps(
@@ -121,8 +108,7 @@ heat_product.add_comps(
 
 power_COP = Bus('power_COP')
 power_COP.add_comps(
-        {'comp': cp1, 'char': -1, 'base': 'bus'},
-        {'comp': cp2, 'char': -1, 'base': 'bus'}
+        {'comp': cp, 'char': -1, 'base': 'bus'},
 
 )
 
@@ -150,8 +136,7 @@ print(ean.network_data.loc['epsilon'])
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
-result_dict.update({cp1.label: cp1.get_plotting_data()[1]})
-result_dict.update({cp2.label: cp2.get_plotting_data()[1]})
+result_dict.update({cp.label: cp.get_plotting_data()[1]})
 result_dict.update({gc.label: gc.get_plotting_data()[1]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[1]})
 result_dict.update({va.label: va.get_plotting_data()[1]})
@@ -183,7 +168,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(37, 50, iterations)
+    'p_kond': np.linspace(36, 50, iterations)
 }
 
 COP = {
@@ -214,23 +199,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
-    #print('E_D', ean.network_data.loc['E_D'])
-    #print('E_F', ean.network_data.loc['E_F'])
-    #print('E_P', ean.network_data.loc['E_P'])
-    #print('eta', ean.network_data.loc['epsilon'])
-    print('heat_product', abs(nw.busses["heat_product_COP"].P.val))
-    #print('power', abs(nw.busses["power_COP"].P.val))
-    #print('Massenstrom Kreislauf', nw.get_conn("1").get_attr("m").val)
-    #print('Massenstrom Senke', nw.get_conn("7").get_attr("m").val)
-    #print('Massenstrom Quelle', nw.get_conn("9").get_attr("m").val)
-    #print('COP', [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val])
-    #print('eta', ean.network_data.loc['epsilon'] * 100)
-    #print('Lorenz-COP', [diff_T_H / (diff_T_H - diff_T_C)])
-
-
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):
@@ -247,11 +217,9 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX COP, eta, Lorenz-COP R1233ZD(E) COOLPROP.svg')
 
-c3.set_attr(p=44)
-
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
-for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor1', 'Compressor2', 'Internal Heat Exchanger']:
+for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
     E_D_List = []
     for p in data['p_kond']:
         c3.set_attr(p=p)

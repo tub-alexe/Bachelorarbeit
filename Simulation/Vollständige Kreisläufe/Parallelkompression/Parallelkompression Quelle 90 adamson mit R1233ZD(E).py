@@ -80,12 +80,12 @@ c1.set_attr(h=h_c1, p=41)
 
 c3.set_attr(p=29, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
-c6.set_attr(p=8.33)
+c6.set_attr(p=8.334)
 
-h_c7 = CPSI("H", "P", 8.33 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
+h_c7 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
 c7.set_attr(h=h_c7)
 
-h_c8 = CPSI("H", "P", 8.33 * 1e5, "T", 273.15 + 150, wf) * 1e-3
+h_c8 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15 + 150, wf) * 1e-3
 c8.set_attr(h=h_c8)
 
 h_c11 = CPSI("H", "P", 29 * 1e5, "T", 273.15 + 155, wf) * 1e-3
@@ -94,7 +94,7 @@ c11.set_attr(h=h_c11)
 
 # Source
 c15.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c16.set_attr(T=94)
+c16.set_attr(T=90)
 
 # Sink
 c17.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
@@ -104,19 +104,17 @@ c18.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
-c1.set_attr(h=None, T=165, p=41)
+c1.set_attr(h=None, p=37)
+gc.set_attr(ttd_l=5)
 c3.set_attr(p=29)
-c6.set_attr(p=8.33)
+c6.set_attr(p=None)
+ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(h=None)
 ihx_1.set_attr(ttd_u=10)
 c11.set_attr(h=None)
 ihx_2.set_attr(ttd_u=10)
-c18.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
-nw.solve(mode='design')
-nw.print_results()
 
 # busses
 power = Bus('power')
@@ -211,7 +209,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(36, 50, iterations)
+    'p_kond': np.linspace(37, 50, iterations)
 }
 
 COP = {
@@ -261,8 +259,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1233ZD(E).svg')
-
-c1.set_attr(p=41)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}

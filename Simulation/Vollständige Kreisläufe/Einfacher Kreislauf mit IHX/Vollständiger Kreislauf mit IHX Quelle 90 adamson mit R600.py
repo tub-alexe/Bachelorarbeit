@@ -58,28 +58,27 @@ nw.add_conns(c1, c2, c2cc, c3, c4, c5, c6, c7, c8, c9, c10)
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx.set_attr(pr1=1, pr2=1)
 ev.set_attr(pr1=1, pr2=1)
-sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+160, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=12.49, fluid={'Butane': 1, 'H2O': 0})
+h_c1 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+160, wf) * 1e-3
+c1.set_attr(h=h_c1, p=12.492, fluid={'Butane': 1, 'H2O': 0})
 
 
-h_ihx_k_vor = CPSI("H", "P", 50 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=50)
+h_c3 = CPSI("H", "P", 50 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_c3, p=50)
 
 
-h_ihx_k_nach = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c6.set_attr(h=h_ihx_k_nach)
+h_c6 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=160, p=41, fluid={'Butane': 0, 'H2O': 1})
+c7.set_attr(T=160, p=36, fluid={'Butane': 0, 'H2O': 1})
 c8.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
-c10.set_attr(T=94)
+c10.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
@@ -87,12 +86,12 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # New Parameters
-c1.set_attr(p=12.49, h=None)
+c1.set_attr(p=None, h=None)
+ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=50, T=165)
+c3.set_attr(h=None, p=50)
+gc.set_attr(ttd_l=5)
 c6.set_attr(h=None, Td_bp=0.1)
-c8.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -225,8 +224,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R600.svg')
-
-c3.set_attr(p=50)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}

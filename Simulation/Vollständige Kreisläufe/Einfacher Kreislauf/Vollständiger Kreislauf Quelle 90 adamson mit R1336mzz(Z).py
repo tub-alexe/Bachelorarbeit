@@ -59,8 +59,8 @@ cp.set_attr(eta_s=0.7)
 
 # Starting Parameters Connections Cycle
 
-h_c2 = CPSI("H", "P", 57 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_c2, p=57)
+h_c2 = CPSI("H", "P", 59 * 1e5, "T", 273.15+165, wf) * 1e-3
+c2.set_attr(h=h_c2, p=59)
 
 c3.set_attr(p=5.52)
 
@@ -80,11 +80,11 @@ c9.set_attr(T=94)
 nw.solve(mode='design')
 nw.print_results()
 
-c2.set_attr(h=None, p=57, T=165)
-c3.set_attr(p=5.52)
+c2.set_attr(h=None, p=59)
+gc.set_attr(ttd_l=5)
+c3.set_attr(p=None)
+ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
-c7.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -139,7 +139,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(50, 90, iterations)
+    'p_kond': np.linspace(57, 90, iterations)
 }
 
 COP = {
@@ -189,8 +189,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung eta, COP, Lorenz-COP R1336mzz(Z).svg')
-
-c2.set_attr(p=57)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
