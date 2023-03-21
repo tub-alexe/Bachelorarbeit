@@ -3,7 +3,6 @@ from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Sou
 from tespy.connections import Connection, Bus
 from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
-from fluprodia import FluidPropertyDiagram
 import math
 
 wf = 'REFPROP::R1336mzz(Z)'
@@ -55,16 +54,16 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
-cp.set_attr(eta_s=0.7)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
 
-h_c2 = CPSI("H", "P", 59 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_c2, p=59)
+h_c2 = CPSI("H", "P", 60 * 1e5, "T", 273.15+165, wf) * 1e-3
+c2.set_attr(h=h_c2, p=60)
 
-c3.set_attr(p=5.52)
+c3.set_attr(p=5.5516)
 
-h_c4 = CPSI("H", "P", 5.52 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c4 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
@@ -80,7 +79,7 @@ c9.set_attr(T=94)
 nw.solve(mode='design')
 nw.print_results()
 
-c2.set_attr(h=None, p=59)
+c2.set_attr(h=None, p=60)
 gc.set_attr(ttd_l=5)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
@@ -139,7 +138,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(57, 90, iterations)
+    'p_kond': np.linspace(60, 90, iterations)
 }
 
 COP = {

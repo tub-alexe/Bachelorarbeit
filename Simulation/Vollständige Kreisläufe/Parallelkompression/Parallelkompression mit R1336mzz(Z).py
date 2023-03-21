@@ -76,15 +76,14 @@ cp_2.set_attr(eta_s=0.7)
 h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15 + 165, wf) * 1e-3
 c1.set_attr(h=h_c1, p=30)
 
-# h_va_2_fl = CPSI("H", "P", 7.3 * 1e5, "Q", 0.4, wf) * 1e-3
 c3.set_attr(p=21, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
-c6.set_attr(p=5.52)
+c6.set_attr(p=5.5516)
 
-h_c7 = CPSI("H", "P", 5.52 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
+h_c7 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
 c7.set_attr(h=h_c7)
 
-h_c8 = CPSI("H", "P", 5.52 * 1e5, "T", 273.15 + 150, wf) * 1e-3
+h_c8 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15 + 150, wf) * 1e-3
 c8.set_attr(h=h_c8)
 
 h_c11 = CPSI("H", "P", 21 * 1e5, "T", 273.15 + 155, wf) * 1e-3
@@ -92,7 +91,7 @@ c11.set_attr(h=h_c11)
 
 # Source
 c15.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c16.set_attr(T=94)
+c16.set_attr(T=90)
 
 # Sink
 c17.set_attr(T=160, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
@@ -104,17 +103,16 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, T=165, p=26)
+c1.set_attr(h=None, p=30)
+gc.set_attr(ttd_l=5)
 c3.set_attr(p=21)
-c6.set_attr(p=5.52)
+c6.set_attr(p=None)
+ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(h=None)
 ihx_1.set_attr(ttd_u=10)
 c11.set_attr(h=None)
 ihx_2.set_attr(ttd_u=10)
-c18.set_attr(T=None)
-gc.set_attr(ttd_u=30)
-
 
 # busses
 power = Bus('power')
@@ -170,7 +168,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(26, 37, iterations)
+    'p_kond': np.linspace(30, 39, iterations)
 }
 
 COP = {
@@ -237,7 +235,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', '
     E_D_Lists[name] = E_D_List
 
 
-width = 0.2
+width = 0.1
 
 fig, ax = plt.subplots()
 bottom = np.zeros(iterations)

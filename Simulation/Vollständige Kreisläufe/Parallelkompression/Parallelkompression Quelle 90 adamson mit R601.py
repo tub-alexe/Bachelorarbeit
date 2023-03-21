@@ -74,14 +74,14 @@ cp_2.set_attr(eta_s=0.76)
 h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15+165, wf) * 1e-3
 c1.set_attr(h=h_c1, p=30)
 
-c3.set_attr(p=16, fluid={'Pentane': 1, 'H2O': 0})
+c3.set_attr(p=17, fluid={'Pentane': 1, 'H2O': 0})
 
-c6.set_attr(p=4.7)
+c6.set_attr(p=4.706)
 
-h_c7 = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c7 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c7.set_attr(h=h_c7)
 
-h_c8 = CPSI("H", "P", 4.7 * 1e5, "T", 273.15+150, wf) * 1e-3
+h_c8 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+150, wf) * 1e-3
 c8.set_attr(h=h_c8)
 
 h_c11 = CPSI("H", "P", 16 * 1e5, "T", 273.15+155, wf) * 1e-3
@@ -90,7 +90,7 @@ c11.set_attr(h=h_c11)
 
 #Source
 c15.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
-c16.set_attr(T=94)
+c16.set_attr(T=90)
 
 #Sink
 c17.set_attr(T=160, p=30, fluid={'Pentane': 0, 'H2O': 1})
@@ -102,16 +102,16 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, T=165, p=30)
+c1.set_attr(h=None, p=30)
+gc.set_attr(ttd_l=15)
 c3.set_attr(p=16)
-c6.set_attr(p=4.7)
+c6.set_attr(p=None)
+ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(h=None)
 ihx_1.set_attr(ttd_u=10)
 c11.set_attr(h=None)
 ihx_2.set_attr(ttd_u=10)
-c18.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 nw.solve(mode='design')
 nw.print_results()
@@ -207,7 +207,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(21, 50, iterations)
+    'p_kond': np.linspace(26, 50, iterations)
 }
 
 COP = {

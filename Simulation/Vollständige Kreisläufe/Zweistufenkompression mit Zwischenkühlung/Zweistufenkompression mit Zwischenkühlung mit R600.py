@@ -71,15 +71,15 @@ cp_2.set_attr(eta_s=0.76)
 
 
 # Starting Parameters Connections Cycle
-h_c1 = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+155, wf) * 1e-3
-c1.set_attr(h=h_c1, p=12.49, fluid={'Butane': 1, 'H2O': 0})
+h_c1 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+155, wf) * 1e-3
+c1.set_attr(h=h_c1, p=12.492, fluid={'Butane': 1, 'H2O': 0})
 
-c2.set_attr(p=24)
+c2.set_attr(p=18)
 
-h_c6 = CPSI("H", "P", 50 * 1e5, "T", 273.15+165, wf) * 1e-3
-c6.set_attr(h=h_c6, p=50)
+h_c6 = CPSI("H", "P", 55 * 1e5, "T", 273.15+165, wf) * 1e-3
+c6.set_attr(h=h_c6, p=55)
 
-h_c11 = CPSI("H", "P", 12.49 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c11 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
 c12.set_attr(T=160, p=30, fluid={'Butane': 0, 'H2O': 1})
@@ -87,19 +87,19 @@ c13.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
-c15.set_attr(T=94)
+c15.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
 nw.print_results()
 
-c1.set_attr(p=12.49, h=None)
+c1.set_attr(p=None, h=None)
+ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=10)
 c2.set_attr(p=18)
-c6.set_attr(h=None, p=50, T=165)
+c6.set_attr(h=None, p=55)
+gc.set_attr(ttd_l=5)
 c11.set_attr(h=None, Td_bp=0.1)
-c13.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -187,7 +187,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(50, 125, iterations)
+    'p_kond': np.linspace(55, 100, iterations)
 }
 
 COP = {
@@ -237,8 +237,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R600.svg')
-
-c6.set_attr(p=50)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}

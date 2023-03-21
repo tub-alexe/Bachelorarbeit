@@ -75,8 +75,8 @@ cp_2.set_attr(eta_s=0.76)
 
 #Paramters Connections
 #Main Cycle
-h_c1 = CPSI("H", "P", 41 * 1e5, "T", 273.15 + 165, wf) * 1e-3
-c1.set_attr(h=h_c1, p=41)
+h_c1 = CPSI("H", "P", 42 * 1e5, "T", 273.15 + 165, wf) * 1e-3
+c1.set_attr(h=h_c1, p=42)
 
 c3.set_attr(p=29, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
@@ -104,8 +104,8 @@ c18.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
-c1.set_attr(h=None, p=37)
-gc.set_attr(ttd_l=5)
+c1.set_attr(h=None, p=42)
+gc.set_attr(ttd_l=15)
 c3.set_attr(p=29)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
@@ -209,7 +209,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(37, 50, iterations)
+    'p_kond': np.linspace(42, 50, iterations)
 }
 
 COP = {

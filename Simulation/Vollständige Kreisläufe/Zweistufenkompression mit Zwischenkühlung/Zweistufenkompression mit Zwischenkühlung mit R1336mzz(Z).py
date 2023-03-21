@@ -71,15 +71,15 @@ cp_2.set_attr(eta_s=0.76)
 
 
 # Starting Parameters Connections Cycle
-h_c1 = CPSI("H", "P", 5.52 * 1e5, "T", 273.15+155, wf) * 1e-3
-c1.set_attr(h=h_c1, p=5.52, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
+h_c1 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+155, wf) * 1e-3
+c1.set_attr(h=h_c1, p=5.5516, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
 c2.set_attr(p=12)
 
-h_c6 = CPSI("H", "P", 26 * 1e5, "T", 273.15+165, wf) * 1e-3
-c6.set_attr(h=h_c6, p=26)
+h_c6 = CPSI("H", "P", 29 * 1e5, "T", 273.15+165, wf) * 1e-3
+c6.set_attr(h=h_c6, p=29)
 
-h_c11 = CPSI("H", "P", 5.52 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c11 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
 c12.set_attr(T=160, p=30, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
@@ -87,19 +87,19 @@ c13.set_attr(T=200)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c15.set_attr(T=94)
+c15.set_attr(T=90)
 
 #Solve Model
 nw.solve(mode='design')
 nw.print_results()
 
-c1.set_attr(p=5.52, h=None)
+c1.set_attr(p=None, h=None)
+ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=10)
 c2.set_attr(p=10)
-c6.set_attr(h=None, p=26, T=165)
+c6.set_attr(h=None, p=29)
+gc.set_attr(ttd_l=5)
 c11.set_attr(h=None, Td_bp=0.1)
-c13.set_attr(T=None)
-gc.set_attr(ttd_u=30)
 
 # busses
 power = Bus('power')
@@ -155,7 +155,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 
 data = {
-    'p_kond': np.linspace(26, 41, iterations)
+    'p_kond': np.linspace(29, 36, iterations)
 }
 
 COP = {
@@ -222,7 +222,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', '
     E_D_Lists[name] = E_D_List
 
 
-width = 0.3
+width = 0.2
 
 fig, ax = plt.subplots()
 bottom = np.zeros(iterations)
