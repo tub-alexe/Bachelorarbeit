@@ -91,7 +91,6 @@ c8.set_attr(h=h_c8)
 h_c11 = CPSI("H", "P", 29 * 1e5, "T", 273.15 + 155, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
-
 # Source
 c15.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c16.set_attr(T=90)
@@ -104,6 +103,7 @@ c18.set_attr(T=200)
 nw.solve(mode='design')
 nw.print_results()
 
+#Final Parameters
 c1.set_attr(h=None, p=42)
 gc.set_attr(ttd_l=15)
 c3.set_attr(p=29)
@@ -148,11 +148,9 @@ nw.add_busses(power, heat_source, heat_product, power_COP, heat_product_COP)
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -160,9 +158,6 @@ ean = ExergyAnalysis(nw, E_P=[heat_product], E_F=[power, heat_source])
 ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
-
-
-
 
 #log p,h- diagram
 result_dict = {}
@@ -199,8 +194,7 @@ for key in result_dict.keys():
 
 diagram.save('logph_Parallel_R1233ZD(E).png', dpi=300)
 
-#Parameter optmization
-
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -208,6 +202,7 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
     'p_kond': np.linspace(42, 50, iterations)
 }
@@ -243,7 +238,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):

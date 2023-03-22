@@ -123,10 +123,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -135,7 +133,7 @@ ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
-#parameter optimization
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -143,6 +141,7 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
     'p_kond': np.linspace(26, 35, iterations)
 }
@@ -178,7 +177,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):

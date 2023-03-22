@@ -136,7 +136,6 @@ print('COP', heat_product_COP.P.val / power_COP.P.val)
 print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -146,7 +145,6 @@ ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
 #log p,h- diagram
-
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
 result_dict.update({ihx.label: ihx.get_plotting_data()[2]})
@@ -177,7 +175,7 @@ for key in result_dict.keys():
 
 diagram.save('Test.png', dpi=300)
 
-#parameter optimization
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -185,8 +183,9 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(36, 65, iterations)
+    'p_kond': np.linspace(37.5, 65, iterations)
 }
 
 COP = {
@@ -236,8 +235,6 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R1233ZD(E).svg')
-
-c6.set_attr(p=37)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}

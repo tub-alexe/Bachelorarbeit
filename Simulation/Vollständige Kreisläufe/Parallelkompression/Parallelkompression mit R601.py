@@ -6,7 +6,7 @@ from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
 
-wf = 'Butane'
+wf = 'REFPROP::Pentane'
 si = 'H2O'
 fld_wf = {wf: 1, si: 0}
 fld_si = {wf: 0, si: 1}
@@ -20,7 +20,6 @@ cp_2 = Compressor('Compressor 2')
 va_1 = Valve('Valve 1')
 va_2 = Valve('Valve 2')
 ev = HeatExchanger('Evaporator')
-sup = HeatExchanger('Superheater')
 gc = HeatExchanger('Gas cooler')
 ihx_1 = HeatExchanger('Internal Heat Exchanger 1')
 ihx_2 = HeatExchanger('Internal Heat Exchanger 2')
@@ -63,38 +62,38 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9,
 
 #Parameters Components
 ev.set_attr(pr1=1, pr2=1)
-sup.set_attr(pr1=1, pr2=1)
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx_1.set_attr(pr1=1, pr2=1)
 ihx_2.set_attr(pr1=1, pr2=1)
-cp_1.set_attr(eta_s=0.7)
-cp_2.set_attr(eta_s=0.7)
+cp_1.set_attr(eta_s=0.76)
+cp_2.set_attr(eta_s=0.76)
 
 
 #Paramters Connections
 #Main Cycle
-h_c1 = CPSI("H", "P", 62 * 1e5, "T", 273.15 + 165, wf) * 1e-3
-c1.set_attr(h=h_c1, p=62)
+h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15+165, wf) * 1e-3
+c1.set_attr(h=h_c1, p=30)
 
-c3.set_attr(p=37, fluid={'Butane': 1, 'H2O': 0})
+c3.set_attr(p=17, fluid={'Pentane': 1, 'H2O': 0})
 
-c6.set_attr(p=12.492)
+c6.set_attr(p=4.706)
 
-h_c7 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
+h_c7 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c7.set_attr(h=h_c7)
 
-h_c8 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15 + 145, wf) * 1e-3
+h_c8 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+150, wf) * 1e-3
 c8.set_attr(h=h_c8)
 
-h_c11 = CPSI("H", "P", 36 * 1e5, "T", 273.15 + 155, wf) * 1e-3
+h_c11 = CPSI("H", "P", 16 * 1e5, "T", 273.15+155, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
-# Source
-c15.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
+
+#Source
+c15.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
-# Sink
-c17.set_attr(T=160, p=20, fluid={'Butane': 0, 'H2O': 1})
+#Sink
+c17.set_attr(T=160, p=30, fluid={'Pentane': 0, 'H2O': 1})
 c18.set_attr(T=200)
 
 #Solve Model
@@ -102,10 +101,10 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
-# New Parameters
-c1.set_attr(h=None, p=62)
+# Final Parameters
+c1.set_attr(h=None, p=30)
 gc.set_attr(ttd_l=5)
-c3.set_attr(p=37)
+c3.set_attr(p=16)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -113,6 +112,10 @@ c8.set_attr(h=None)
 ihx_1.set_attr(ttd_u=10)
 c11.set_attr(h=None)
 ihx_2.set_attr(ttd_u=10)
+
+#Solve Model
+nw.solve(mode='design')
+nw.print_results()
 
 # busses
 power = Bus('power')
@@ -146,7 +149,6 @@ nw.add_busses(power, heat_source, heat_product, power_COP, heat_product_COP)
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Exergy Analysis
 
@@ -177,14 +179,14 @@ result_dict.update({va_1.label: va_1.get_plotting_data()[1]})
 
 
 
-diagram = FluidPropertyDiagram(wf)
+diagram = FluidPropertyDiagram('Pentane')
 diagram.set_unit_system(T='°C', p='bar', h='kJ/kg')
 
 for key, data in result_dict.items():
     result_dict[key]['datapoints'] = diagram.calc_individual_isoline(**data)
 
 diagram.calc_isolines()
-diagram.set_limits(x_min=0, x_max=1000, y_min=1e-1, y_max=2e2)
+diagram.set_limits(x_min=0, x_max=800, y_min=1e-1, y_max=2e2)
 diagram.draw_isolines('logph')
 
 for key in result_dict.keys():
@@ -193,19 +195,18 @@ for key in result_dict.keys():
     diagram.ax.scatter(datapoints['h'][0], datapoints['p'][0], color='#ff0000')
 
 
-diagram.save('logph_Parallel_R600.png', dpi=300)
+diagram.save('logph_Parallel_R601.png', dpi=300)
 
-#Parameter optmization
-
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
 iterations = 20
-
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(52, 80, iterations)
+    'p_kond': np.linspace(26, 50, iterations)
 }
 
 COP = {
@@ -239,7 +240,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):
@@ -254,9 +254,9 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 
 plt.tight_layout()
 plt.show()
-fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R600.svg')
+fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 
-c1.set_attr(p=62)
+c1.set_attr(p=30)
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -286,4 +286,4 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc='lower right')
 
 plt.show()
-fig.savefig('Optimierung Parallel Exergievernichtung R600.svg')
+fig.savefig('Optimierung Parallel Exergievernichtung R601.svg')

@@ -14,7 +14,6 @@ fld_si = {wf: 0, si: 1}
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 # Components
-
 gc = HeatExchanger('Gas cooler')
 ev = HeatExchanger('Evaporator')
 sup = HeatExchanger('Superheater')
@@ -22,7 +21,6 @@ va = Valve('Valve')
 cp = Compressor('Compressor')
 
 #Sources, Sinks and CycleCloser
-
 si_in = Source('Sink in')
 si_out = Sink('Sink out')
 
@@ -32,7 +30,6 @@ sou_out = Sink('Source out')
 cc = CycleCloser('CycleCloser')
 
 # Connections Cycle
-
 c1 = Connection(cc, 'out1', gc, 'in1', label="1")
 c2 = Connection(gc, 'out1', va, 'in1', label="2")
 c3 = Connection(va, 'out1', ev, 'in2', label="3")
@@ -45,13 +42,11 @@ c6 = Connection(si_in, 'out1', gc, 'in2', label="6")
 c7 = Connection(gc, 'out2', si_out, 'in1', label="7")
 
 # Connections Source
-
 c8 = Connection(sou_in, 'out1', ev, 'in1', label="8")
 c9 = Connection(ev, 'out1', sou_out, 'in1', label="9")
 nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 
 # Starting Parameters Components
-
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
@@ -78,8 +73,7 @@ c9.set_attr(T=90)
 nw.solve(mode='design')
 nw.print_results()
 
-#New Parameters
-
+#Final Parameters
 c2.set_attr(h=None, p=57)
 gc.set_attr(ttd_l=5)
 c3.set_attr(p=None)
@@ -116,10 +110,8 @@ nw.add_busses(power, heat_product, heat_source, power_COP, heat_product_COP)
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 #Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -129,7 +121,6 @@ ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
 #log p,h diagram
-
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
 result_dict.update({cp.label: cp.get_plotting_data()[1]})
@@ -155,7 +146,7 @@ for key in result_dict.keys():
 diagram.save('logph_R1233zd(E).png', dpi=300)
 
 
-#parameter optimization
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -163,6 +154,7 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
     'p_kond': np.linspace(57, 110, iterations)
 }
@@ -198,7 +190,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):

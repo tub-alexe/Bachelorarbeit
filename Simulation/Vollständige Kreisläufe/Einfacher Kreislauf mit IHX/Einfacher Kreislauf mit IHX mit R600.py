@@ -85,7 +85,7 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
-# New Parameters
+#Final Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=10)
@@ -125,10 +125,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -165,7 +163,7 @@ for key in result_dict.keys():
 
 diagram.save('logph_IHX_R600.png', dpi=300)
 
-#parameter optimization
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -173,6 +171,7 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
     'p_kond': np.linspace(50, 120, iterations)
 }
@@ -208,7 +207,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):

@@ -67,14 +67,13 @@ sup.set_attr(pr1=1, pr2=1)
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ihx_1.set_attr(pr1=1, pr2=1)
 ihx_2.set_attr(pr1=1, pr2=1)
-cp_1.set_attr(eta_s=0.7)
-cp_2.set_attr(eta_s=0.7)
-
+cp_1.set_attr(eta_s=0.76)
+cp_2.set_attr(eta_s=0.76)
 
 #Paramters Connections
 #Main Cycle
-h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15 + 165, wf) * 1e-3
-c1.set_attr(h=h_c1, p=30)
+h_c1 = CPSI("H", "P", 32 * 1e5, "T", 273.15 + 165, wf) * 1e-3
+c1.set_attr(h=h_c1, p=32)
 
 c3.set_attr(p=21, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
@@ -103,7 +102,7 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, p=30)
+c1.set_attr(h=None, p=32)
 gc.set_attr(ttd_l=5)
 c3.set_attr(p=21)
 c6.set_attr(p=None)
@@ -143,13 +142,12 @@ heat_product_COP.add_comps(
 
 nw.add_busses(power, heat_source, heat_product, power_COP, heat_product_COP)
 
+#Solve Model
 nw.solve(mode='design')
 nw.print_results()
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-print('COP', nw.busses["heat_product"].P.val / nw.busses["power"].P.val)
 
 # Exergy Analysis
-
 pamb = 1
 Tamb = 25
 
@@ -158,8 +156,7 @@ ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
-#Parameter optmization
-
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -167,8 +164,9 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(30, 39, iterations)
+    'p_kond': np.linspace(32, 39, iterations)
 }
 
 COP = {
@@ -202,7 +200,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):

@@ -54,14 +54,12 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
-cp.set_attr(eta_s=0.7)
+cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
+h_c2 = CPSI("H", "P", 93 * 1e5, "T", 273.15+165, wf) * 1e-3
+c2.set_attr(h=h_c2, p=93)
 
-h_gk_nach = CPSI("H", "P", 93 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_gk_nach, p=93)
-
-#h_verd = CPSI("H", "Q", 0, "T", 273.15+70, km) * 1e-3
 c3.set_attr(p=12.492)
 
 h_c4 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+90.1, wf) * 1e-3
@@ -79,7 +77,7 @@ c9.set_attr(T=90)
 nw.solve(mode='design')
 nw.print_results()
 
-# New Parameters
+#Final Parameters
 c2.set_attr(h=None, p=93)
 gc.set_attr(ttd_l=5)
 c3.set_attr(p=None)
@@ -113,7 +111,7 @@ heat_product_COP.add_comps(
 
 nw.add_busses(power, heat_product, heat_source, power_COP, heat_product_COP)
 
-
+#Solve Model
 nw.solve(mode='design')
 nw.print_results()
 
@@ -127,7 +125,6 @@ ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
 #log p,h diagram
-
 result_dict = {}
 result_dict.update({ev.label: ev.get_plotting_data()[2]})
 result_dict.update({cp.label: cp.get_plotting_data()[1]})
@@ -152,7 +149,7 @@ for key in result_dict.keys():
 
 diagram.save('logph_R600.png', dpi=300)
 
-#parameter optimization
+#COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -160,8 +157,9 @@ import numpy as np
 plt.rc('font', **{'size': 18})
 iterations = 20
 
+#bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(88, 145, iterations)
+    'p_kond': np.linspace(93, 145, iterations)
 }
 
 COP = {
