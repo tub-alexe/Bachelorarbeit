@@ -156,7 +156,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(57, 110, iterations)
+    'p_kond': np.linspace(57, 71, iterations)
 }
 
 COP = {
@@ -214,7 +214,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor']:
         c2.set_attr(p=p)
         nw.solve('design')
         ean.analyse(pamb=pamb, Tamb=Tamb)
-        E_D_List += [ean.component_data['E_D'][name] * 1e-6]
+        E_D_List += [ean.component_data['y_Dk'][name]]
 
     E_D_Lists[name] = E_D_List
 
@@ -229,8 +229,27 @@ for boolean, E_D_List in E_D_Lists.items():
     bottom += E_D_List
 
 ax.set_xlabel('Kondensatordruck in bar')
-ax.set_ylabel('Exergievernichtung in MW')
+ax.set_ylabel('Exergievernichtungsquotient')
 ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(57, 71, iterations))
+}
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Einfacher Kreislauf.txt", "r")
+print(f.read())
+

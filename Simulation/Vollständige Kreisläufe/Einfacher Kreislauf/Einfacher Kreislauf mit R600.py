@@ -159,7 +159,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(93, 145, iterations)
+    'p_kond': np.linspace(93, 125, iterations)
 }
 
 COP = {
@@ -193,7 +193,6 @@ for p in data['p_kond']:
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
-#ax = [ax]
 [a.grid() for a in ax]
 
 for i, dictionary in enumerate([COP, eta, Lorenz_COP]):
@@ -238,3 +237,21 @@ ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung Exergievernichtung R600.svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(93, 125, iterations))
+}
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Einfacher Kreislauf.txt", "r")
+print(f.read())

@@ -235,3 +235,21 @@ ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R1336mzz(Z).svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(29, 36, iterations))
+}
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Zweistufenkompression.txt", "r")
+print(f.read())

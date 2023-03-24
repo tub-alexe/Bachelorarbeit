@@ -173,7 +173,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(50, 120, iterations)
+    'p_kond': np.linspace(50, 70, iterations)
 }
 
 COP = {
@@ -251,3 +251,21 @@ ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R600.svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(50, 70, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())

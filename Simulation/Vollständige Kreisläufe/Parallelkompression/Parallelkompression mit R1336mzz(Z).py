@@ -248,3 +248,20 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R1336mzz(Z).svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(32, 39, iterations))
+}
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Parallelkompression.txt", "r")
+print(f.read())

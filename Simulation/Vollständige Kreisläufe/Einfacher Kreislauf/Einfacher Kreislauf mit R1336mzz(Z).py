@@ -137,7 +137,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(63, 90, iterations)
+    'p_kond': np.linspace(63, 75, iterations)
 }
 
 COP = {
@@ -216,3 +216,20 @@ ax.legend(loc="lower right")
 plt.show()
 fig.savefig('Optimierung Exergievernichtung R1336mzz(Z).svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(63, 75, iterations))
+}
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Einfacher Kreislauf.txt", "r")
+print(f.read())

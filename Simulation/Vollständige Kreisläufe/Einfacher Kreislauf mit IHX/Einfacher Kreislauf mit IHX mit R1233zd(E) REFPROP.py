@@ -225,7 +225,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat E
         c3.set_attr(p=p)
         nw.solve('design')
         ean.analyse(pamb=pamb, Tamb=Tamb)
-        E_D_List += [ean.component_data['E_D'][name] * 1e-6]
+        E_D_List += [ean.component_data['y_Dk'][name]]
 
     E_D_Lists[name] = E_D_List
 
@@ -240,8 +240,26 @@ for boolean, E_D_List in E_D_Lists.items():
     bottom += E_D_List
 
 ax.set_xlabel('Kondensatordruck in bar')
-ax.set_ylabel('Exergievernichtung in MW')
+ax.set_ylabel('Exergievernichtungsgrad')
 ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E) REFPROP.svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(36, 50, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())

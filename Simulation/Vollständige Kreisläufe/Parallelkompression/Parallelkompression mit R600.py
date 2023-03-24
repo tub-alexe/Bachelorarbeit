@@ -199,7 +199,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(52, 80, iterations)
+    'p_kond': np.linspace(52, 65, iterations)
 }
 
 COP = {
@@ -280,3 +280,21 @@ ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R600.svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(52, 65, iterations))
+}
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Parallelkompression.txt", "r")
+print(f.read())

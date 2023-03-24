@@ -185,7 +185,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(37.5, 65, iterations)
+    'p_kond': np.linspace(37.5, 55, iterations)
 }
 
 COP = {
@@ -265,3 +265,21 @@ ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R1233ZD(E).svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(37.5, 55, iterations))
+}
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Zweistufenkompression.txt", "r")
+print(f.read())
