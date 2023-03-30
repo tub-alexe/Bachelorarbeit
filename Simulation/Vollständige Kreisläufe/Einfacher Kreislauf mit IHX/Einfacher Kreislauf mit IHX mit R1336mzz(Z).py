@@ -61,18 +61,18 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_ihx_h_nach = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+155, wf) * 1e-3
-c1.set_attr(h=h_ihx_h_nach, p=5.5516, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
+h_c1 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+155, wf) * 1e-3
+c1.set_attr(h=h_c1, p=5.5516, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
-h_ihx_k_vor = CPSI("H", "P", 30 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_ihx_k_vor, p=30)
+h_c3 = CPSI("H", "P", 26 * 1e5, "T", 273.15+165, wf) * 1e-3
+c3.set_attr(h=h_c3, p=26)
 
-h_ihx_k_nach = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c6.set_attr(h=h_ihx_k_nach)
+h_c6 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
 c7.set_attr(T=160, p=30, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c8.set_attr(T=200)
+c8.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
@@ -86,9 +86,9 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 # New Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=30)
-gc.set_attr(ttd_l=5)
+ihx.set_attr(ttd_u=15)
+c3.set_attr(h=None, p=31)
+gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -143,7 +143,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(27.5, 35, iterations)
+    'p_kond': np.linspace(28.5, 33, iterations)
 }
 
 COP = {
@@ -225,7 +225,7 @@ fig.savefig('Optimierung IHX Exergievernichtung R1336mzz(Z).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(27.5, 35, iterations))
+    'p_kond': list(np.linspace(28.5, 33, iterations))
 }
 
 with open('IHX.txt', 'a') as convert_file:

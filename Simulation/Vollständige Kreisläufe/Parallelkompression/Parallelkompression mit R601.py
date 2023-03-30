@@ -71,7 +71,7 @@ cp_2.set_attr(eta_s=0.76)
 
 #Paramters Connections
 #Main Cycle
-h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15+165, wf) * 1e-3
+h_c1 = CPSI("H", "P", 30 * 1e5, "T", 273.15+186, wf) * 1e-3
 c1.set_attr(h=h_c1, p=30)
 
 c3.set_attr(p=17, fluid={'Pentane': 1, 'H2O': 0})
@@ -93,8 +93,8 @@ c15.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
 #Sink
-c17.set_attr(T=160, p=30, fluid={'Pentane': 0, 'H2O': 1})
-c18.set_attr(T=200)
+c17.set_attr(T=182, p=30, fluid={'Pentane': 0, 'H2O': 1})
+c18.set_attr(T=190)
 
 #Solve Model
 nw.solve(mode='design')
@@ -102,16 +102,16 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # Final Parameters
-c1.set_attr(h=None, p=30)
-gc.set_attr(ttd_l=5)
-c3.set_attr(p=16)
+c1.set_attr(h=None, p=32)
+gc.set_attr(ttd_l=10)
+c3.set_attr(p=11)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(h=None)
-ihx_1.set_attr(ttd_u=10)
+ihx_1.set_attr(ttd_u=15)
 c11.set_attr(h=None)
-ihx_2.set_attr(ttd_u=10)
+ihx_2.set_attr(ttd_u=15)
 
 #Solve Model
 nw.solve(mode='design')
@@ -206,7 +206,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(26, 34, iterations)
+    'p_kond': np.linspace(32, 38, iterations)
 }
 
 COP = {
@@ -290,7 +290,7 @@ fig.savefig('Optimierung Parallel Exergievernichtung R601.svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(26, 34, iterations))
 }
 
@@ -304,4 +304,4 @@ with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Parallelkompression.txt", "r")
-print(f.read())
+print(f.read())"""

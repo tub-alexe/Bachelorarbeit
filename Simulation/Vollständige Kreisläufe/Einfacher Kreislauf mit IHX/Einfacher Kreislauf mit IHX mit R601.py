@@ -60,18 +60,18 @@ sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
-h_c1 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+155, wf) * 1e-3
+h_c1 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+168, wf) * 1e-3
 c1.set_attr(h=h_c1, p=4.706, fluid={'Pentane': 1, 'H2O': 0})
 
-h_c3 = CPSI("H", "P", 26 * 1e5, "T", 273.15+165, wf) * 1e-3
-c3.set_attr(h=h_c3, p=26)
+h_c3 = CPSI("H", "P", 34 * 1e5, "T", 273.15+178, wf) * 1e-3
+c3.set_attr(h=h_c3, p=34)
 
 h_c6 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=160, p=35, fluid={'Pentane': 0, 'H2O': 1})
-c8.set_attr(T=200)
+c7.set_attr(T=175, p=25, fluid={'Pentane': 0, 'H2O': 1})
+c8.set_attr(T=210)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -85,9 +85,9 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 #Final Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
-c3.set_attr(h=None, p=26)
-gc.set_attr(ttd_l=5)
+ihx.set_attr(ttd_u=15)
+c3.set_attr(h=None, p=31)
+gc.set_attr(ttd_l=15)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -166,11 +166,11 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(24, 34, iterations)
+    'p_kond': np.linspace(31, 40, iterations)
 }
 
 COP = {
@@ -201,6 +201,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(nw.get_conn("1").get_attr("m").val)
+    print(nw.get_comp('Compressor').get_attr("P").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -251,7 +253,7 @@ fig.savefig('Optimierung IHX Exergievernichtung R601.svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(24, 34, iterations))
 }
 
@@ -265,4 +267,4 @@ with open('IHX.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("IHX.txt", "r")
-print(f.read())
+print(f.read())"""

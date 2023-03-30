@@ -17,30 +17,30 @@ import json
 with open('IHX.txt') as f:
     read = f.readlines()
 
-data_R601 = json.loads(read[1])
-data_R601['p_kond'] = np.array(data_R601['p_kond'])
-COP_R601 = json.loads(read[2])
-eta_R601 = json.loads(read[3])
+#data_R601 = json.loads(read[1])
+#data_R601['p_kond'] = np.array(data_R601['p_kond'])
+#COP_R601 = json.loads(read[2])
+#eta_R601 = json.loads(read[3])
 
-data_R1233ZDE = json.loads(read[5])
+data_R1233ZDE = json.loads(read[1])
 data_R1233ZDE['p_kond'] = np.array(data_R1233ZDE['p_kond'])
-COP_R1233ZDE = json.loads(read[6])
-eta_R1233ZDE = json.loads(read[7])
+COP_R1233ZDE = json.loads(read[2])
+eta_R1233ZDE = json.loads(read[3])
 
-data_R600 = json.loads(read[9])
+data_R600 = json.loads(read[5])
 data_R600['p_kond'] = np.array(data_R600['p_kond'])
-COP_R600 = json.loads(read[10])
-eta_R600 = json.loads(read[11])
+COP_R600 = json.loads(read[6])
+eta_R600 = json.loads(read[7])
 
-data_R1336MZZZ = json.loads(read[13])
+data_R1336MZZZ = json.loads(read[9])
 data_R1336MZZZ['p_kond'] = np.array(data_R1336MZZZ['p_kond'])
-COP_R1336MZZZ = json.loads(read[14])
-eta_R1336MZZZ = json.loads(read[15])
+COP_R1336MZZZ = json.loads(read[10])
+eta_R1336MZZZ = json.loads(read[11])
 
 plt.rc('font', **{'size': 18})
 
-for key in data_R601:
-    plt.scatter(data_R601[key], COP_R601[key], s=100, color="blue", label='R601')
+#for key in data_R601:
+    #plt.scatter(data_R601[key], COP_R601[key], s=100, color="blue", label='R601')
 
 for key in data_R1233ZDE:
     plt.scatter(data_R1233ZDE[key], COP_R1233ZDE[key], s=100, color="red", label='R1233ZDE')
@@ -52,7 +52,7 @@ for key in data_R1336MZZZ:
     plt.scatter(data_R1336MZZZ[key], COP_R1336MZZZ[key], s=100, color="black", label='R1336MZZZ')
 plt.xlabel('Gaskühlerdruck in bar')
 plt.ylabel('COP')
-plt.ylim([2.5, 3.3])
+#plt.ylim([2.5, 3.3])
 plt.legend(loc='upper right')
 plt.grid()
 plt.show()
@@ -60,8 +60,8 @@ plt.savefig('Zusammenführung_IHX_COP.svg')
 
 plt.rc('font', **{'size': 18})
 
-for key in data_R601:
-    plt.scatter(data_R601[key], eta_R601[key], s=100, color="blue", label='R601')
+#for key in data_R601:
+    #plt.scatter(data_R601[key], eta_R601[key], s=100, color="blue", label='R601')
 
 for key in data_R1233ZDE:
     plt.scatter(data_R1233ZDE[key], eta_R1233ZDE[key], s=100, color="red", label='R1233ZDE')
@@ -73,7 +73,7 @@ for key in data_R1336MZZZ:
     plt.scatter(data_R1336MZZZ[key], eta_R1336MZZZ[key], s=100, color="black", label='R1336MZZZ')
 plt.xlabel('Gaskühlerdruck in bar')
 plt.ylabel('eta')
-plt.ylim([68, 79])
+#plt.ylim([68, 79])
 plt.legend(loc='upper right')
 plt.grid()
 plt.show()

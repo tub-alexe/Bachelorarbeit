@@ -75,14 +75,14 @@ c1.set_attr(h=h_c1, p=4.706, fluid={'Pentane': 1, 'H2O': 0})
 
 c2.set_attr(p=8)
 
-h_c6 = CPSI("H", "P", 25 * 1e5, "T", 273.15+165, wf) * 1e-3
-c6.set_attr(h=h_c6, p=25)
+h_c6 = CPSI("H", "P", 26 * 1e5, "T", 273.15+169, wf) * 1e-3
+c6.set_attr(h=h_c6, p=26)
 
 h_c11 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
-c12.set_attr(T=160, p=35, fluid={'Pentane': 0, 'H2O': 1})
-c13.set_attr(T=200)
+c12.set_attr(T=168, p=35, fluid={'Pentane': 0, 'H2O': 1})
+c13.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -95,10 +95,10 @@ nw.print_results()
 #Final Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
-c2.set_attr(p=8)
-c6.set_attr(h=None, p=25)
-gc.set_attr(ttd_l=5)
+ihx.set_attr(ttd_u=15)
+c2.set_attr(p=5)
+c6.set_attr(h=None, p=29)
+gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -187,7 +187,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(25, 35, iterations)
+    'p_kond': np.linspace(29, 35, iterations)
 }
 
 COP = {
@@ -269,7 +269,7 @@ fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R601.svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(25, 35, iterations))
 }
 
@@ -283,4 +283,4 @@ with open('Zweistufenkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Zweistufenkompression.txt", "r")
-print(f.read())
+print(f.read())"""

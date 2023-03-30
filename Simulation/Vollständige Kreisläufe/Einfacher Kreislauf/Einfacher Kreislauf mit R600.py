@@ -67,7 +67,7 @@ c4.set_attr(h=h_c4, fluid={'Butane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
 c6.set_attr(T=160, p=30, fluid={'Butane': 0, 'H2O': 1})
-c7.set_attr(T=200)
+c7.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c8.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
@@ -78,8 +78,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c2.set_attr(h=None, p=93)
-gc.set_attr(ttd_l=5)
+c2.set_attr(h=None, p=70)
+gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
@@ -159,7 +159,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(93, 125, iterations)
+    'p_kond': np.linspace(70, 145, iterations)
 }
 
 COP = {
@@ -241,7 +241,7 @@ fig.savefig('Optimierung Exergievernichtung R600.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(93, 125, iterations))
+    'p_kond': list(np.linspace(70, 145, iterations))
 }
 
 with open('Einfacher Kreislauf.txt', 'a') as convert_file:

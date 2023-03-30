@@ -68,7 +68,7 @@ h_uebe = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_uebe, fluid={'Pentane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c6.set_attr(T=162, p=20, fluid={'Pentane': 0, 'H2O': 1})
 c7.set_attr(T=200)
 
 # Starting Parameters Connection Source
@@ -81,8 +81,8 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # Final Parameters
-c2.set_attr(h=None)
-gc.set_attr(ttd_l=5)
+c2.set_attr(h=None, p=39)
+gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
@@ -194,6 +194,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(nw.get_conn("1").get_attr("m").val)
+    print(nw.get_comp('Compressor').get_attr("P").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -244,7 +246,7 @@ fig.savefig('Optimierung Exergievernichtung R601.svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(36, 50, iterations))
 }
 
@@ -258,4 +260,4 @@ with open('Einfacher Kreislauf.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Einfacher Kreislauf.txt", "r")
-print(f.read())
+print(f.read())"""

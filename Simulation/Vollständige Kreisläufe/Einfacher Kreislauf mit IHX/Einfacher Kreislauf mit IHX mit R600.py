@@ -74,7 +74,7 @@ c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
 c7.set_attr(T=160, p=36, fluid={'Butane': 0, 'H2O': 1})
-c8.set_attr(T=200)
+c8.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
@@ -88,9 +88,9 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 #Final Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
+ihx.set_attr(ttd_u=15)
 c3.set_attr(h=None, p=50)
-gc.set_attr(ttd_l=5)
+gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -173,7 +173,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(50, 70, iterations)
+    'p_kond': np.linspace(51, 74, iterations)
 }
 
 COP = {
@@ -255,7 +255,7 @@ fig.savefig('Optimierung IHX Exergievernichtung R600.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(50, 70, iterations))
+    'p_kond': list(np.linspace(51, 74, iterations))
 }
 
 with open('IHX.txt', 'a') as convert_file:

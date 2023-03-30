@@ -94,7 +94,7 @@ c16.set_attr(T=90)
 
 # Sink
 c17.set_attr(T=160, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c18.set_attr(T=200)
+c18.set_attr(T=190)
 
 #Solve Model
 nw.solve(mode='design')
@@ -102,16 +102,16 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, p=32)
-gc.set_attr(ttd_l=5)
-c3.set_attr(p=21)
+c1.set_attr(h=None, p=31)
+gc.set_attr(ttd_l=10)
+c3.set_attr(p=8)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
 c8.set_attr(h=None)
-ihx_1.set_attr(ttd_u=10)
+ihx_1.set_attr(ttd_u=15)
 c11.set_attr(h=None)
-ihx_2.set_attr(ttd_u=10)
+ihx_2.set_attr(ttd_u=15)
 
 # busses
 power = Bus('power')
@@ -166,7 +166,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(32, 39, iterations)
+    'p_kond': np.linspace(31, 39, iterations)
 }
 
 COP = {
@@ -251,7 +251,7 @@ fig.savefig('Optimierung Parallel Exergievernichtung R1336mzz(Z).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(32, 39, iterations))
+    'p_kond': list(np.linspace(31, 39, iterations))
 }
 
 with open('Parallelkompression.txt', 'a') as convert_file:

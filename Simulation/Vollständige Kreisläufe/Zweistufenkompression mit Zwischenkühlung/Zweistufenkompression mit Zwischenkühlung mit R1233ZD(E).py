@@ -82,7 +82,7 @@ h_c11 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
 c12.set_attr(T=160, p=35, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c13.set_attr(T=200)
+c13.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
@@ -94,10 +94,10 @@ nw.print_results()
 
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
-c2.set_attr(p=14.5)
-c6.set_attr(h=None, p=38)
-gc.set_attr(ttd_l=5)
+ihx.set_attr(ttd_u=15)
+c2.set_attr(p=17)
+c6.set_attr(h=None, p=39)
+gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -185,7 +185,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(37.5, 55, iterations)
+    'p_kond': np.linspace(40, 53, iterations)
 }
 
 COP = {
@@ -269,7 +269,7 @@ fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R1233ZD(E).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(37.5, 55, iterations))
+    'p_kond': list(np.linspace(40, 53, iterations))
 }
 
 with open('Zweistufenkompression.txt', 'a') as convert_file:
