@@ -103,7 +103,7 @@ print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 #Final Parameters
 c1.set_attr(h=None, p=51)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=31)
+c3.set_attr(p=30)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)

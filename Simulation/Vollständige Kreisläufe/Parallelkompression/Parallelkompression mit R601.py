@@ -93,7 +93,7 @@ c15.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
 #Sink
-c17.set_attr(T=182, p=30, fluid={'Pentane': 0, 'H2O': 1})
+c17.set_attr(T=182, p=20, fluid={'Pentane': 0, 'H2O': 1})
 c18.set_attr(T=190)
 
 #Solve Model

@@ -16,6 +16,7 @@ fld_si = {wf: 0, si: 1}
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 # Components
+
 gc = HeatExchanger('Gas cooler')
 ev = HeatExchanger('Evaporator')
 sup = HeatExchanger('Superheater')
@@ -71,7 +72,7 @@ c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
 c7.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
-c8.set_attr(T=200)
+c8.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
@@ -82,12 +83,12 @@ nw.solve(mode='design')
 nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
-#Final Parameters
+# Final Parameters
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
-ihx.set_attr(ttd_u=10)
+ihx.set_attr(ttd_u=15)
 c3.set_attr(h=None, p=46)
-gc.set_attr(ttd_l=5)
+gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -167,7 +168,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(36, 50, iterations)
+    'p_kond': np.linspace(40, 54, iterations)
 }
 
 COP = {
@@ -198,6 +199,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(nw.get_conn("1").get_attr("m").val)
+    print(nw.get_comp('Compressor').get_attr("P").val)
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
 [a.grid() for a in ax]
@@ -224,7 +227,7 @@ for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat E
         c3.set_attr(p=p)
         nw.solve('design')
         ean.analyse(pamb=pamb, Tamb=Tamb)
-        E_D_List += [ean.component_data['E_D'][name] * 1e-6]
+        E_D_List += [ean.component_data['y_Dk'][name]]
 
     E_D_Lists[name] = E_D_List
 
@@ -239,8 +242,26 @@ for boolean, E_D_List in E_D_Lists.items():
     bottom += E_D_List
 
 ax.set_xlabel('Kondensatordruck in bar')
-ax.set_ylabel('Exergievernichtung in MW')
+ax.set_ylabel('Exergievernichtungsgrad')
 ax.legend(loc="lower right")
 
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E) COOLPROP.svg')
+
+import json
+
+"""data = {
+    'p_kond': list(np.linspace(40, 54, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())"""

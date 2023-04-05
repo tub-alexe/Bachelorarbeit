@@ -241,7 +241,7 @@ data = {
     'p_kond': list(np.linspace(48, 91, iterations))
 }
 
-with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+with open('Einfacher Kreislauf.txt', 'w') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
 with open('Einfacher Kreislauf.txt', 'a') as convert_file:

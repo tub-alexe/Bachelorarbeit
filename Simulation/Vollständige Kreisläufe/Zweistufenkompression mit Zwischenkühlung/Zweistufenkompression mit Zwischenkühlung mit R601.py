@@ -81,7 +81,7 @@ c6.set_attr(h=h_c6, p=26)
 h_c11 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
-c12.set_attr(T=168, p=35, fluid={'Pentane': 0, 'H2O': 1})
+c12.set_attr(T=168, p=20, fluid={'Pentane': 0, 'H2O': 1})
 c13.set_attr(T=190)
 
 # Starting Parameters Connection Source

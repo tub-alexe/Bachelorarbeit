@@ -62,7 +62,7 @@ plt.savefig('Zusammenführung_Zweistufen_COP.svg')
 plt.rc('font', **{'size': 18})
 
 #for key in data_R601:
-    #plt.scatter(data_R601[key], eta_R601[key], s=100, color="blue", label='R601')
+    #   plt.scatter(data_R601[key], eta_R601[key], s=100, color="blue", label='R601')
 
 for key in data_R1233ZDE:
     plt.scatter(data_R1233ZDE[key], eta_R1233ZDE[key], s=100, color="red", label='R1233ZDE')

@@ -166,7 +166,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(31, 39, iterations)
+    'p_kond': np.linspace(30.9, 45, iterations)
 }
 
 COP = {
@@ -216,8 +216,6 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1336mzz(Z).svg')
 
-c1.set_attr(p=26)
-
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -251,7 +249,7 @@ fig.savefig('Optimierung Parallel Exergievernichtung R1336mzz(Z).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(31, 39, iterations))
+    'p_kond': list(np.linspace(30.9, 45, iterations))
 }
 
 with open('Parallelkompression.txt', 'a') as convert_file:

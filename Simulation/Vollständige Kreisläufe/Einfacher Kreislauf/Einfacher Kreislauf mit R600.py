@@ -66,7 +66,7 @@ h_c4 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'Butane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=160, p=30, fluid={'Butane': 0, 'H2O': 1})
+c6.set_attr(T=160, p=20, fluid={'Butane': 0, 'H2O': 1})
 c7.set_attr(T=190)
 
 # Starting Parameters Connection Source
@@ -78,7 +78,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c2.set_attr(h=None, p=70)
+c2.set_attr(h=None, p=133.2)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
