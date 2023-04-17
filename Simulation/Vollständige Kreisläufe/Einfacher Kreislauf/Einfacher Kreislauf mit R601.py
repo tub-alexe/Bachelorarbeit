@@ -59,17 +59,17 @@ cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
 
-h_gk_nach = CPSI("H", "P", 39 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_gk_nach, p=39)
+h_c2 = CPSI("H", "P", 41 * 1e5, "T", 273.15+180, wf) * 1e-3
+c2.set_attr(h=h_c2, p=41)
 
 c3.set_attr(p=4.706)
 
-h_uebe = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c4.set_attr(h=h_uebe, fluid={'Pentane': 1, 'H2O': 0})
+h_c4 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c4.set_attr(h=h_c4, fluid={'Pentane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=162, p=20, fluid={'Pentane': 0, 'H2O': 1})
-c7.set_attr(T=200)
+c6.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c7.set_attr(T=205)
 
 # Starting Parameters Connection Source
 c8.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -81,8 +81,8 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # Final Parameters
-c2.set_attr(h=None, p=39)
-gc.set_attr(ttd_l=10)
+c2.set_attr(h=None, p=55)
+gc.set_attr(ttd_l=15)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
@@ -163,7 +163,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(36, 50, iterations)
+    'p_kond': np.linspace(100, 150, iterations)
 }
 
 COP = {

@@ -87,7 +87,7 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c3.set_attr(h=None, p=46)
+c3.set_attr(h=None, p=40)
 gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 

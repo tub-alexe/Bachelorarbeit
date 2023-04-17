@@ -135,7 +135,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 print('COP', heat_product_COP.P.val / power_COP.P.val)
-
+print(nw.get_comp("Compressor 1").get_attr("P").val + nw.get_comp("Compressor 2").get_attr("P").val)
 # Exergy Analysis
 
 pamb = 1
@@ -219,6 +219,7 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(nw.get_comp("Compressor 1").get_attr("P").val + nw.get_comp("Compressor 2").get_attr("P").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -270,7 +271,7 @@ fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R600.svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(60, 80, iterations))
 }
 
@@ -284,4 +285,4 @@ with open('Zweistufenkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Zweistufenkompression.txt", "r")
-print(f.read())
+print(f.read())"""

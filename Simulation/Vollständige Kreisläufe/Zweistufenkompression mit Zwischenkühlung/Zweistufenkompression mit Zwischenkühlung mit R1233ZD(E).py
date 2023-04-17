@@ -96,7 +96,7 @@ c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
 c2.set_attr(p=17)
-c6.set_attr(h=None, p=39)
+c6.set_attr(h=None, p=40)
 gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 

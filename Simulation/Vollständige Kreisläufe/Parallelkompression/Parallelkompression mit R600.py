@@ -194,7 +194,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
-plt.rc('font', **{'size': 18})
+#plt.rc('font', **{'size': 18})
 iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
@@ -279,11 +279,11 @@ ax.set_ylabel('Exergievernichtung in MW')
 ax.legend(loc='lower right')
 
 plt.show()
-fig.savefig('Optimierung Parallel Exergievernichtung R600.svg')
+fig.savefig('Optimierung Parallel Exergievernichtung R600.png')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(53, 65, iterations))
 }
 
@@ -297,4 +297,4 @@ with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Parallelkompression.txt", "r")
-print(f.read())
+print(f.read())"""

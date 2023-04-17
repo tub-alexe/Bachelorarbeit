@@ -199,7 +199,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
-plt.rc('font', **{'size': 18})
+#plt.rc('font', **{'size': 18})
 iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
@@ -254,6 +254,8 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1233ZD(E).svg')
 
+plt.rc('font', **{'size': 18})
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -279,14 +281,14 @@ for boolean, E_D_List in E_D_Lists.items():
 
 ax.set_xlabel('Kondensatordruck in bar')
 ax.set_ylabel('Exergievernichtung in MW')
-ax.legend(loc='lower right')
+ax.legend(fontsize="17", loc='lower right')
 
 plt.show()
-fig.savefig('Optimierung Parallel Exergievernichtung R1233ZD(E).svg')
+fig.savefig('Optimierung Parallel Exergievernichtung R1233ZD(E).png')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(39, 50, iterations))
 }
 
@@ -300,6 +302,6 @@ with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Parallelkompression.txt", "r")
-print(f.read())
+print(f.read())"""
 
 

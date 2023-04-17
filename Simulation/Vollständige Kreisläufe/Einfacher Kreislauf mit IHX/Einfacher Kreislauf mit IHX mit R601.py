@@ -71,7 +71,7 @@ c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
 c7.set_attr(T=175, p=25, fluid={'Pentane': 0, 'H2O': 1})
-c8.set_attr(T=210)
+c8.set_attr(T=205)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -166,7 +166,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {

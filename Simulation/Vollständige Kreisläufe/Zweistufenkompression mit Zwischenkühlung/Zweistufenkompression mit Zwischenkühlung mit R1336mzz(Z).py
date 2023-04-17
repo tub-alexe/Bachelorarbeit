@@ -204,8 +204,6 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R1336mzz(Z).svg')
 
-c6.set_attr(p=26)
-
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -238,7 +236,7 @@ fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R1336mzz(Z).svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(29, 38, iterations))
 }
 
@@ -252,4 +250,4 @@ with open('Zweistufenkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Zweistufenkompression.txt", "r")
-print(f.read())
+print(f.read())"""
