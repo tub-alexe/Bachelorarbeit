@@ -106,7 +106,7 @@ nw.print_results()
 #Final Parameters
 c1.set_attr(h=None, p=39)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=24)
+c3.set_attr(p=24.47)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -235,6 +235,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -288,20 +290,20 @@ fig.savefig('Optimierung Parallel Exergievernichtung R1233ZD(E).png')
 
 import json
 
-"""data = {
+data = {
     'p_kond': list(np.linspace(39, 50, iterations))
 }
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("Parallelkompression.txt", "r")
-print(f.read())"""
+f = open("Zwischendruck.txt", "r")
+print(f.read())
 
 

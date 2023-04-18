@@ -29,6 +29,22 @@ data_IHX_T140 = json.loads(read[9])
 COP_IHX_T140 = json.loads(read[10])
 eta_IHX_T140 = json.loads(read[11])
 
+data_IHX_T160_R1233ZDE = json.loads(read[13])
+COP_IHX_T160_R1233ZDE = json.loads(read[14])
+eta_IHX_T160_R1233ZDE = json.loads(read[15])
+
+data_IHX_T150_R1233ZDE = json.loads(read[17])
+COP_IHX_T150_R1233ZDE = json.loads(read[18])
+eta_IHX_T150_R1233ZDE = json.loads(read[19])
+
+data_IHX_T140_R1233ZDE = json.loads(read[21])
+COP_IHX_T140_R1233ZDE = json.loads(read[22])
+eta_IHX_T140_R1233ZDE = json.loads(read[23])
+
+data_IHX_T130_R1233ZDE = json.loads(read[25])
+COP_IHX_T130_R1233ZDE = json.loads(read[26])
+eta_IHX_T130_R1233ZDE = json.loads(read[27])
+
 with open('Parallelkompression\Senkentemperatur.txt') as f:
     read = f.readlines()
 
@@ -43,6 +59,22 @@ eta_Parallel_T150 = json.loads(read[7])
 data_Parallel_T140 = json.loads(read[9])
 COP_Parallel_T140 = json.loads(read[10])
 eta_Parallel_T140 = json.loads(read[11])
+
+data_Parallel_T160_R1233ZDE = json.loads(read[13])
+COP_Parallel_T160_R1233ZDE = json.loads(read[14])
+eta_Parallel_T160_R1233ZDE = json.loads(read[15])
+
+data_Parallel_T150_R1233ZDE = json.loads(read[17])
+COP_Parallel_T150_R1233ZDE = json.loads(read[18])
+eta_Parallel_T150_R1233ZDE = json.loads(read[19])
+
+data_Parallel_T140_R1233ZDE = json.loads(read[21])
+COP_Parallel_T140_R1233ZDE = json.loads(read[22])
+eta_Parallel_T140_R1233ZDE = json.loads(read[23])
+
+data_Parallel_T130_R1233ZDE = json.loads(read[25])
+COP_Parallel_T130_R1233ZDE = json.loads(read[26])
+eta_Parallel_T130_R1233ZDE = json.loads(read[27])
 
 plt.rc('font', **{'size': 18})
 
@@ -66,5 +98,27 @@ plt.legend(handles=[o_line, s_line, red_line, blue_line, yellow_line])
 plt.grid()
 plt.show()
 plt.savefig('Senkentemperatur.svg')
+
+plt.plot(data_IHX_T160_R1233ZDE, eta_IHX_T160_R1233ZDE, marker='o', color='red')
+plt.plot(data_IHX_T150_R1233ZDE, eta_IHX_T150_R1233ZDE, marker='o', color='darkcyan', label='150°C IHX')
+plt.plot(data_IHX_T140_R1233ZDE, eta_IHX_T140_R1233ZDE, marker='o',  color='gold', label='140°C IHX')
+plt.plot(data_IHX_T130_R1233ZDE, eta_IHX_T130_R1233ZDE, marker='o',  color='green', label='130°C IHX')
+plt.plot(data_Parallel_T160_R1233ZDE, eta_Parallel_T160_R1233ZDE, marker='s', color='red', label='160°C Parallel')
+plt.plot(data_Parallel_T150_R1233ZDE, eta_Parallel_T150_R1233ZDE, marker='s', color='darkcyan', label='150°C Parallel')
+plt.plot(data_Parallel_T140_R1233ZDE, eta_Parallel_T140_R1233ZDE, marker='s', color='gold', label='140°C Parallel')
+plt.plot(data_Parallel_T130_R1233ZDE, eta_Parallel_T130_R1233ZDE, marker='s', color='green', label='130°C Parallel')
+plt.xlabel('Gaskühlerdruck in bar')
+plt.ylabel('exergetischer Wirkungsgrad')
+#plt.legend(loc='upper right', fontsize='13')
+o_line = mlines.Line2D([], [], color='red', marker='o',
+                          markersize=5, label='IHX')
+s_line = mlines.Line2D([], [], color='red', marker='s',
+                          markersize=5, label='Parallel')
+red_line = mlines.Line2D([], [], color='red', label='160°C')
+blue_line = mlines.Line2D([], [], color='darkcyan', label='150°C')
+yellow_line = mlines.Line2D([], [], color='gold', label='140°C')
+plt.legend(handles=[o_line, s_line, red_line, blue_line, yellow_line])
+plt.grid()
+plt.show()
 
 
