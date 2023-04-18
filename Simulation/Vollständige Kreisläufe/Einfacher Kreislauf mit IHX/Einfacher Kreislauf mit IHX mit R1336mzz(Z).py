@@ -224,7 +224,7 @@ fig.savefig('Optimierung IHX Exergievernichtung R1336mzz(Z).svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(28.5, 35, iterations))
 }
 
@@ -238,7 +238,7 @@ with open('IHX.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("IHX.txt", "r")
-print(f.read())
+print(f.read())"""
 
 
 

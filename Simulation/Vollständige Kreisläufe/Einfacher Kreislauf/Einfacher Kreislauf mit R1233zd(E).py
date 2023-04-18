@@ -16,7 +16,6 @@ nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit
 # Components
 gc = HeatExchanger('Gas cooler')
 ev = HeatExchanger('Evaporator')
-sup = HeatExchanger('Superheater')
 va = Valve('Valve')
 cp = Compressor('Compressor')
 
@@ -49,7 +48,6 @@ nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 # Starting Parameters Components
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
-sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
@@ -62,7 +60,7 @@ h_c4 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c6.set_attr(T=150, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c7.set_attr(T=190)
 
 # Starting Parameters Connection Source
@@ -187,6 +185,13 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print('Kompressorleistung=', nw.get_comp('Compressor').get_attr('P').val)
+    print('Drossel =', ean.component_data['E_D']['Valve'] * 1e-6)
+    print('Gaskühler =', ean.component_data['E_D']['Gas cooler'] * 1e-6)
+    print('Kompressor =', ean.component_data['E_D']['Compressor'] * 1e-6)
+    print('Verdampfer =', ean.component_data['E_D']['Evaporator'] * 1e-6)
+    print(ean.network_data.loc['epsilon'])
+    print(ean.network_data.loc['E_D'] * 1e-6)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -237,11 +242,11 @@ fig.savefig('Optimierung Exergievernichtung R1233ZD(E).svg')
 
 import json
 
-data = {
+"""data = {
     'p_kond': list(np.linspace(48, 91, iterations))
 }
 
-with open('Einfacher Kreislauf.txt', 'w') as convert_file:
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
 with open('Einfacher Kreislauf.txt', 'a') as convert_file:
@@ -251,5 +256,5 @@ with open('Einfacher Kreislauf.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Einfacher Kreislauf.txt", "r")
-print(f.read())
+print(f.read())"""
 

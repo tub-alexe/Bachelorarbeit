@@ -45,6 +45,11 @@ data_IHX_T130_R1233ZDE = json.loads(read[25])
 COP_IHX_T130_R1233ZDE = json.loads(read[26])
 eta_IHX_T130_R1233ZDE = json.loads(read[27])
 
+data_IHX_T120_R1233ZDE = json.loads(read[29])
+COP_IHX_T120_R1233ZDE = json.loads(read[30])
+eta_IHX_T120_R1233ZDE = json.loads(read[31])
+
+
 with open('Parallelkompression\Senkentemperatur.txt') as f:
     read = f.readlines()
 
@@ -99,10 +104,11 @@ plt.grid()
 plt.show()
 plt.savefig('Senkentemperatur.svg')
 
-plt.plot(data_IHX_T160_R1233ZDE, eta_IHX_T160_R1233ZDE, marker='o', color='red')
+plt.plot(data_IHX_T160_R1233ZDE, eta_IHX_T160_R1233ZDE, marker='o', color='red', label='160°C IHX')
 plt.plot(data_IHX_T150_R1233ZDE, eta_IHX_T150_R1233ZDE, marker='o', color='darkcyan', label='150°C IHX')
 plt.plot(data_IHX_T140_R1233ZDE, eta_IHX_T140_R1233ZDE, marker='o',  color='gold', label='140°C IHX')
 plt.plot(data_IHX_T130_R1233ZDE, eta_IHX_T130_R1233ZDE, marker='o',  color='green', label='130°C IHX')
+plt.plot(data_IHX_T120_R1233ZDE, eta_IHX_T120_R1233ZDE, marker='o',  color='black', label='120°C IHX')
 plt.plot(data_Parallel_T160_R1233ZDE, eta_Parallel_T160_R1233ZDE, marker='s', color='red', label='160°C Parallel')
 plt.plot(data_Parallel_T150_R1233ZDE, eta_Parallel_T150_R1233ZDE, marker='s', color='darkcyan', label='150°C Parallel')
 plt.plot(data_Parallel_T140_R1233ZDE, eta_Parallel_T140_R1233ZDE, marker='s', color='gold', label='140°C Parallel')
@@ -117,7 +123,9 @@ s_line = mlines.Line2D([], [], color='red', marker='s',
 red_line = mlines.Line2D([], [], color='red', label='160°C')
 blue_line = mlines.Line2D([], [], color='darkcyan', label='150°C')
 yellow_line = mlines.Line2D([], [], color='gold', label='140°C')
-plt.legend(handles=[o_line, s_line, red_line, blue_line, yellow_line])
+green_line = mlines.Line2D([], [], color='green', label='130°C')
+black_line = mlines.Line2D([], [], color='black', label='120°C')
+plt.legend(handles=[o_line, s_line, red_line, blue_line, yellow_line, green_line, black_line])
 plt.grid()
 plt.show()
 
