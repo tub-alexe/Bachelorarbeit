@@ -8,6 +8,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import *
+import matplotlib.lines as mlines
 
 
 # importing the module
@@ -31,6 +32,10 @@ data_R1336MZZZ = json.loads(read[9])
 COP_R1336MZZZ = json.loads(read[10])
 eta_R1336MZZZ = json.loads(read[11])
 
+data_R601 = json.loads(read[13])
+COP_R601 = json.loads(read[14])
+eta_R601 = json.loads(read[15])
+
 with open('Einfacher Kreislauf mit IHX\IHX.txt') as f:
     read = f.readlines()
 
@@ -48,6 +53,10 @@ data_R1336MZZZ_IHX = json.loads(read[9])
 #data_R1336MZZZ_IHX['p_kond'] = np.array(data_R1336MZZZ_IHX['p_kond'])
 COP_R1336MZZZ_IHX = json.loads(read[10])
 eta_R1336MZZZ_IHX = json.loads(read[11])
+
+data_R601_IHX = json.loads(read[13])
+COP_R601_IHX = json.loads(read[14])
+eta_R601_IHX = json.loads(read[15])
 
 with open('Parallelkompression\Parallelkompression.txt') as f:
     read = f.readlines()
@@ -67,6 +76,10 @@ data_R1336MZZZ_Parallel = json.loads(read[9])
 COP_R1336MZZZ_Parallel = json.loads(read[10])
 eta_R1336MZZZ_Parallel = json.loads(read[11])
 
+data_R601_Parallel = json.loads(read[13])
+COP_R601_Parallel = json.loads(read[14])
+eta_R601_Parallel = json.loads(read[15])
+
 with open('Zweistufenkompression mit Zwischenkühlung\Zweistufenkompression.txt') as f:
     read = f.readlines()
 
@@ -81,14 +94,17 @@ COP_R600_Zweistufen = json.loads(read[6])
 eta_R600_Zweistufen = json.loads(read[7])
 
 data_R1336MZZZ_Zweistufen = json.loads(read[9])
-#data_R1336MZZZ_Zweistufen['p_kond'] = np.array(data_R1336MZZZ_Zweistufen['p_kond'])
 COP_R1336MZZZ_Zweistufen= json.loads(read[10])
 eta_R1336MZZZ_Zweistufen = json.loads(read[11])
+
+data_R601_Zweistufen = json.loads(read[13])
+COP_R601_Zweistufen= json.loads(read[14])
+eta_R601_Zweistufen = json.loads(read[15])
 
 print(data_R600)
 print(COP_R600)
 
-plt.rc('font', **{'size': 18})
+plt.rc('font', **{'size': 17})
 
 plt.plot(data_R1233ZDE, eta_R1233ZDE, color='r', label='einfacher Kreislauf')
 plt.plot(data_R1233ZDE_IHX, eta_R1233ZDE_IHX, color='darkolivegreen', label='Interne Wärmerückgewinnung')
@@ -122,6 +138,90 @@ plt.legend(loc='upper right')
 plt.grid()
 plt.show()
 plt.savefig('Zusammenführung_eta_R1336mzz(Z).svg')
+
+
+fig, ax = plt.subplots(1, 2)
+ax[1].plot(data_R1233ZDE, eta_R1233ZDE, color='red', label='einfacher Kreislauf')
+ax[0].plot(data_R1233ZDE_IHX, eta_R1233ZDE_IHX, color='steelblue', label='mit IWÜ')
+ax[0].plot(data_R1233ZDE_Parallel, eta_R1233ZDE_Parallel, color='green', label='mit IWÜ und PK')
+ax[0].plot(data_R1233ZDE_Zweistufen, eta_R1233ZDE_Zweistufen, color='orange', label='mit IWÜ und ZK')
+ax[0].set_xlabel('Gaskühlerdruck in bar')
+ax[0].set_ylabel('exergetischer Wirkungsgrad')
+red_line = mlines.Line2D([], [], color='red', label='einfacher Kreislauf')
+green_line = mlines.Line2D([], [], color='green', label='Zweistufenkompression')
+orange_line = mlines.Line2D([], [], color='orange', label='Parallelkompression')
+blue_line = mlines.Line2D([], [], color='steelblue', label='Interne Wärmerückgewinnung')
+#ax[0].legend(handles=[ red_line, green_line, black_line, blue_line], fontsize=14)
+ax[0].legend(loc='upper right', fontsize=16)
+ax[1].legend(loc='upper left', fontsize=16)
+ax[1].set_xlabel('Gaskühlerdruck in bar')
+ax[1].set_ylabel('exergetischer Wirkungsgrad')
+ax[0].grid()
+ax[1].grid()
+plt.show()
+
+fig, ax = plt.subplots(1, 2)
+ax[1].plot(data_R600, eta_R600, color='r', label='einfacher Kreislauf')
+ax[0].plot(data_R600_IHX, eta_R600_IHX, color='steelblue', label='mit IWÜ')
+ax[0].plot(data_R600_Parallel, eta_R600_Parallel, color='green', label='mit IWÜ und PK')
+ax[0].plot(data_R600_Zweistufen, eta_R600_Zweistufen, color='orange', label='mit IWÜ und ZK')
+ax[0].set_xlabel('Gaskühlerdruck in bar')
+ax[0].set_ylabel('exergetischer Wirkungsgrad')
+red_line = mlines.Line2D([], [], color='red', label='einfacher Kreislauf')
+green_line = mlines.Line2D([], [], color='steelblue', label='Interne Wärmerückgewinnung')
+black_line = mlines.Line2D([], [], color='green', label='Parallelkompression')
+blue_line = mlines.Line2D([], [], color='orange', label='Zweistufenkompression')
+#ax[0].legend(handles=[ red_line, green_line, black_line, blue_line], fontsize=14)
+ax[0].legend(loc='upper right', fontsize=16)
+ax[1].legend(loc='upper left', fontsize=16)
+ax[1].set_xlabel('Gaskühlerdruck in bar')
+ax[1].set_ylabel('exergetischer Wirkungsgrad')
+#ax[0].set_xlim([50, 77])
+#ax[0].set_ylim([62, 68])
+ax[0].grid()
+ax[1].grid()
+plt.show()
+
+fig, ax = plt.subplots(1, 2)
+ax[1].plot(data_R1336MZZZ, eta_R1336MZZZ, color='r', label='einfacher Kreislauf')
+ax[0].plot(data_R1336MZZZ_IHX, eta_R1336MZZZ_IHX, color='steelblue', label='mit IWÜ')
+ax[0].plot(data_R1336MZZZ_Parallel, eta_R1336MZZZ_Parallel, color='green', label='mit IWÜ und PK')
+ax[0].plot(data_R1336MZZZ_Zweistufen, eta_R1336MZZZ_Zweistufen, color='orange', label='mit IWÜ und ZK')
+ax[0].set_xlabel('Gaskühlerdruck in bar')
+ax[0].set_ylabel('exergetischer Wirkungsgrad')
+red_line = mlines.Line2D([], [], color='red', label='einfacher Kreislauf')
+green_line = mlines.Line2D([], [], color='darkolivegreen', label='Interne Wärmerückgewinnung')
+black_line = mlines.Line2D([], [], color='black', label='Parallelkompression')
+blue_line = mlines.Line2D([], [], color='royalblue', label='Zweistufenkompression')
+#ax[0].legend(handles=[ red_line, green_line, black_line, blue_line], fontsize=14)
+ax[0].legend(loc='upper right', fontsize=16)
+ax[1].legend(loc='upper left', fontsize=16)
+ax[1].set_xlabel('Gaskühlerdruck in bar')
+ax[1].set_ylabel('exergetischer Wirkungsgrad')
+ax[0].grid()
+ax[1].grid()
+plt.show()
+
+fig, ax = plt.subplots(1, 2)
+ax[1].plot(data_R601, eta_R601, color='r', label='einfacher Kreislauf')
+ax[0].plot(data_R601_IHX, eta_R601_IHX, color='steelblue', label='mit IWÜ')
+ax[0].plot(data_R601_Parallel, eta_R601_Parallel, color='green', label='mit IWÜ und PK')
+ax[0].plot(data_R601_Zweistufen, eta_R601_Zweistufen, color='orange', label='mit IWÜ und ZK')
+ax[0].set_xlabel('Gaskühlerdruck in bar')
+ax[0].set_ylabel('exergetischer Wirkungsgrad')
+red_line = mlines.Line2D([], [], color='red', label='einfacher Kreislauf')
+green_line = mlines.Line2D([], [], color='steelblue', label='Interne Wärmerückgewinnung')
+black_line = mlines.Line2D([], [], color='orange', label='Parallelkompression')
+blue_line = mlines.Line2D([], [], color='green', label='Zweistufenkompression')
+#ax[0].legend(handles=[ red_line, green_line, black_line, blue_line], fontsize=14)
+ax[0].legend(loc='upper right', fontsize=16)
+ax[1].legend(loc='upper left', fontsize=16)
+ax[1].set_xlabel('Gaskühlerdruck in bar')
+ax[1].set_ylabel('exergetischer Wirkungsgrad')
+ax[0].grid()
+ax[0].set_ylim([63, 69.2])
+ax[1].grid()
+plt.show()
 
 """plt.rc('font', **{'size': 18})
 

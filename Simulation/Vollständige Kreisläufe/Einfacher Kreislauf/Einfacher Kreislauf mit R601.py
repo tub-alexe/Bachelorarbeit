@@ -159,11 +159,11 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(100, 150, iterations)
+    'p_kond': np.linspace(120, 140, iterations)
 }
 
 COP = {
@@ -215,6 +215,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung eta, COP, Lorenz-COP R601.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(120, 140, iterations))
+}
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Einfacher Kreislauf.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Einfacher Kreislauf.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor']:
@@ -244,20 +262,3 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Exergievernichtung R601.svg')
 
-import json
-
-"""data = {
-    'p_kond': list(np.linspace(36, 50, iterations))
-}
-
-with open('Einfacher Kreislauf.txt', 'w') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Einfacher Kreislauf.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Einfacher Kreislauf.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Einfacher Kreislauf.txt", "r")
-print(f.read())"""

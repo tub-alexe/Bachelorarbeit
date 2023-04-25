@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::R1336mzz(Z)'
 si = 'H2O'
@@ -102,9 +103,9 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, p=31)
+c1.set_attr(h=None, p=34.3)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=8)
+c3.set_attr(p=12.88)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -156,6 +157,21 @@ ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
+
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
@@ -166,7 +182,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(30.9, 45, iterations)
+    'p_kond': np.linspace(34.3, 48.3, iterations)
 }
 
 COP = {
@@ -197,6 +213,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("3").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -215,6 +233,24 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1336mzz(Z).svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(34.3, 48.3, iterations))
+}
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Senkentemperatur.txt", "r")
+print(f.read())
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -246,20 +282,3 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R1336mzz(Z).svg')
 
-import json
-
-data = {
-    'p_kond': list(np.linspace(30.9, 45, iterations))
-}
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Parallelkompression.txt", "r")
-print(f.read())

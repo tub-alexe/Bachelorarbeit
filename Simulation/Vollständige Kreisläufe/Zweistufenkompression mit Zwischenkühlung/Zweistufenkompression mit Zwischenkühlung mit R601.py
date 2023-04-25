@@ -96,8 +96,8 @@ nw.print_results()
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c2.set_attr(p=9.5)
-c6.set_attr(h=None, p=31)
+c2.set_attr(p=11)
+c6.set_attr(h=None, p=34)
 gc.set_attr(ttd_l=15)
 c11.set_attr(h=None, Td_bp=0.1)
 
@@ -187,7 +187,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(31, 42, iterations)
+    'p_kond': np.linspace(31, 35.8, iterations)
 }
 
 COP = {
@@ -218,6 +218,9 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("6").get_attr("T").val + 273.15)
+    print(nw.get_conn("6").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -269,11 +272,11 @@ fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R601.svg')
 
 import json
 
-"""data = {
-    'p_kond': list(np.linspace(25, 35, iterations))
+data = {
+    'p_kond': list(np.linspace(31, 35.8, iterations))
 }
 
-with open('Zweistufenkompression.txt', 'w') as convert_file:
+with open('Zweistufenkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
 with open('Zweistufenkompression.txt', 'a') as convert_file:
@@ -283,4 +286,4 @@ with open('Zweistufenkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
 f = open("Zweistufenkompression.txt", "r")
-print(f.read())"""
+print(f.read())

@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::R1233ZD(E)'
 si = 'H2O'
@@ -60,7 +61,7 @@ h_c4 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=150, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c6.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c7.set_attr(T=190)
 
 # Starting Parameters Connection Source
@@ -72,7 +73,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c2.set_attr(h=None, p=48)
+c2.set_attr(h=None, p=80.18)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
@@ -143,6 +144,19 @@ for key in result_dict.keys():
 
 diagram.save('logph_R1233zd(E).png', dpi=300)
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
 
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt

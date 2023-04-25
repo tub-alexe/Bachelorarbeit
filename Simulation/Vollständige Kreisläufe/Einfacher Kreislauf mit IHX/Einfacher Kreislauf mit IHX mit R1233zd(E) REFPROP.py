@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 #Fluids
 wf = 'REFPROP::R1233ZD(E)'
@@ -87,7 +88,7 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c3.set_attr(h=None, p=40)
+c3.set_attr(h=None, p=44.43)
 gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 
@@ -158,13 +159,27 @@ for key in result_dict.keys():
 
 diagram.save('logph_IHX_R1233ZD(E) REFPROP.png', dpi=300)
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
@@ -219,6 +234,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX COP, eta, Lorenz-COP R1233ZD(E) REFPROP.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(40, 54, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
@@ -248,20 +281,3 @@ ax.legend(loc="lower right")
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R1233ZD(E) REFPROP.svg')
 
-import json
-
-"""data = {
-    'p_kond': list(np.linspace(40, 54, iterations))
-}
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("IHX.txt", "r")
-print(f.read())"""

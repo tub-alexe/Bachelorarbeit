@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::R1233ZD(E)'
 si = 'H2O'
@@ -104,7 +105,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c1.set_attr(h=None, p=39)
+c1.set_attr(h=None, p=40.49)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=24.47)
 c6.set_attr(p=None)
@@ -194,6 +195,20 @@ for key in result_dict.keys():
 
 diagram.save('logph_Parallel_R1233ZD(E).png', dpi=300)
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
@@ -204,7 +219,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(39, 50, iterations)
+    'p_kond': np.linspace(39, 54, iterations)
 }
 
 COP = {
@@ -236,6 +251,7 @@ for p in data['p_kond']:
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
     print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("3").get_attr("p").val)
 
 
 
@@ -255,6 +271,26 @@ ax[2].set_ylabel('Lorenz-COP of the Heat Pump')
 plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1233ZD(E).svg')
+
+import json
+
+data = {
+    'p_kond': list(np.linspace(39, 54, iterations))
+}
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Senkentemperatur.txt", "r")
+print(f.read())
+
+
 
 plt.rc('font', **{'size': 18})
 
@@ -288,22 +324,6 @@ ax.legend(fontsize="17", loc='lower right')
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R1233ZD(E).png')
 
-import json
 
-data = {
-    'p_kond': list(np.linspace(39, 50, iterations))
-}
-
-with open('Zwischendruck.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Zwischendruck.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Zwischendruck.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Zwischendruck.txt", "r")
-print(f.read())
 
 

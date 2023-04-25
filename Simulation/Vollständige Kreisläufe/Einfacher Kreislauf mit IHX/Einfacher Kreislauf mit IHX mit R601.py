@@ -166,7 +166,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
@@ -222,6 +222,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R601.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(31, 40, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
@@ -251,20 +269,3 @@ ax.legend(loc="lower right")
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R601.svg')
 
-import json
-
-"""data = {
-    'p_kond': list(np.linspace(24, 34, iterations))
-}
-
-with open('IHX.txt', 'w') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("IHX.txt", "r")
-print(f.read())"""

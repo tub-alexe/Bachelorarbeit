@@ -101,9 +101,9 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 #Final Parameters
-c1.set_attr(h=None, p=51)
+c1.set_attr(h=None, p=56.29)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=30)
+c3.set_attr(p=30.63)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -195,11 +195,11 @@ import numpy as np
 
 # make text reasonably sized
 #plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(53, 65, iterations)
+    'p_kond': np.linspace(56.2, 56.3, iterations)
 }
 
 COP = {
@@ -230,6 +230,9 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("14").get_attr("T").val)
+    print(nw.get_conn("14").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -249,7 +252,23 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R600.svg')
 
-c1.set_attr(p=62)
+import json
+
+data = {
+    'p_kond': list(np.linspace(53, 65, iterations))
+}
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Parallelkompression.txt", "r")
+print(f.read())
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -281,20 +300,3 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R600.png')
 
-import json
-
-"""data = {
-    'p_kond': list(np.linspace(53, 65, iterations))
-}
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Parallelkompression.txt", "r")
-print(f.read())"""

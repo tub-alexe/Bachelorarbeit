@@ -102,7 +102,7 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # Final Parameters
-c1.set_attr(h=None, p=32)
+c1.set_attr(h=None, p=32.49)
 gc.set_attr(ttd_l=15)
 c3.set_attr(p=6.5)
 c6.set_attr(p=None)
@@ -203,7 +203,7 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
     'p_kond': np.linspace(32, 38, iterations)
@@ -256,7 +256,23 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 
-c1.set_attr(p=30)
+import json
+
+data = {
+    'p_kond': list(np.linspace(32, 38, iterations))
+}
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Parallelkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Parallelkompression.txt", "r")
+print(f.read())
 
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
@@ -288,20 +304,3 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Parallel Exergievernichtung R601.svg')
 
-import json
-
-"""data = {
-    'p_kond': list(np.linspace(26, 34, iterations))
-}
-
-with open('Parallelkompression.txt', 'w') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Parallelkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Parallelkompression.txt", "r")
-print(f.read())"""

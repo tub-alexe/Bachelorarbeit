@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::R1336mzz(Z)'
 si = 'H2O'
@@ -133,6 +134,20 @@ ean.analyse(pamb=pamb, Tamb=Tamb)
 ean.print_results()
 print(ean.network_data.loc['epsilon'])
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
@@ -143,7 +158,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(28.5, 35, iterations)
+    'p_kond': np.linspace(28.2, 41, iterations)
 }
 
 COP = {
@@ -193,6 +208,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R1336mzz(Z).svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(28.2, 41, iterations))
+}
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Senkentemperatur.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
@@ -222,23 +255,7 @@ ax.legend(loc="lower right")
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R1336mzz(Z).svg')
 
-import json
 
-"""data = {
-    'p_kond': list(np.linspace(28.5, 35, iterations))
-}
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("IHX.txt", "r")
-print(f.read())"""
 
 
 

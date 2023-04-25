@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::R1233ZD(E)'
 si = 'H2O'
@@ -95,8 +96,8 @@ nw.print_results()
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c2.set_attr(p=17)
-c6.set_attr(h=None, p=40)
+c2.set_attr(p=16.63)
+c6.set_attr(h=None, p=43.44)
 gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 
@@ -175,13 +176,27 @@ for key in result_dict.keys():
 
 diagram.save('Test.png', dpi=300)
 
+# grassmann diagram
+
+links, nodes = ean.generate_plotly_sankey_input()
+fig = go.Figure(go.Sankey(
+    arrangement="snap",
+    node={
+        "label": nodes,
+        'pad': 11,
+        'color': 'orange'},
+    link=links),
+    layout=go.Layout({'width': 1100})
+    )
+fig.show()
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
@@ -216,6 +231,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("6").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))

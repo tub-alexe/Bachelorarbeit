@@ -5,6 +5,7 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 from fluprodia import FluidPropertyDiagram
 import math
+import plotly.graph_objects as go
 
 wf = 'REFPROP::Butane'
 si = 'H2O'
@@ -163,13 +164,27 @@ for key in result_dict.keys():
 
 diagram.save('logph_IHX_R600.png', dpi=300)
 
+
+links, nodes = ean.generate_plotly_sankey_input()
+
+fig = go.Figure(go.Sankey(
+    arrangement='snap',
+    node={
+        'label': nodes,
+        'pad':11,
+        'color': 'orange'
+    },
+    link=links
+))
+fig.show()
+
 #COP, eta, Lorenz-COP and E_D - high pressure diagrams
 import matplotlib.pyplot as plt
 import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
@@ -223,6 +238,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R600.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(51, 74, iterations))
+}
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('IHX.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("IHX.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor', 'Internal Heat Exchanger']:
@@ -252,20 +285,3 @@ ax.legend(loc="lower right")
 plt.show()
 fig.savefig('Optimierung IHX Exergievernichtung R600.svg')
 
-import json
-
-data = {
-    'p_kond': list(np.linspace(51, 74, iterations))
-}
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('IHX.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("IHX.txt", "r")
-print(f.read())
