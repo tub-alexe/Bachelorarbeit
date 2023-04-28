@@ -188,7 +188,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(60, 71.3, iterations)
+    'p_kond': np.linspace(53.4, 71.3, iterations)
 }
 
 COP = {
@@ -240,6 +240,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R600.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(53.4, 71.3, iterations))
+}
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Zweistufenkompression.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -270,20 +288,4 @@ ax.legend(loc='lower right')
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R600.svg')
 
-import json
 
-data = {
-    'p_kond': list(np.linspace(60, 71.3, iterations))
-}
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Zweistufenkompression.txt", "r")
-print(f.read())

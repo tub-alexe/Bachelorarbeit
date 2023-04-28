@@ -103,9 +103,9 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # New Parameters
-c1.set_attr(h=None, p=34.3)
+c1.set_attr(h=None, p=31.11)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=12.88)
+c3.set_attr(p=8)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -182,7 +182,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(34.3, 48.3, iterations)
+    'p_kond': np.linspace(30.9, 45, iterations)
 }
 
 COP = {
@@ -214,7 +214,7 @@ for p in data['p_kond']:
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
     print(ean.network_data.loc['epsilon'])
-    print(nw.get_conn("3").get_attr("p").val)
+    print(nw.get_conn("1").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -237,19 +237,19 @@ fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1336mzz(Z).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(34.3, 48.3, iterations))
+    'p_kond': list(np.linspace(30.9, 45, iterations))
 }
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Parallelkompression.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("Senkentemperatur.txt", "r")
+f = open("Parallelkompression.txt", "r")
 print(f.read())
 
 dat = tuple(data['p_kond'])

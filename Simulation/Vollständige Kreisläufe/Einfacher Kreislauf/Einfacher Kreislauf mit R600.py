@@ -78,7 +78,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c2.set_attr(h=None, p=133.2)
+c2.set_attr(h=None, p=79.82)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)

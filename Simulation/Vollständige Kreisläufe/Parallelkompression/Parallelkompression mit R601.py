@@ -206,7 +206,7 @@ plt.rc('font', **{'size': 18})
 iterations = 40
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(32, 38, iterations)
+    'p_kond': np.linspace(30.8, 38, iterations)
 }
 
 COP = {
@@ -259,7 +259,7 @@ fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(32, 38, iterations))
+    'p_kond': list(np.linspace(30.8, 38, iterations))
 }
 
 with open('Parallelkompression.txt', 'a') as convert_file:
