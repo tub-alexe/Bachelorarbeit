@@ -214,7 +214,7 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
-    print(nw.get_conn("1").get_attr("m").val)
+    print(nw.get_conn("3").get_attr("p").val)
     print(nw.get_comp('Compressor').get_attr("P").val)
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))

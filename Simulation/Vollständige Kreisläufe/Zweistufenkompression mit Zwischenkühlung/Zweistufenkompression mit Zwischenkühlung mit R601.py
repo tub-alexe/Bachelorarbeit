@@ -81,8 +81,8 @@ c6.set_attr(h=h_c6, p=26)
 h_c11 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c11.set_attr(h=h_c11)
 
-c12.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
-c13.set_attr(T=205)
+c12.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c13.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c14.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -96,9 +96,9 @@ nw.print_results()
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c2.set_attr(p=11)
-c6.set_attr(h=None, p=33.26)
-gc.set_attr(ttd_l=15)
+c2.set_attr(p=8.51)
+c6.set_attr(h=None, p=24.4)
+gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -187,7 +187,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(31, 35.8, iterations)
+    'p_kond': np.linspace(24.4, 44, iterations)
 }
 
 COP = {
@@ -240,6 +240,24 @@ plt.tight_layout()
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R601.svg')
 
+import json
+
+data = {
+    'p_kond': list(np.linspace(24.4, 44, iterations))
+}
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(data)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(COP)+"\n")
+
+with open('Zweistufenkompression.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(eta)+"\n")
+
+f = open("Zweistufenkompression.txt", "r")
+print(f.read())
+
 dat = tuple(data['p_kond'])
 E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve 1', 'Valve 2', 'Compressor 1', 'Compressor 2',
@@ -269,21 +287,3 @@ ax.legend(loc='lower right')
 
 plt.show()
 fig.savefig('Optimierung Zwischenkühlung Exergievernichtung R601.svg')
-
-import json
-
-data = {
-    'p_kond': list(np.linspace(31, 35.8, iterations))
-}
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(data)+"\n")
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(COP)+"\n")
-
-with open('Zweistufenkompression.txt', 'a') as convert_file:
-    convert_file.write(json.dumps(eta)+"\n")
-
-f = open("Zweistufenkompression.txt", "r")
-print(f.read())

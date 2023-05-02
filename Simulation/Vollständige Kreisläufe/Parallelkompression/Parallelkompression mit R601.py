@@ -93,8 +93,8 @@ c15.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
 #Sink
-c17.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
-c18.set_attr(T=205)
+c17.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c18.set_attr(T=190)
 
 #Solve Model
 nw.solve(mode='design')
@@ -102,9 +102,9 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # Final Parameters
-c1.set_attr(h=None, p=32.49)
-gc.set_attr(ttd_l=15)
-c3.set_attr(p=6.5)
+c1.set_attr(h=None, p=27.8)
+gc.set_attr(ttd_l=10)
+c3.set_attr(p=14.35)
 c6.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c7.set_attr(h=None, Td_bp=0.1)
@@ -113,9 +113,6 @@ ihx_1.set_attr(ttd_u=15)
 c11.set_attr(h=None)
 ihx_2.set_attr(ttd_u=15)
 
-#Solve Model
-nw.solve(mode='design')
-nw.print_results()
 
 # busses
 power = Bus('power')
@@ -203,10 +200,10 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 20
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(30.8, 38, iterations)
+    'p_kond': np.linspace(27.8, 40, iterations)
 }
 
 COP = {
@@ -237,6 +234,8 @@ for p in data['p_kond']:
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
+    print(ean.network_data.loc['epsilon'])
+    print(nw.get_conn("1").get_attr("p").val)
 
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
@@ -259,19 +258,19 @@ fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(30.8, 38, iterations))
+    'p_kond': list(np.linspace(27.8, 40, iterations))
 }
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('Parallelkompression.txt', 'a') as convert_file:
+with open('Zwischendruck.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("Parallelkompression.txt", "r")
+f = open("Zwischendruck.txt", "r")
 print(f.read())
 
 dat = tuple(data['p_kond'])

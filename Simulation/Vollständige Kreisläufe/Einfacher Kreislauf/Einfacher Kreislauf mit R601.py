@@ -68,8 +68,8 @@ h_c4 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c4.set_attr(h=h_c4, fluid={'Pentane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Sink
-c6.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
-c7.set_attr(T=205)
+c6.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c7.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c8.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -81,8 +81,8 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # Final Parameters
-c2.set_attr(h=None, p=137.22)
-gc.set_attr(ttd_l=15)
+c2.set_attr(h=None, p=32.88)
+gc.set_attr(ttd_l=10)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)
@@ -159,11 +159,11 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(120, 140, iterations)
+    'p_kond': np.linspace(32, 72, iterations)
 }
 
 COP = {
@@ -218,7 +218,7 @@ fig.savefig('Optimierung eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(120, 140, iterations))
+    'p_kond': list(np.linspace(32, 72, iterations))
 }
 
 with open('Einfacher Kreislauf.txt', 'a') as convert_file:
