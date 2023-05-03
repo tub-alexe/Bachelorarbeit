@@ -81,8 +81,8 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # Final Parameters
-c2.set_attr(h=None, p=32.88)
-gc.set_attr(ttd_l=10)
+c2.set_attr(h=None, p=None)
+gc.set_attr(ttd_l=10, ttd_u=5)
 c3.set_attr(p=None)
 ev.set_attr(ttd_l=5)
 c4.set_attr(h=None, Td_bp=0.1)

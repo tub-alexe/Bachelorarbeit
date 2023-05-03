@@ -102,7 +102,7 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / (cp_1.P.val + cp_2.P.val)}')
 
 # Final Parameters
-c1.set_attr(h=None, p=27.8)
+c1.set_attr(h=None, p=27.74)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=14.35)
 c6.set_attr(p=None)
@@ -203,7 +203,7 @@ plt.rc('font', **{'size': 18})
 iterations = 20
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(27.8, 40, iterations)
+    'p_kond': np.linspace(27.74, 40, iterations)
 }
 
 COP = {
@@ -258,7 +258,7 @@ fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(27.8, 40, iterations))
+    'p_kond': list(np.linspace(27.74, 40, iterations))
 }
 
 with open('Zwischendruck.txt', 'a') as convert_file:

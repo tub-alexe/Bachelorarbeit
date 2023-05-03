@@ -70,8 +70,8 @@ h_c6 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=175, p=25, fluid={'Pentane': 0, 'H2O': 1})
-c8.set_attr(T=205)
+c7.set_attr(T=160, p=25, fluid={'Pentane': 0, 'H2O': 1})
+c8.set_attr(T=190)
 
 # Starting Parameters Connection Source
 c9.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
@@ -86,8 +86,8 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c3.set_attr(h=None, p=32.05)
-gc.set_attr(ttd_l=15)
+c3.set_attr(h=None, p=24.63)
+gc.set_attr(ttd_l=10)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -166,11 +166,11 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 40
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(31, 40, iterations)
+    'p_kond': np.linspace(24.63, 40, iterations)
 }
 
 COP = {
@@ -225,7 +225,7 @@ fig.savefig('Optimierung IHX eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(31, 40, iterations))
+    'p_kond': list(np.linspace(24.63, 40, iterations))
 }
 
 with open('IHX.txt', 'a') as convert_file:

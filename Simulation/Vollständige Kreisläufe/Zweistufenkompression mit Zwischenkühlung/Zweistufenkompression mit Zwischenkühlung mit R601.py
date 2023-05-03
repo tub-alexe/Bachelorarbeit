@@ -97,7 +97,7 @@ c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
 c2.set_attr(p=8.51)
-c6.set_attr(h=None, p=24.4)
+c6.set_attr(h=None, p=24.38)
 gc.set_attr(ttd_l=10)
 c11.set_attr(h=None, Td_bp=0.1)
 
@@ -187,7 +187,7 @@ iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(24.4, 44, iterations)
+    'p_kond': np.linspace(24.38, 44, iterations)
 }
 
 COP = {
@@ -243,7 +243,7 @@ fig.savefig('Optimierung Zwischenkühlung eta, COP, Lorenz-COP R601.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(24.4, 44, iterations))
+    'p_kond': list(np.linspace(24.38, 44, iterations))
 }
 
 with open('Zweistufenkompression.txt', 'a') as convert_file:
