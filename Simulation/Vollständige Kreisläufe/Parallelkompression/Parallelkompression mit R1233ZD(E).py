@@ -97,7 +97,7 @@ c15.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
 # Sink
-c17.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c17.set_attr(T=160, p=21, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c18.set_attr(T=190)
 
 #Solve Model
@@ -105,7 +105,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c1.set_attr(h=None, p=40.49)
+c1.set_attr(h=None, p=41.52)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=24.47)
 c6.set_attr(p=None)
@@ -215,11 +215,11 @@ import numpy as np
 
 # make text reasonably sized
 #plt.rc('font', **{'size': 18})
-iterations = 20
+iterations = 80
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(39, 54, iterations)
+    'p_kond': np.linspace(47.64, 54, iterations)
 }
 
 COP = {
@@ -275,19 +275,19 @@ fig.savefig('Optimierung Parallel eta, COP, Lorenz-COP R1233ZD(E).svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(39, 54, iterations))
+    'p_kond': list(np.linspace(47.64, 54, iterations))
 }
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('Senkentemperatur.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("Senkentemperatur.txt", "r")
+f = open("Senkenaustrittstemperatur.txt", "r")
 print(f.read())
 
 

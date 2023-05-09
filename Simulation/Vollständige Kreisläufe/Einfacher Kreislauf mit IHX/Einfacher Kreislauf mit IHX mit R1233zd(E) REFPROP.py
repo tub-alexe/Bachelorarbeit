@@ -179,11 +179,11 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 80
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(40, 54, iterations)
+    'p_kond': np.linspace(37, 60, iterations)
 }
 
 COP = {
@@ -237,19 +237,19 @@ fig.savefig('Optimierung IHX COP, eta, Lorenz-COP R1233ZD(E) REFPROP.svg')
 import json
 
 data = {
-    'p_kond': list(np.linspace(40, 54, iterations))
+    'p_kond': list(np.linspace(37, 60, iterations))
 }
 
-with open('IHX.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('IHX.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('IHX.txt', 'a') as convert_file:
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("IHX.txt", "r")
+f = open("Senkenaustrittstemperatur.txt", "r")
 print(f.read())
 
 dat = tuple(data['p_kond'])
