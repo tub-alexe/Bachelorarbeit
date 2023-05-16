@@ -97,7 +97,7 @@ c15.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c16.set_attr(T=90)
 
 # Sink
-c17.set_attr(T=160, p=21, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c17.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c18.set_attr(T=190)
 
 #Solve Model
@@ -105,7 +105,7 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Final Parameters
-c1.set_attr(h=None, p=41.52)
+c1.set_attr(h=None, p=39)
 gc.set_attr(ttd_l=10)
 c3.set_attr(p=24.47)
 c6.set_attr(p=None)
@@ -215,11 +215,11 @@ import numpy as np
 
 # make text reasonably sized
 #plt.rc('font', **{'size': 18})
-iterations = 80
+iterations = 20
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(47.64, 54, iterations)
+    'p_kond': np.linspace(39, 50, iterations)
 }
 
 COP = {
@@ -233,6 +233,10 @@ eta = {
 Lorenz_COP = {
     'p_kond': []
 }
+
+p_ttd_u = {
+    'p_kond': []
+}
 description = {
     'p_kond': 'Kondensatordruck in bar',
 }
@@ -243,6 +247,7 @@ for p in data['p_kond']:
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
+    p_ttd_u['p_kond'] += [nw.get_conn("1").get_attr("p").val]
     T_Hi = nw.get_conn("17").get_attr("T").val + 273.15
     T_Ho = nw.get_conn("18").get_attr("T").val + 273.15
     T_Ci = nw.get_conn("15").get_attr("T").val + 273.15
@@ -251,7 +256,7 @@ for p in data['p_kond']:
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
     print(ean.network_data.loc['epsilon'])
-    print(nw.get_conn("3").get_attr("p").val)
+    print(nw.get_conn("1").get_attr("p").val)
 
 
 
@@ -286,6 +291,9 @@ with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
 
 with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
+
+with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(p_ttd_u) + "\n")
 
 f = open("Senkenaustrittstemperatur.txt", "r")
 print(f.read())

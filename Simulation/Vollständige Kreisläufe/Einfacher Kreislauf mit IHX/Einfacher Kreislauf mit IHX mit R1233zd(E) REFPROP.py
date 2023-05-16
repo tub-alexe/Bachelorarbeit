@@ -72,7 +72,7 @@ h_c6 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c6.set_attr(h=h_c6)
 
 # Starting Parameters Connection Sink
-c7.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
+c7.set_attr(T=137, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c8.set_attr(T=190)
 
 # Starting Parameters Connection Source
@@ -88,8 +88,8 @@ print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 c1.set_attr(p=None, h=None)
 ev.set_attr(ttd_l=5)
 ihx.set_attr(ttd_u=15)
-c3.set_attr(h=None, p=44.43)
-gc.set_attr(ttd_l=10)
+c3.set_attr(h=None, p=None)
+gc.set_attr(ttd_l=10, ttd_u=5)
 c6.set_attr(h=None, Td_bp=0.1)
 
 # busses
@@ -183,7 +183,7 @@ iterations = 80
 
 #bei Veränderung der minimalen Temeraturdifferenzen beim Gaskühler muss der Druckbereich gegebenfalls verkleinert werden
 data = {
-    'p_kond': np.linspace(37, 60, iterations)
+    'p_kond': np.linspace(120, 136, iterations)
 }
 
 COP = {
@@ -197,16 +197,21 @@ eta = {
 Lorenz_COP = {
     'p_kond': []
 }
+
+p_ttd_u = {
+    'p_kond': []
+}
 description = {
     'p_kond': 'Kondensatordruck in bar',
 }
 
 for p in data['p_kond']:
-    c3.set_attr(p=p)
+    c7.set_attr(T=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
+    p_ttd_u['p_kond'] += [nw.get_conn("3").get_attr("p").val]
     T_Hi = nw.get_conn("7").get_attr("T").val + 273.15
     T_Ho = nw.get_conn("8").get_attr("T").val + 273.15
     T_Ci = nw.get_conn("9").get_attr("T").val + 273.15
@@ -215,7 +220,7 @@ for p in data['p_kond']:
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
     print(nw.get_conn("3").get_attr("p").val)
-    print(nw.get_comp('Compressor').get_attr("P").val)
+    print(nw.get_conn("7").get_attr("T").val)
 
 fig, ax = plt.subplots(1, 3, figsize=(16, 8))
 [a.grid() for a in ax]
@@ -240,16 +245,20 @@ data = {
     'p_kond': list(np.linspace(37, 60, iterations))
 }
 
-with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
+with open('Senkentemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(data)+"\n")
 
-with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
+with open('Senkentemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(COP)+"\n")
 
-with open('Senkenaustrittstemperatur.txt', 'a') as convert_file:
+with open('Senkentemperatur.txt', 'a') as convert_file:
+    convert_file.write(json.dumps(p_ttd_u) + "\n")
+
+with open('Senkentemperatur.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta)+"\n")
 
-f = open("Senkenaustrittstemperatur.txt", "r")
+
+f = open("Senkentemperatur.txt", "r")
 print(f.read())
 
 dat = tuple(data['p_kond'])
