@@ -14,7 +14,6 @@ fld_si = {wf: 0, si: 1}
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
 
 # Components
-
 gc = HeatExchanger('Gas cooler')
 ev = HeatExchanger('Evaporator')
 sup = HeatExchanger('Superheater')
@@ -22,7 +21,6 @@ va = Valve('Valve')
 cp = Compressor('Compressor')
 
 #Sources, Sinks and CycleCloser
-
 si_in = Source('Sink in')
 si_out = Sink('Sink out')
 
@@ -32,48 +30,46 @@ sou_out = Sink('Source out')
 cc = CycleCloser('CycleCloser')
 
 # Connections Cycle
-
-c1 = Connection(cc, 'out1', gc, 'in1', label="1")
-c2 = Connection(gc, 'out1', va, 'in1', label="2")
-c3 = Connection(va, 'out1', ev, 'in2', label="3")
-c4 = Connection(ev, 'out2', cp, 'in1', label="4")
-c5 = Connection(cp, 'out1', cc, 'in1', label="5")
-
-# Connections Sink
-
-c6 = Connection(si_in, 'out1', gc, 'in2', label="6")
-c7 = Connection(gc, 'out2', si_out, 'in1', label="7")
+c21 = Connection(cc, 'out1', gc, 'in1', label="21")
+c22 = Connection(gc, 'out1', va, 'in1', label="22")
+c23 = Connection(va, 'out1', ev, 'in2', label="23")
+c24 = Connection(ev, 'out2', cp, 'in1', label="24")
+c21_cc = Connection(cp, 'out1', cc, 'in1', label="21_cc")
 
 # Connections Source
+c11 = Connection(sou_in, 'out1', ev, 'in1', label="11")
+c12 = Connection(ev, 'out1', sou_out, 'in1', label="12")
 
-c8 = Connection(sou_in, 'out1', ev, 'in1', label="8")
-c9 = Connection(ev, 'out1', sou_out, 'in1', label="9")
-nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
+# Connections Sink
+c13 = Connection(si_in, 'out1', gc, 'in2', label="13")
+c14 = Connection(gc, 'out2', si_out, 'in1', label="14")
+
+nw.add_conns(c21, c22, c23, c24, c21_cc, c11, c12, c13, c14)
 
 # Starting Parameters Components
-
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
+h_c22 = CPSI("H", "P", 41 * 1e5, "T", 273.15+180, wf) * 1e-3
+c22.set_attr(h=h_c22, p=41)
 
-h_c2 = CPSI("H", "P", 41 * 1e5, "T", 273.15+180, wf) * 1e-3
-c2.set_attr(h=h_c2, p=41)
+c23.set_attr(p=4.706)
 
-c3.set_attr(p=4.706)
-
-h_c4 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c4.set_attr(h=h_c4, fluid={'Pentane': 1, 'H2O': 0})
-
-# Starting Parameters Connection Sink
-c6.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
-c7.set_attr(T=190)
+h_c24 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c24.set_attr(h=h_c24, fluid={'Pentane': 1, 'H2O': 0})
 
 # Starting Parameters Connection Source
-c8.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
-c9.set_attr(T=90)
+c11.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
+c12.set_attr(T=90)
+
+# Starting Parameters Connection Sink
+c13.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c14.set_attr(T=190)
+
+
 
 #Solve Model
 nw.solve(mode='design')
@@ -81,11 +77,11 @@ nw.print_results()
 print(f'COP = {abs(gc.Q.val) / cp.P.val}')
 
 # Final Parameters
-c2.set_attr(h=None, p=None)
+c22.set_attr(h=None, p=None)
 gc.set_attr(ttd_l=10, ttd_u=5)
-c3.set_attr(p=None)
+c23.set_attr(p=None)
 ev.set_attr(ttd_l=5)
-c4.set_attr(h=None, Td_bp=0.1)
+c24.set_attr(h=None, Td_bp=0.1)
 
 # busses
 power = Bus('power')
@@ -182,15 +178,15 @@ description = {
 }
 
 for p in data['p_kond']:
-    c2.set_attr(p=p)
+    c22.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
-    T_Hi = nw.get_conn("6").get_attr("T").val + 273.15
-    T_Ho = nw.get_conn("7").get_attr("T").val + 273.15
-    T_Ci = nw.get_conn("8").get_attr("T").val + 273.15
-    T_Co = nw.get_conn("9").get_attr("T").val + 273.15
+    T_Hi = nw.get_conn("13").get_attr("T").val + 273.15
+    T_Ho = nw.get_conn("14").get_attr("T").val + 273.15
+    T_Ci = nw.get_conn("11").get_attr("T").val + 273.15
+    T_Co = nw.get_conn("12").get_attr("T").val + 273.15
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
@@ -238,7 +234,7 @@ E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor']:
     E_D_List = []
     for p in data['p_kond']:
-        c2.set_attr(p=p)
+        c22.set_attr(p=p)
         nw.solve('design')
         ean.analyse(pamb=pamb, Tamb=Tamb)
         E_D_List += [ean.component_data['y_Dk'][name]]

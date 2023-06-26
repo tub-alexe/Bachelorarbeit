@@ -16,7 +16,8 @@ Metall = np.array([3.3, 10.4, 122.5, 480.5])
 
 width = 0.5
 
-plt.rc('font', **{'size': 18})
+plt.rc('font', **{'size': 20})
+plt.rcParams["figure.figsize"] = (20, 12)
 
 plt.bar(sector, Ernährung, width, color='maroon', label='Ernährungsgewerbe')
 plt.bar(sector, Papier, width, bottom=Ernährung, color='firebrick', label='Papiergewerbe')
@@ -25,6 +26,6 @@ plt.bar(sector, Glas, width, bottom=Ernährung+Papier+Chemie, color='darkorange'
 plt.bar(sector, Metall, width, bottom=Ernährung+Papier+Chemie+Glas, color='gold', label='Metallerzeugung und -bearbeitung')
 
 plt.legend(loc="upper left")
-plt.ylabel('Prozesswärmebedarf in PJ/a')
+plt.ylabel('Prozesswärmebedarf [PJ/a]')
+plt.savefig('Prozesswärme Grafik.svg')
 plt.show()
-plt.savefig('Prozesswärme Grafik.png')

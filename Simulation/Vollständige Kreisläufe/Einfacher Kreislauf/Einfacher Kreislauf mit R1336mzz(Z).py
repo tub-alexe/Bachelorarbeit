@@ -29,59 +29,56 @@ sou_out = Sink('Source out')
 cc = CycleCloser('CycleCloser')
 
 # Connections Cycle
-
-c1 = Connection(cc, 'out1', gc, 'in1', label="1")
-c2 = Connection(gc, 'out1', va, 'in1', label="2")
-c3 = Connection(va, 'out1', ev, 'in2', label="3")
-c4 = Connection(ev, 'out2', cp, 'in1', label="4")
-c5 = Connection(cp, 'out1', cc, 'in1', label="5")
-
-# Connections Sink
-
-c6 = Connection(si_in, 'out1', gc, 'in2', label="6")
-c7 = Connection(gc, 'out2', si_out, 'in1', label="7")
+c21 = Connection(cc, 'out1', gc, 'in1', label="21")
+c22 = Connection(gc, 'out1', va, 'in1', label="22")
+c23 = Connection(va, 'out1', ev, 'in2', label="23")
+c24 = Connection(ev, 'out2', cp, 'in1', label="24")
+c21_cc = Connection(cp, 'out1', cc, 'in1', label="21_cc")
 
 # Connections Source
+c11 = Connection(sou_in, 'out1', ev, 'in1', label="11")
+c12 = Connection(ev, 'out1', sou_out, 'in1', label="12")
 
-c8 = Connection(sou_in, 'out1', ev, 'in1', label="8")
-c9 = Connection(ev, 'out1', sou_out, 'in1', label="9")
-nw.add_conns(c1, c2, c3, c4, c5, c6, c7, c8, c9)
+# Connections Sink
+c13 = Connection(si_in, 'out1', gc, 'in2', label="13")
+c14 = Connection(gc, 'out2', si_out, 'in1', label="14")
+
+nw.add_conns(c21, c22, c23, c24, c21_cc, c11, c12, c13, c14)
 
 # Starting Parameters Components
-
 gc.set_attr(pr1=1, pr2=1, Q=-1e7)
 ev.set_attr(pr1=1, pr2=1)
 sup.set_attr(pr1=1, pr2=1)
 cp.set_attr(eta_s=0.76)
 
 # Starting Parameters Connections Cycle
+h_c22 = CPSI("H", "P", 63 * 1e5, "T", 273.15+165, wf) * 1e-3
+c22.set_attr(h=h_c22, p=63)
 
-h_c2 = CPSI("H", "P", 63 * 1e5, "T", 273.15+165, wf) * 1e-3
-c2.set_attr(h=h_c2, p=63)
+c23.set_attr(p=5.5516)
 
-c3.set_attr(p=5.5516)
-
-h_c4 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
-c4.set_attr(h=h_c4, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
-
-# Starting Parameters Connection Sink
-c6.set_attr(T=160, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c7.set_attr(T=190)
+h_c24 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+c24.set_attr(h=h_c24, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
 # Starting Parameters Connection Source
-c8.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
-c9.set_attr(T=90)
+c11.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
+c12.set_attr(T=90)
+
+# Starting Parameters Connection Sink
+c13.set_attr(T=160, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
+c14.set_attr(T=190)
+
 
 #Solve Model
 
 nw.solve(mode='design')
 nw.print_results()
 
-c2.set_attr(h=None, p=88.18)
+c22.set_attr(h=None, p=88.18)
 gc.set_attr(ttd_l=10)
-c3.set_attr(p=None)
+c23.set_attr(p=None)
 ev.set_attr(ttd_l=5)
-c4.set_attr(h=None, Td_bp=0.1)
+c24.set_attr(h=None, Td_bp=0.1)
 
 # busses
 power = Bus('power')
@@ -156,15 +153,15 @@ description = {
 }
 
 for p in data['p_kond']:
-    c2.set_attr(p=p)
+    c22.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=pamb, Tamb=Tamb)
     COP['p_kond'] += [nw.busses["heat_product_COP"].P.val / nw.busses["power_COP"].P.val]
     eta['p_kond'] += [ean.network_data.loc['epsilon'] * 100]
-    T_Hi = nw.get_conn("6").get_attr("T").val + 273.15
-    T_Ho = nw.get_conn("7").get_attr("T").val + 273.15
-    T_Ci = nw.get_conn("8").get_attr("T").val + 273.15
-    T_Co = nw.get_conn("9").get_attr("T").val + 273.15
+    T_Hi = nw.get_conn("13").get_attr("T").val + 273.15
+    T_Ho = nw.get_conn("14").get_attr("T").val + 273.15
+    T_Ci = nw.get_conn("11").get_attr("T").val + 273.15
+    T_Co = nw.get_conn("12").get_attr("T").val + 273.15
     diff_T_H = (T_Ho-T_Hi) / math.log(T_Ho / T_Hi)
     diff_T_C = (T_Ci-T_Co) / math.log(T_Ci / T_Co)
     Lorenz_COP['p_kond'] += [diff_T_H / (diff_T_H - diff_T_C)]
@@ -192,7 +189,7 @@ E_D_Lists = {}
 for name in ['Gas cooler', 'Evaporator', 'Valve', 'Compressor']:
     E_D_List = []
     for p in data['p_kond']:
-        c2.set_attr(p=p)
+        c22.set_attr(p=p)
         nw.solve('design')
         ean.analyse(pamb=pamb, Tamb=Tamb)
         E_D_List += [ean.component_data['E_D'][name] * 1e-6]
