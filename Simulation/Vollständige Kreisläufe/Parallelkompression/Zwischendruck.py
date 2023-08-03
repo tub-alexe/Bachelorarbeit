@@ -18,39 +18,29 @@ import json
 with open('Zwischendruck.txt') as f:
     read = f.readlines()
 
-data_zw8 = json.loads(read[1])
-COP_zw8 = json.loads(read[2])
-eta_zw8 = json.loads(read[3])
+data_zw8 = json.loads(read[3])
+eta_zw8 = json.loads(read[4])
 
-data_zw11 = json.loads(read[5])
-COP_zw11 = json.loads(read[6])
+data_zw11 = json.loads(read[6])
 eta_zw11 = json.loads(read[7])
 
 data_zw15 = json.loads(read[9])
-COP_zw15 = json.loads(read[10])
-eta_zw15 = json.loads(read[11])
+eta_zw15 = json.loads(read[10])
 
-data_zw19 = json.loads(read[13])
-COP_zw19 = json.loads(read[14])
-eta_zw19 = json.loads(read[15])
+data_zw19 = json.loads(read[12])
+eta_zw19 = json.loads(read[13])
 
-data_ttd_u_3 = json.loads(read[21])
-eta_ttd_u_3 = json.loads(read[22])
+data_ttd_u_5 = json.loads(read[16])
+eta_ttd_u_5 = json.loads(read[17])
 
-data_ttd_u_5 = json.loads(read[24])
-eta_ttd_u_5 = json.loads(read[25])
+data_ttd_u_10 = json.loads(read[19])
+eta_ttd_u_10 = json.loads(read[20])
 
-data_ttd_u_7 = json.loads(read[27])
-eta_ttd_u_7 = json.loads(read[28])
+data_ttd_u_15 = json.loads(read[22])
+eta_ttd_u_15 = json.loads(read[23])
 
-data_ttd_u_10 = json.loads(read[30])
-eta_ttd_u_10 = json.loads(read[31])
-
-data_ttd_u_15 = json.loads(read[33])
-eta_ttd_u_15 = json.loads(read[34])
-
-data_ttd_u_20 = json.loads(read[36])
-eta_ttd_u_20 = json.loads(read[37])
+data_ttd_u_20 = json.loads(read[25])
+eta_ttd_u_20 = json.loads(read[26])
 
 plt.rc('font', **{'size': 20})
 plt.rcParams["figure.figsize"] = (20, 12)
