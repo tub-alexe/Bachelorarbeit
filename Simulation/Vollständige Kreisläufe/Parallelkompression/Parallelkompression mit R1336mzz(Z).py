@@ -300,7 +300,7 @@ for i in h:
     print('exergetischer Wirkungsgrad = ', Wirkungsgrad[q])
 
     c24.set_attr(p=Mitteldruck[q])
-    param = list(np.linspace(30.2, 46, iterations))
+    param = list(np.linspace(30.16, 46, 80))
 
     # Datensatz für die Exergieanalyse mit dem optimalen Zwischendruck
     for p3 in param:

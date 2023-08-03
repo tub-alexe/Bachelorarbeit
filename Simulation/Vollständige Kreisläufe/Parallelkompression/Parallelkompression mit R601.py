@@ -102,17 +102,17 @@ for i in h:
     c12.set_attr(T=90)
 
     # Setzen Startparameter der Verbindungen der Senke
-    c13.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
-    c14.set_attr(T=190)
+    c13.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
+    c14.set_attr(T=205)
 
     # Lösen des Netzwerks
     nw.solve(mode='design')
     nw.print_results()
 
     # Final Parameters
-    c22.set_attr(h=None, p=28)
-    GK.set_attr(ttd_l=10)
-    c24.set_attr(p=14.3)
+    c22.set_attr(h=None, p=30.5)
+    GK.set_attr(ttd_l=15)
+    c24.set_attr(p=10)
     c27.set_attr(p=None)
     VD.set_attr(ttd_l=5)
     c28.set_attr(h=None, Td_bp=0.1)
@@ -172,11 +172,11 @@ for i in h:
     # Für die Linien konstanter oberer Temperaturdifferenz im GK/KO im optimierten Fall wird nur in die innere Schleife benötigt, die Variation des Hochdrucks wird daher in Zeile 316 wird daher hier nicht benötigt
     import matplotlib.pyplot as plt
 
-    iterations = 20
-    iterations2 = 50
+    iterations = 80
+    iterations2 = 70
 
-    param = list(np.linspace(27.5, 28, iterations))
-    param2 = list(np.linspace(14.2, 14.5, iterations2))
+    param = list(np.linspace(30.5, 31, iterations))
+    param2 = list(np.linspace(19.1, 19.6, iterations2))
     eta = []
     p_gk = []
     Hochdruck = []
@@ -190,7 +190,7 @@ for i in h:
     # j = 0
 
     # erster Parameter wird variiert
-    for p1 in param:
+    """for p1 in param:
         c22.set_attr(p=p1)
         y = 0
         x = 0
@@ -231,15 +231,15 @@ for i in h:
             c12.set_attr(T=90)
 
             # Setzen Startparameter der Verbindungen der Senke
-            c13.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
-            c14.set_attr(T=190)
+            c13.set_attr(T=175, p=20, fluid={'Pentane': 0, 'H2O': 1})
+            c14.set_attr(T=205)
 
             # Lösen des Netzwerks
             nw.solve(mode='design')
 
             #Neues setzen der zu untersuchenden Parameter
             c22.set_attr(h=None, p=p1)
-            GK.set_attr(ttd_l=10)
+            GK.set_attr(ttd_l=15)
             c24.set_attr(p=p2)
             c27.set_attr(p=None)
             VD.set_attr(ttd_l=5)
@@ -251,7 +251,6 @@ for i in h:
 
             # Lösen des Netzwerks und Durchführung einer Exergieanalyse
             nw.solve('design')
-            nw.print_results()
             ean.analyse(pamb=p_umg, Tamb=T_umg)
 
             if ean.network_data.loc['epsilon'] < y:
@@ -290,6 +289,7 @@ for i in h:
                     x = nw.get_conn("22").get_attr("p").val
                     z = nw.get_conn("24").get_attr("p").val
                     j = nw.get_conn("13").get_attr("T").val
+                    #print(ean.network_data.loc['epsilon'])
 
     q = np.array(Wirkungsgrad).argmax()
     maxlist1 += [Hochdruck[q]]
@@ -300,13 +300,15 @@ for i in h:
     print('Hochdruck = ', Hochdruck[q])
     print('exergetischer Wirkungsgrad = ', Wirkungsgrad[q])
 
-    c24.set_attr(p=Mitteldruck[q])
-    param = list(np.linspace(39, 54, iterations))
+    c24.set_attr(p=Mitteldruck[q])"""
+    param = list(np.linspace(30.5, 54, iterations))
 
     # Datensatz für die Exergieanalyse mit dem optimalen Zwischendruck
     for p3 in param:
         c22.set_attr(p=p3)
         nw.solve('design')
+        print(ean.network_data.loc['epsilon'])
+        print(nw.get_conn("22").get_attr("p").val)
         ean.analyse(pamb=p_umg, Tamb=T_umg)
         eta += [ean.network_data.loc['epsilon'] * 100]
         p_gk += [nw.get_conn("22").get_attr("p").val]
