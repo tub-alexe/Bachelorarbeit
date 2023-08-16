@@ -1,21 +1,9 @@
-import pylab as pl
-from tespy.networks import Network
-from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink)
-from tespy.connections import Connection, Bus
-from CoolProp.CoolProp import PropsSI as CPSI
-from tespy.tools import ExergyAnalysis
-from fluprodia import FluidPropertyDiagram
-import math
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import numpy as np
-from numpy import *
-
-
-# importing the module
 import json
 
-with open('../Einfacher Kreislauf mit IHX/Senkeneintrittstemperatur.txt') as f:
+#Import der Datensätze
+with open('../mit interner Wärmerückgewinnung/Senkeneintrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_IHX_T160_R1233ZDE = json.loads(read[5])
@@ -138,7 +126,7 @@ eta_ttd_u_20_IHX_R601 = json.loads(read[190])
 data_ttd_u_25_IHX_R601 = json.loads(read[194])
 eta_ttd_u_25_IHX_R601 = json.loads(read[195])
 
-with open('../Parallelkompression/Senkeneintrittstemperatur.txt') as f:
+with open('../mit interner Wärmerückgewinnung und Parallelkompression/Senkeneintrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_Parallel_T160_R1233ZDE = json.loads(read[5])
@@ -327,6 +315,7 @@ eta_ttd_u_15_Parallel_R601_opt = json.loads(read[366])
 data_ttd_u_20_Parallel_R601_opt = json.loads(read[371])
 eta_ttd_u_20_Parallel_R601_opt = json.loads(read[372])
 
+#Erstellung der Grafiken mit Kennzeichnung von Datenpunkten
 plt.rc('font', **{'size': 20})
 plt.rcParams["figure.figsize"] = (20, 12)
 
@@ -345,8 +334,7 @@ plt.plot(data_ttd_u_10_IHX_R1233ZDE, eta_ttd_u_10_IHX_R1233ZDE, linestyle='--', 
 plt.plot(data_ttd_u_15_IHX_R1233ZDE, eta_ttd_u_15_IHX_R1233ZDE, linestyle='--', color='green')
 plt.plot(data_ttd_u_20_IHX_R1233ZDE, eta_ttd_u_20_IHX_R1233ZDE, linestyle='--', color='steelblue')
 plt.plot(data_ttd_u_25_IHX_R1233ZDE, eta_ttd_u_25_IHX_R1233ZDE, linestyle='--', color='blueviolet')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ΔT_gk,ob:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 orange_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='15 K')
@@ -456,7 +444,7 @@ plt.plot(data_ttd_u_10_IHX_R600, eta_ttd_u_10_IHX_R600, linestyle='--', color='o
 plt.plot(data_ttd_u_15_IHX_R600, eta_ttd_u_15_IHX_R600, linestyle='--', color='green')
 plt.plot(data_ttd_u_20_IHX_R600, eta_ttd_u_20_IHX_R600, linestyle='--', color='steelblue')
 plt.plot(data_ttd_u_25_IHX_R600, eta_ttd_u_25_IHX_R600, linestyle='--', color='blueviolet')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{gk,ob}$:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{GK,ob}$:')
 s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 orange_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
@@ -569,7 +557,7 @@ plt.plot(data_ttd_u_25_IHX_R1336MZZZ, eta_ttd_u_25_IHX_R1336MZZZ, linestyle='--'
 
 plt.xlabel('Gaskühlerdruck [bar]')
 plt.ylabel('exergetischer Wirkungsgrad [%]')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{gk,ob}$:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [°C]          $ΔT_{GK,ob}$:')
 s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 orange_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
@@ -579,8 +567,9 @@ black_line = mlines.Line2D([], [], color='blueviolet', linestyle='--', label='25
 plt.xlim(24, 41)
 plt.legend(handles=[o_line, red_line, orange_line, green_line, blue_line, black_line], loc='lower center', fontsize='16', ncol=7)
 plt.grid()
-plt.show()
 plt.savefig('Senkeneintrittstemperatur IWUE R1336MZZ(Z).svg')
+plt.show()
+
 
 
 plt.plot(data_Parallel_T160_R1336MZZZ, eta_Parallel_T160_R1336MZZZ, color='black', label='160°C Parallel')

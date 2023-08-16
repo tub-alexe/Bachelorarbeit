@@ -1,14 +1,12 @@
 from tespy.networks import Network
-from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink, DropletSeparator, Merge)
+from tespy.components import (HeatExchanger, Compressor, CycleCloser, Valve, Source, Sink, Merge, DropletSeparator)
 from tespy.connections import Connection, Bus
+from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 import plotly.graph_objects as go
-from CoolProp.CoolProp import PropsSI as CPSI
 
-wf = 'REFPROP::Butane'
+wf = 'REFPROP::R1233ZD(E)'
 si = 'REFPROP::H2O'
-fld_wf = {wf: 1, si: 0}
-fld_si = {wf: 0, si: 1}
 
 # Definition des Netwerks
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', iterinfo=False)
@@ -65,23 +63,23 @@ KP1.set_attr(eta_s=0.76)
 KP2.set_attr(eta_s=0.76)
 
 # Setzen Startparameter der Verbindungen des Kreislaufs
-h_c22 = CPSI("H", "P", 55 * 1e5, "T", 273.15+165, wf) * 1e-3
-c22.set_attr(h=h_c22, p=55)
+h_c22 = CPSI("H", "P", 38 * 1e5, "T", 273.15+165, wf) * 1e-3
+c22.set_attr(h=h_c22, p=38)
 
-h_c27 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c27 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c27.set_attr(h=h_c27)
 
-h_c28 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15+155, wf) * 1e-3
-c28.set_attr(h=h_c28, p=12.492, fluid={'Butane': 1, 'H2O': 0})
+h_c28 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15+155, wf) * 1e-3
+c28.set_attr(h=h_c28, p=8.334, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
-c29.set_attr(p=18)
+c29.set_attr(p=14.5)
 
 # Setzen Startparameter der Verbindungen der Quelle
-c11.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
+c11.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c12.set_attr(T=90)
 
 # Setzen Startparameter der Verbindungen der Senke
-c13.set_attr(T=160, p=20, fluid={'Butane': 0, 'H2O': 1})
+c13.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
 c14.set_attr(T=190)
 
 #Lösen des Netzwerks
@@ -89,13 +87,13 @@ nw.solve(mode='design')
 nw.print_results()
 
 #Setzen der Betriebsparameter
-c22.set_attr(h=None, p=68)
+c22.set_attr(h=None, p=43.52)
 GK.set_attr(ttd_l=10)
 c27.set_attr(h=None, Td_bp=0.1)
 c28.set_attr(p=None, h=None)
 VD.set_attr(ttd_l=5)
 IWUE.set_attr(ttd_u=15)
-c29.set_attr(p=18)
+c29.set_attr(p=16.52)
 
 # Definition der Energieströme
 el = Bus('elektrische Leistung')
@@ -103,12 +101,12 @@ el.add_comps(
     {'comp': KP1, 'char': 1, 'base': 'bus'},
     {'comp': KP2, 'char': 1, 'base': 'bus'})
 
-wae_zu = Bus('Wärmezufuhr')
+wae_zu = Bus('Wärmequelle')
 wae_zu.add_comps(
     {'comp': qu_ein, 'base': 'bus'},
     {'comp': qu_aus})
 
-wae_ab = Bus('Wärmeabfuhr')
+wae_ab = Bus('Wärmesenke')
 wae_ab.add_comps(
     {'comp': se_ein, 'base': 'bus'},
     {'comp': se_aus})
@@ -126,7 +124,6 @@ T_umg = 25
 ean = ExergyAnalysis(nw, E_P=[wae_ab], E_F=[el, wae_zu])
 ean.analyse(pamb=p_umg, Tamb=T_umg)
 ean.print_results()
-print(ean.network_data.loc['epsilon'])
 
 # Erstellung des Grassmanndiagramms
 links, nodes = ean.generate_plotly_sankey_input()
@@ -148,10 +145,12 @@ fig.show()
 import matplotlib.pyplot as plt
 import numpy as np
 
-iterations = 60
-iterations2 = 60
-param = list(np.linspace(68.1, 68.5, iterations))
-param2 = list(np.linspace(21.8, 22.2, iterations2))
+iterations = 80
+iterations2 = 30
+param = list(np.linspace(43.4, 43.8, iterations))
+param2 = list(np.linspace(16.5, 16.6, iterations2))
+
+
 eta = []
 p_gk = []
 Hochdruck = []
@@ -162,6 +161,7 @@ Tsink = []
 #x = 0
 #z = 0
 #j = 0
+
 #erster Parameter wird variiert
 for p1 in param:
     c22.set_attr(p=p1)
@@ -174,7 +174,6 @@ for p1 in param:
 
     #zweiter Parameter wird variiert
     for p2 in param2:
-
         VD.set_attr(pr1=1, pr2=1, ttd_l=None)
         GK.set_attr(pr1=1, pr2=1, Q=-1e7, ttd_l=None, ttd_u=None)
         IWUE.set_attr(pr1=1, pr2=1, ttd_u=None)
@@ -182,29 +181,29 @@ for p1 in param:
         KP2.set_attr(eta_s=0.76)
 
         # Setzen Startparameter der Verbindungen des Kreislaufs
-        h_c22 = CPSI("H", "P", 55 * 1e5, "T", 273.15 + 165, wf) * 1e-3
-        c22.set_attr(h=h_c22, p=55)
+        h_c22 = CPSI("H", "P", 38 * 1e5, "T", 273.15 + 165, wf) * 1e-3
+        c22.set_attr(h=h_c22, p=38)
 
-        h_c27 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
+        h_c27 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15 + 90.1, wf) * 1e-3
         c27.set_attr(h=h_c27, Td_bp=None)
 
-        h_c28 = CPSI("H", "P", 12.492 * 1e5, "T", 273.15 + 155, wf) * 1e-3
-        c28.set_attr(h=h_c28, p=12.492, fluid={'Butane': 1, 'H2O': 0})
+        h_c28 = CPSI("H", "P", 8.334 * 1e5, "T", 273.15 + 155, wf) * 1e-3
+        c28.set_attr(h=h_c28, p=8.334, fluid={'R1233ZD(E)': 1, 'H2O': 0})
 
-        c29.set_attr(p=18)
+        c29.set_attr(p=14.5)
 
         # Setzen Startparameter der Verbindungen der Quelle
-        c11.set_attr(T=95, p=5, fluid={'Butane': 0, 'H2O': 1})
+        c11.set_attr(T=95, p=5, fluid={'R1233ZD(E)': 0, 'H2O': 1})
         c12.set_attr(T=90)
 
         # Setzen Startparameter der Verbindungen der Senke
-        c13.set_attr(T=160, p=20, fluid={'Butane': 0, 'H2O': 1})
+        c13.set_attr(T=160, p=20, fluid={'R1233ZD(E)': 0, 'H2O': 1})
         c14.set_attr(T=190)
 
         # Lösen des Netzwerks
         nw.solve(mode='design')
 
-        #Neues setzen der zu untersuchenden Parameter
+        #Neues Setzen der zu untersuchenden Parameter
         c22.set_attr(h=None, p=p1)
         GK.set_attr(ttd_l=10)
         c27.set_attr(h=None, Td_bp=0.1)
@@ -216,12 +215,11 @@ for p1 in param:
         # Lösen des Netzwerks und Durchführung einer Exergieanalyse
         nw.solve('design')
         ean.analyse(pamb=p_umg, Tamb=T_umg)
-        #print(ean.component_data['E_D']['Zusammenführung'])
+
         if ean.network_data.loc['epsilon'] < y:
 
             # Abbruch der inneren Schleife falls mit diesem Zwischendruckniveau der Zustand des Fluids außerhalb des Zweiphasengebiets liegt
-            if ean.component_data['E_D']['Zusammenführung'] < 0:
-                print('Halloo')
+            if nw.get_conn('21').get_attr('p').val == 38.0:
                 Hochdruck += [x]
                 Mitteldruck += [z]
                 Wirkungsgrad += [y * 100]
@@ -233,16 +231,13 @@ for p1 in param:
                 Mitteldruck += [z]
                 Wirkungsgrad += [y * 100]
                 Tsink += [j]
-                print('Ausfahrt Nummer 1')
                 break
             else:
-                print('Ausfahrt Nummer 2')
                 break
 
         elif ean.network_data.loc['epsilon'] > y:
             # Abbruch der inneren Schleife falls mit diesem Zwischendruckniveau der Zustand des Fluids außerhalb des Zweiphasengebiets liegt
-            if ean.component_data['E_D']['Zusammenführung'] < 0:
-                print('Halloooo')
+            if nw.get_conn('21').get_attr('p').val == 38.0:
                 Hochdruck += [x]
                 Mitteldruck += [z]
                 Wirkungsgrad += [y * 100]
@@ -262,7 +257,7 @@ print('Hochdruck = ', Hochdruck[q])
 print('exergetischer Wirkungsgrad = ', Wirkungsgrad[q])
 
 c29.set_attr(p=Mitteldruck[q])
-param = list(np.linspace(53.4, 68.1, 100))
+param = list(np.linspace(38.4, 53, 80))
 
 # Datensatz für die Exergieanalyse mit dem optimalen Zwischendruck
 for p3 in param:
@@ -280,12 +275,14 @@ plt.show()
 
 import json
 
-with open('Zweistufenkompression.txt', 'a') as convert_file:
+with open('Zwischenkühlung.txt', 'a') as convert_file:
     convert_file.write(json.dumps(p_gk) + "\n")
 
-with open('Zweistufenkompression.txt', 'a') as convert_file:
+with open('Zwischenkühlung.txt', 'a') as convert_file:
     convert_file.write(json.dumps(eta) + "\n")
 
-f = open("Zweistufenkompression.txt", "r")
+f = open("Zwischenkühlung.txt", "r")
 print(f.read())
+
+
 

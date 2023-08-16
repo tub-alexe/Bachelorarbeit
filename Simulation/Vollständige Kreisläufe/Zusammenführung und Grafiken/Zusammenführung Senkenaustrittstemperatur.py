@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import numpy as np
-
-# importing the module
 import json
 
-with open('../Einfacher Kreislauf mit IHX/Senkenaustrittstemperatur.txt') as f:
+#Import der Datensätze
+with open('../mit interner Wärmerückgewinnung/Senkenaustrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_T190_IHX_R1233ZDE = json.loads(read[5])
@@ -140,7 +138,7 @@ eta_ttd_u_20_IHX_R601 = json.loads(read[202])
 data_ttd_u_30_IHX_R601 = json.loads(read[206])
 eta_ttd_u_30_IHX_R601 = json.loads(read[207])
 
-with open('../Parallelkompression/Senkenaustrittstemperatur.txt') as f:
+with open('../mit interner Wärmerückgewinnung und Parallelkompression/Senkenaustrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_T190_Parallel_R1233ZDE = json.loads(read[5])
@@ -266,7 +264,7 @@ eta_ttd_u_15_Parallel_R601 = json.loads(read[204])
 data_ttd_u_20_Parallel_R601 = json.loads(read[209])
 eta_ttd_u_20_Parallel_R601 = json.loads(read[210])
 
-
+#Erstellung der Grafiken mit Kennzeichnung von Datenpunkten
 plt.rc('font', **{'size': 20})
 plt.rcParams["figure.figsize"] = (20, 13)
 
@@ -290,8 +288,7 @@ plt.plot(data_ttd_u_30_IHX_R1233ZDE, eta_ttd_u_30_IHX_R1233ZDE, linestyle='--', 
 plt.plot(data_ttd_u_40_IHX_R1233ZDE, eta_ttd_u_40_IHX_R1233ZDE, linestyle='--', color='steelblue', label='40°C')
 plt.xlabel('Gaskühlerdruck [bar]')
 plt.ylabel('exergetischer Wirkungsgrad [%]')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='15 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='20 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='30 K')
@@ -331,8 +328,7 @@ plt.plot(data_ttd_u_15_Parallel_R1233ZDE, eta_ttd_u_15_Parallel_R1233ZDE, linest
 plt.plot(data_ttd_u_20_Parallel_R1233ZDE, eta_ttd_u_20_Parallel_R1233ZDE, linestyle='--', color='steelblue', label='20 K')
 plt.xlabel('Gaskühlerdruck [bar]')
 plt.ylabel('exergetischer Wirkungsgrad [%]')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='15 K')
@@ -363,8 +359,7 @@ plt.plot(data_ttd_u_10_IHX_R600, eta_ttd_u_10_IHX_R600, linestyle='--', color='r
 plt.plot(data_ttd_u_15_IHX_R600, eta_ttd_u_15_IHX_R600, linestyle='--', color='orange', label='15 K')
 plt.plot(data_ttd_u_20_IHX_R600, eta_ttd_u_20_IHX_R600, linestyle='--', color='green', label='20 K')
 plt.plot(data_ttd_u_30_IHX_R600, eta_ttd_u_30_IHX_R600, linestyle='--', color='steelblue', label='30 K')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ΔT_{gk,ob}:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='10 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='15 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='20 K')
@@ -387,13 +382,11 @@ plt.plot(data_T205_Parallel_R600, eta_T205_Parallel_R600, color='black', label='
 plt.annotate('205', xy=(75, 67.05), xytext=(75, 67.05))
 plt.plot(data_T210_Parallel_R600, eta_T210_Parallel_R600, color='black', label='210')
 plt.annotate('210', xy=(75, 67.75), xytext=(75, 67.75))
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='15 K')
 blue_line = mlines.Line2D([], [], color='steelblue', linestyle='--', label='20 K')
-black_line = mlines.Line2D([], [], color='blueviolet', linestyle='--', label='25 K')
 plt.plot(data_ttd_u_5_Parallel_R600, eta_ttd_u_5_Parallel_R600, linestyle='--', color='red', label='5 K')
 plt.plot(data_ttd_u_10_Parallel_R600, eta_ttd_u_10_Parallel_R600, linestyle='--', color='orange', label='10 K')
 plt.plot(data_ttd_u_15_Parallel_R600, eta_ttd_u_15_Parallel_R600, linestyle='--', color='green', label='15 K')
@@ -420,8 +413,7 @@ plt.plot(data_T215_IHX_R1336MZZZ, eta_T215_IHX_R1336MZZZ, color='black', label='
 plt.annotate('215', xy=(35.03, 72.17), xytext=(35.03, 72.17))
 plt.plot(data_T220_IHX_R1336MZZZ, eta_T220_IHX_R1336MZZZ, color='black', label='220°C')
 plt.annotate('220', xy=(35.03, 72.89), xytext=(35.03, 72.89))
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ΔT_{gk,ob}:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='10 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='15 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='20 K')
@@ -439,7 +431,7 @@ plt.show()
 
 #vielleicht bei 50 bar enden lassen
 plt.plot(data_T190_Parallel_R1336MZZZ, eta_T190_Parallel_R1336MZZZ, color='black', label='190')
-plt.annotate('190', xy=(52.8, 68.0), xytext=(52.8, 68.0))
+plt.annotate('190', xy=(46.05, 69.1), xytext=(46.05, 69.1))
 plt.plot(data_T195_Parallel_R1336MZZZ, eta_T195_Parallel_R1336MZZZ, color='black', label='195')
 plt.annotate('195', xy=(53.9, 68.6), xytext=(53.9, 68.6))
 plt.plot(data_T200_Parallel_R1336MZZZ, eta_T200_Parallel_R1336MZZZ, color='black', label='200')
@@ -450,13 +442,11 @@ plt.plot(data_T210_Parallel_R1336MZZZ, eta_T210_Parallel_R1336MZZZ, color='black
 plt.annotate('210', xy=(55.8, 70.55), xytext=(55.8, 70.55))
 plt.plot(data_T215_Parallel_R1336MZZZ, eta_T215_Parallel_R1336MZZZ, color='black', label='215')
 plt.annotate('215', xy=(56.3, 71.18), xytext=(56.3, 71.18))
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ΔT_{gk,ob}:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='15 K')
 blue_line = mlines.Line2D([], [], color='steelblue', linestyle='--', label='20 K')
-black_line = mlines.Line2D([], [], color='blueviolet', linestyle='--', label='25 K')
 plt.plot(data_ttd_u_5_Parallel_R1336MZZZ, eta_ttd_u_5_Parallel_R1336MZZZ, linestyle='--', color='red', label='5 K')
 plt.plot(data_ttd_u_10_Parallel_R1336MZZZ, eta_ttd_u_10_Parallel_R1336MZZZ, linestyle='--', color='orange', label='10 K')
 plt.plot(data_ttd_u_15_Parallel_R1336MZZZ, eta_ttd_u_15_Parallel_R1336MZZZ, linestyle='--', color='green', label='15 K')
@@ -488,8 +478,7 @@ plt.plot(data_ttd_u_10_IHX_R601, eta_ttd_u_10_IHX_R601, linestyle='--', color='r
 plt.plot(data_ttd_u_15_IHX_R601, eta_ttd_u_15_IHX_R601, linestyle='--', color='orange', label='15°C')
 plt.plot(data_ttd_u_20_IHX_R601, eta_ttd_u_20_IHX_R601, linestyle='--', color='green', label='20°C')
 plt.plot(data_ttd_u_30_IHX_R601, eta_ttd_u_30_IHX_R601, linestyle='--', color='steelblue', label='30°C')
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ΔT_{gk,ob}:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='10 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='15 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='20 K')
@@ -517,13 +506,11 @@ plt.plot(data_T215_Parallel_R601, eta_T215_Parallel_R601, color='black', label='
 plt.annotate('215', xy=(55, 71.85), xytext=(55, 71.85))
 plt.plot(data_T220_Parallel_R601, eta_T220_Parallel_R601, color='black', label='220°C')
 plt.annotate('220', xy=(55, 72.55), xytext=(55, 72.55))
-o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,ein}$ [C]          $ΔT_{gk,ob}$:')
-s_line = mlines.Line2D([], [], color='black',  linestyle='--', label='ttd_gk,ob:')
+o_line = mlines.Line2D([], [], color='black', label=r'$T_{se,aus}$ [°C]          $ΔT_{GK,ob}$:')
 red_line = mlines.Line2D([], [], color='red', linestyle='--', label='5 K')
 yellow_line = mlines.Line2D([], [], color='orange', linestyle='--', label='10 K')
 green_line = mlines.Line2D([], [], color='green', linestyle='--', label='15 K')
 blue_line = mlines.Line2D([], [], color='steelblue', linestyle='--', label='20 K')
-black_line = mlines.Line2D([], [], color='blueviolet', linestyle='--', label='25 K')
 plt.plot(data_ttd_u_5_Parallel_R601, eta_ttd_u_5_Parallel_R601, linestyle='--', color='red', label='5 K')
 plt.plot(data_ttd_u_10_Parallel_R601, eta_ttd_u_10_Parallel_R601, linestyle='--', color='orange', label='10 K')
 plt.plot(data_ttd_u_15_Parallel_R601, eta_ttd_u_15_Parallel_R601, linestyle='--', color='green', label='15 K')

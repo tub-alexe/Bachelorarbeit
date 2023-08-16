@@ -5,11 +5,8 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 import plotly.graph_objects as go
 
-
 wf = 'REFPROP::R1336mzz(Z)'
-si = 'H2O'
-fld_wf = {wf: 1, si: 0}
-fld_si = {wf: 0, si: 1}
+si = 'REFPROP::H2O'
 
 # Definition des Netwerks
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
@@ -84,12 +81,12 @@ el = Bus('elektrische Leistung')
 el.add_comps(
     {'comp': KP, 'char': 1, 'base': 'bus'})
 
-wae_zu = Bus('Wärmezufuhr')
+wae_zu = Bus('Wärmequelle')
 wae_zu.add_comps(
     {'comp': qu_ein, 'base': 'bus'},
     {'comp': qu_aus})
 
-wae_ab = Bus('Wärmeabfuhr')
+wae_ab = Bus('Wärmesenke')
 wae_ab.add_comps(
     {'comp': se_ein, 'base': 'bus'},
     {'comp': se_aus})
@@ -135,12 +132,18 @@ iterations = 20
 
 param = list(np.linspace(43, 95, iterations))
 eta = []
+p_gk = []
 
-for x in param:
-    c22.set_attr(p=x)
+for p in param:
+    c22.set_attr(p=p)
     nw.solve('design')
     ean.analyse(pamb=p_umg, Tamb=T_umg)
     eta += [ean.network_data.loc['epsilon'] * 100]
+    p_gk += [nw.get_conn("22").get_attr("p").val]
+
+q = np.array(eta).argmax()
+print('Hochdruck = ', p_gk[q])
+print('exergetischer Wirkungsgrad = ', eta[q])
 
 plt.plot(param, eta, marker='x', color="#1f567d")
 plt.xlabel('Gaskühler-/Kondensatordruck [bar]')

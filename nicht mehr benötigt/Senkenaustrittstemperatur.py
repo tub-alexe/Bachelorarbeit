@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import json
 
 # reading the data from the file
-with open('../Simulation/Vollständige Kreisläufe/Parallelkompression/Senkenaustrittstemperatur.txt') as f:
+with open(
+        '../Simulation/Vollständige Kreisläufe/mit interner Wärmerückgewinnung und Parallelkompression/Senkenaustrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_T190 = json.loads(read[1])

@@ -6,9 +6,7 @@ from tespy.tools import ExergyAnalysis
 import plotly.graph_objects as go
 
 wf = 'REFPROP::R1233ZD(E)'
-si = 'H2O'
-fld_wf = {wf: 1, si: 0}
-fld_si = {wf: 0, si: 1}
+si = 'REFPROP::H2O'
 
 # Definition des Netwerks
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
@@ -78,8 +76,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 # Setzen der Betriebsparameter
-c22.set_attr(h=None, p=None)
-GK.set_attr(ttd_l=10, ttd_u=25)
+c22.set_attr(h=None, p=44.43)
+GK.set_attr(ttd_l=10)
 c25.set_attr(h=None, Td_bp=0.1)
 c26.set_attr(p=None, h=None)
 VD.set_attr(ttd_l=5)
@@ -90,12 +88,12 @@ el = Bus('elektrische Leistung')
 el.add_comps(
     {'comp': KP, 'char': 1, 'base': 'bus'})
 
-wae_zu = Bus('Wärmezufuhr')
+wae_zu = Bus('Wärmequelle')
 wae_zu.add_comps(
     {'comp': qu_ein, 'base': 'bus'},
     {'comp': qu_aus})
 
-wae_ab = Bus('Wärmeabfuhr')
+wae_ab = Bus('Wärmesenke')
 wae_ab.add_comps(
     {'comp': se_ein, 'base': 'bus'},
     {'comp': se_aus})
@@ -122,6 +120,7 @@ fig = go.Figure(go.Sankey(
     arrangement="snap",
     node={
         "label": nodes,
+        "line": dict(width=0.5),
         'pad': 11,
         'color': 'orange'},
     link=links),
@@ -139,21 +138,24 @@ import numpy as np
 
 # make text reasonably sized
 plt.rc('font', **{'size': 18})
-iterations = 40
+iterations = 80
 
-param = list(np.linspace(150, 130, iterations))
+param = list(np.linspace(40, 54, iterations))
 eta = []
 p_gk = []
 
-for x in param:
-    #c22.set_attr(p=x)
-    c13.set_attr(T=x)
-    #c14.set_attr(T=x)
+for p in param:
+    c22.set_attr(p=p)
+    #c13.set_attr(T=p)
+    #c14.set_attr(T=p)
     nw.solve('design')
     ean.analyse(pamb=p_umg, Tamb=T_umg)
     eta += [ean.network_data.loc['epsilon'] * 100]
     p_gk += [nw.get_conn("22").get_attr("p").val]
 
+q = np.array(eta).argmax()
+print('Hochdruck = ', p_gk[q])
+print('exergetischer Wirkungsgrad = ', eta[q])
 plt.plot(param, eta, marker='x', color="#1f567d")
 plt.xlabel('Gaskühler-/Kondensatordruck [bar]')
 plt.ylabel('exergetischer Wirkungsgrad [%]')

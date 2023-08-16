@@ -14,7 +14,7 @@ from numpy import *
 import json
 
 # reading the data from the file
-with open('../Simulation/Vollständige Kreisläufe/Einfacher Kreislauf mit IHX/IHX.txt') as f:
+with open('../Simulation/Vollständige Kreisläufe/mit interner Wärmerückgewinnung/IWR.txt') as f:
     read = f.readlines()
 
 #data_R601 = json.loads(read[1])

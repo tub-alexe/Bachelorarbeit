@@ -5,10 +5,8 @@ from CoolProp.CoolProp import PropsSI as CPSI
 from tespy.tools import ExergyAnalysis
 import plotly.graph_objects as go
 
-wf = 'REFPROP::Pentane'
-si = 'H2O'
-fld_wf = {wf: 1, si: 0}
-fld_si = {wf: 0, si: 1}
+wf = 'REFPROP::R1336mzz(Z)'
+si = 'REFPROP::H2O'
 
 # Definition des Netwerks
 nw = Network(fluids=[wf, si], T_unit='C', p_unit='bar', h_unit='kJ / kg', m_unit='kg / s', Q_unit='kW')
@@ -55,21 +53,21 @@ VD.set_attr(pr1=1, pr2=1)
 KP.set_attr(eta_s=0.76)
 
 # Setzen Startparameter der Verbindungen des Kreislaufs
-h_c26 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+168, wf) * 1e-3
-c26.set_attr(h=h_c26, p=4.706, fluid={'Pentane': 1, 'H2O': 0})
+h_c26 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+155, wf) * 1e-3
+c26.set_attr(h=h_c26, p=5.5516, fluid={'R1336mzz(Z)': 1, 'H2O': 0})
 
-h_c22 = CPSI("H", "P", 34 * 1e5, "T", 273.15+178, wf) * 1e-3
-c22.set_attr(h=h_c22, p=34)
+h_c22 = CPSI("H", "P", 36 * 1e5, "T", 273.15+165, wf) * 1e-3
+c22.set_attr(h=h_c22, p=36)
 
-h_c25 = CPSI("H", "P", 4.706 * 1e5, "T", 273.15+90.1, wf) * 1e-3
+h_c25 = CPSI("H", "P", 5.5516 * 1e5, "T", 273.15+90.1, wf) * 1e-3
 c25.set_attr(h=h_c25)
 
 # Setzen Startparameter der Verbindungen der Quelle
-c11.set_attr(T=95, p=5, fluid={'Pentane': 0, 'H2O': 1})
+c11.set_attr(T=95, p=5, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
 c12.set_attr(T=90)
 
 # Setzen Startparameter der Verbindungen der Senke
-c13.set_attr(T=160, p=20, fluid={'Pentane': 0, 'H2O': 1})
+c13.set_attr(T=160, p=20, fluid={'R1336mzz(Z)': 0, 'H2O': 1})
 c14.set_attr(T=190)
 
 # Lösen des Netzwerks
@@ -77,8 +75,8 @@ nw.solve(mode='design')
 nw.print_results()
 
 # Setzen der Betriebsparameter
-c22.set_attr(h=None, p=None)
-GK.set_attr(ttd_l=10, ttd_u=5)
+c22.set_attr(h=None, p=31.46)
+GK.set_attr(ttd_l=10)
 c25.set_attr(h=None, Td_bp=0.1)
 c26.set_attr(p=None, h=None)
 VD.set_attr(ttd_l=5)
@@ -89,12 +87,12 @@ el = Bus('elektrische Leistung')
 el.add_comps(
     {'comp': KP, 'char': 1, 'base': 'bus'})
 
-wae_zu = Bus('Wärmezufuhr')
+wae_zu = Bus('Wärmequelle')
 wae_zu.add_comps(
     {'comp': qu_ein, 'base': 'bus'},
     {'comp': qu_aus})
 
-wae_ab = Bus('Wärmeabfuhr')
+wae_ab = Bus('Wärmesenke')
 wae_ab.add_comps(
     {'comp': se_ein, 'base': 'bus'},
     {'comp': se_aus})
@@ -121,6 +119,7 @@ fig = go.Figure(go.Sankey(
     arrangement="snap",
     node={
         "label": nodes,
+        "line": dict(width=0.5),
         'pad': 11,
         'color': 'orange'},
     link=links),
@@ -137,19 +136,23 @@ import numpy as np
 
 iterations = 80
 
-param = list(np.linspace(160, 130, iterations))
+param = list(np.linspace(28.5, 35, iterations))
 eta = []
 p_gk = []
 
 
-for x in param:
-    #c22.set_attr(p=x)
-    c13.set_attr(T=x)
-    #c14.set_attr(T=x)
+for p in param:
+    c22.set_attr(p=p)
+    #c13.set_attr(T=p)
+    #c14.set_attr(T=p)
     nw.solve('design')
     ean.analyse(pamb=p_umg, Tamb=T_umg)
     eta += [ean.network_data.loc['epsilon'] * 100]
     p_gk += [nw.get_conn("22").get_attr("p").val]
+
+q = np.array(eta).argmax()
+print('Hochdruck = ', p_gk[q])
+print('exergetischer Wirkungsgrad = ', eta[q])
 
 plt.plot(param, eta, marker='x', color="#1f567d")
 plt.xlabel('Gaskühler-/Kondensatordruck [bar]')
@@ -172,5 +175,9 @@ with open('Senkeneintrittstemperatur.txt', 'a') as convert_file:
 
 f = open("Senkeneintrittstemperatur.txt", "r")
 print(f.read())
+
+
+
+
 
 

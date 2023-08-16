@@ -14,7 +14,8 @@ from numpy import *
 import json
 
 # reading the data from the file
-with open('../Simulation/Vollständige Kreisläufe/Parallelkompression/Senkeneintrittstemperatur.txt') as f:
+with open(
+        '../Simulation/Vollständige Kreisläufe/mit interner Wärmerückgewinnung und Parallelkompression/Senkeneintrittstemperatur.txt') as f:
     read = f.readlines()
 
 data_T160 = json.loads(read[1])
